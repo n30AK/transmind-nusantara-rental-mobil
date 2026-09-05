@@ -1,0 +1,1119 @@
+/* =========================================================
+   TRANSMIND NUSANTARA RENTAL MOBIL
+   MAIN STYLESHEET — GO LIVE
+   ========================================================= */
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #050505;
+    color: #f5f5f5;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+    line-height: 1.5;
+}
+
+img {
+    max-width: 100%;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   VARIABLES
+   ========================================================= */
+
+:root {
+    --gold: #d5ad58;
+    --gold2: #f0d28a;
+
+    --black: #050505;
+    --black2: #0a0a0a;
+    --card: #111;
+    --border: #292929;
+
+    --text: #f5f5f5;
+    --muted: #999;
+
+    --wrap: 1180px;
+}
+
+
+/* =========================================================
+   GLOBAL WRAPPER
+   ========================================================= */
+
+.wrap {
+    width: min(var(--wrap), calc(100% - 48px));
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+
+    background: rgba(5, 5, 5, .88);
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.nav {
+    min-height: 78px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 30px;
+}
+
+
+/* BRAND */
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    flex-shrink: 0;
+}
+
+.brand img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}
+
+.brand span {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand b {
+    color: #fff;
+    font-size: 17px;
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+.brand small {
+    margin-top: 5px;
+
+    color: var(--gold);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+
+/* NAVIGATION */
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+nav a {
+    position: relative;
+
+    color: #ccc;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+
+    transition: color .25s ease;
+}
+
+nav a::after {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+
+    width: 0;
+    height: 1px;
+
+    background: var(--gold);
+
+    transition: width .25s ease;
+}
+
+nav a:hover {
+    color: var(--gold);
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero {
+    position: relative;
+
+    min-height: 680px;
+
+    display: flex;
+    align-items: center;
+
+    overflow: hidden;
+
+    background: #050505;
+}
+
+.hero-video {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    z-index: 0;
+}
+
+.hero-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 1;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0, 0, 0, .90) 0%,
+            rgba(0, 0, 0, .68) 45%,
+            rgba(0, 0, 0, .42) 100%
+        );
+}
+
+.hero-in {
+    position: relative;
+
+    z-index: 2;
+
+    min-height: 680px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 60px;
+
+    padding-top: 78px;
+}
+
+.hero-content {
+    max-width: 650px;
+}
+
+.hero-content label,
+.head label,
+.services-section > .wrap > label,
+.contact-section label {
+    display: block;
+
+    margin-bottom: 14px;
+
+    color: var(--gold);
+
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2.2px;
+}
+
+.hero-content h1 {
+    margin: 0;
+
+    color: #fff;
+
+    font-size: clamp(42px, 6vw, 76px);
+    line-height: 1.02;
+    letter-spacing: -2px;
+}
+
+.hero-content h1 em {
+    color: var(--gold);
+
+    font-style: normal;
+}
+
+.hero-content p {
+    max-width: 570px;
+
+    margin: 25px 0 0;
+
+    color: #c0c0c0;
+
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+.hero-logo {
+    width: min(280px, 28vw);
+
+    opacity: .92;
+
+    filter:
+        drop-shadow(0 20px 50px rgba(0, 0, 0, .7));
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 30px;
+}
+
+.btn {
+    min-height: 44px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 22px;
+
+    border-radius: 4px;
+
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+
+    transition:
+        transform .25s ease,
+        background .25s ease,
+        border-color .25s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn.gold {
+    color: #111;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--gold),
+            var(--gold2)
+        );
+
+    border: 1px solid var(--gold);
+}
+
+.btn.gold:hover {
+    background: var(--gold2);
+}
+
+.btn.outline {
+    color: #fff;
+
+    background: rgba(0, 0, 0, .2);
+
+    border: 1px solid rgba(255, 255, 255, .35);
+}
+
+.btn.outline:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.btn.full {
+    width: 100%;
+}
+
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+.section {
+    position: relative;
+
+    padding: 100px 0;
+}
+
+.booking-section {
+    background: #080808;
+}
+
+.fleet-section {
+    background: #050505;
+}
+
+.services-section {
+    background: #090909;
+}
+
+.contact-section {
+    background: #050505;
+}
+
+
+/* SECTION HEAD */
+
+.head {
+    max-width: 720px;
+
+    margin-bottom: 40px;
+}
+
+.head h2,
+.services-section h2,
+.contact-section h2 {
+    margin: 0;
+
+    color: #fff;
+
+    font-size: clamp(30px, 4vw, 46px);
+    line-height: 1.1;
+    letter-spacing: -1px;
+}
+
+.head p {
+    margin: 15px 0 0;
+
+    color: var(--muted);
+
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   BOOKING
+   ========================================================= */
+
+.booking {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+
+    padding: 30px;
+
+    background: #101010;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.booking > div {
+    min-width: 0;
+}
+
+.booking > div > label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #ddd;
+
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+}
+
+.booking input,
+.booking select {
+    width: 100%;
+    height: 46px;
+
+    padding: 0 14px;
+
+    color: #fff;
+
+    background: #080808;
+
+    border: 1px solid #303030;
+    border-radius: 5px;
+
+    outline: none;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.booking input::placeholder {
+    color: #666;
+}
+
+.booking input:focus,
+.booking select:focus {
+    border-color: var(--gold);
+
+    box-shadow:
+        0 0 0 2px rgba(213, 173, 88, .08);
+}
+
+.booking select option {
+    background: #111;
+    color: #fff;
+}
+
+.vehicle-info {
+    min-height: 38px;
+
+    padding-top: 8px;
+
+    color: #888;
+
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.booking .full {
+    grid-column: 1 / -1;
+
+    margin-top: 4px;
+}
+
+.result {
+    grid-column: 1 / -1;
+
+    min-height: 20px;
+
+    margin: 0;
+
+    color: var(--gold);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   ARMADA VIDEO
+   ========================================================= */
+
+.section-video {
+    width: 100%;
+
+    margin: 0 0 38px;
+
+    overflow: hidden;
+
+    background: #080808;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.section-video video {
+    display: block;
+
+    width: 100%;
+    height: 420px;
+
+    object-fit: cover;
+
+    background: #000;
+}
+
+
+/* =========================================================
+   FLEET STATUS
+   ========================================================= */
+
+.fleet-status {
+    margin-bottom: 25px;
+
+    color: var(--gold);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   VEHICLE GRID — 26 ARMADA
+   ========================================================= */
+
+.grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 24px;
+
+    width: 100%;
+}
+
+
+/* =========================================================
+   VEHICLE CARD
+   ========================================================= */
+
+.car {
+    min-width: 0;
+
+    overflow: hidden;
+
+    background: #111;
+
+    border: 1px solid #292929;
+    border-radius: 10px;
+
+    transition:
+        transform .3s ease,
+        border-color .3s ease,
+        box-shadow .3s ease;
+}
+
+.car:hover {
+    transform: translateY(-5px);
+
+    border-color: rgba(213, 173, 88, .65);
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, .4);
+}
+
+
+/* PHOTO */
+
+.photo {
+    position: relative;
+
+    width: 100%;
+    height: 230px;
+
+    overflow: hidden;
+
+    background: #090909;
+}
+
+.photo img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center;
+
+    transition: transform .4s ease;
+}
+
+.car:hover .photo img {
+    transform: scale(1.035);
+}
+
+
+/* CARD INFORMATION */
+
+.ci {
+    padding: 20px;
+}
+
+.ci > b {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--gold);
+
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+}
+
+.ci > h3 {
+    margin: 0 0 8px;
+
+    color: #fff;
+
+    font-size: 18px;
+    line-height: 1.3;
+}
+
+.ci > p {
+    margin: 0 0 18px;
+
+    color: #999;
+
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+
+/* CARD BUTTON */
+
+.ci button {
+    width: 100%;
+    height: 42px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--gold),
+            var(--gold2)
+        );
+
+    color: #111;
+
+    border: 0;
+    border-radius: 4px;
+
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    transition: .25s;
+}
+
+.ci button:hover {
+    transform: translateY(-1px);
+
+    background: var(--gold2);
+}
+
+
+/* =========================================================
+   SERVICES
+   ========================================================= */
+
+.services-section h2 {
+    max-width: 750px;
+
+    margin-bottom: 40px;
+}
+
+.services {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.services article {
+    min-height: 220px;
+
+    padding: 26px;
+
+    background: #101010;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    transition:
+        transform .25s ease,
+        border-color .25s ease;
+}
+
+.services article:hover {
+    transform: translateY(-4px);
+
+    border-color:
+        rgba(213, 173, 88, .55);
+}
+
+.services article > b {
+    color: var(--gold);
+
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+.services article h3 {
+    margin: 25px 0 10px;
+
+    color: #fff;
+
+    font-size: 19px;
+}
+
+.services article p {
+    margin: 0;
+
+    color: #999;
+
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   CONTACT
+   ========================================================= */
+
+.contact {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.4fr)
+        minmax(280px, .8fr);
+
+    gap: 70px;
+}
+
+.contact-section h2 {
+    margin-bottom: 20px;
+}
+
+.contact-section p {
+    max-width: 650px;
+
+    color: #999;
+
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.contact-section p b {
+    color: #fff;
+}
+
+.address {
+    padding: 30px;
+
+    background: #101010;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.address > b {
+    display: block;
+
+    margin-bottom: 12px;
+
+    color: var(--gold);
+
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.address p {
+    margin-bottom: 25px;
+}
+
+.payment-box {
+    max-width: 480px;
+
+    margin-top: 30px;
+    padding: 22px;
+
+    background: #101010;
+
+    border: 1px solid var(--border);
+    border-radius: 7px;
+}
+
+.payment-box > b {
+    color: var(--gold);
+
+    font-size: 10px;
+    letter-spacing: 1.5px;
+}
+
+.payment-box p {
+    margin: 8px 0;
+
+    font-size: 12px;
+}
+
+.payment-box strong {
+    color: #fff;
+
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+footer {
+    padding: 45px 0;
+
+    background: #030303;
+
+    border-top: 1px solid #1d1d1d;
+}
+
+footer b {
+    color: #fff;
+
+    font-size: 11px;
+    letter-spacing: 1.5px;
+}
+
+footer p {
+    margin: 8px 0 20px;
+
+    color: #777;
+
+    font-size: 12px;
+}
+
+footer small {
+    color: #555;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .nav {
+        min-height: 70px;
+    }
+
+    nav {
+        gap: 18px;
+    }
+
+    .hero {
+        min-height: 620px;
+    }
+
+    .hero-in {
+        min-height: 620px;
+    }
+
+    .hero-logo {
+        width: 220px;
+    }
+
+    .grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .services {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .wrap {
+        width: min(
+            var(--wrap),
+            calc(100% - 30px)
+        );
+    }
+
+    header {
+        position: relative;
+    }
+
+    .nav {
+        min-height: auto;
+
+        padding: 15px 0;
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 14px;
+    }
+
+    nav {
+        width: 100%;
+
+        display: flex;
+
+        gap: 14px;
+
+        overflow-x: auto;
+
+        padding-bottom: 3px;
+    }
+
+    nav a {
+        flex-shrink: 0;
+
+        font-size: 9px;
+    }
+
+    .hero {
+        min-height: 600px;
+    }
+
+    .hero-in {
+        min-height: 600px;
+
+        flex-direction: column;
+
+        justify-content: center;
+
+        align-items: flex-start;
+
+        gap: 30px;
+
+        padding-top: 35px;
+        padding-bottom: 35px;
+    }
+
+    .hero-content h1 {
+        font-size: 43px;
+
+        letter-spacing: -1.5px;
+    }
+
+    .hero-content p {
+        font-size: 13px;
+    }
+
+    .hero-logo {
+        width: 150px;
+
+        align-self: center;
+    }
+
+    .actions {
+        width: 100%;
+
+        flex-direction: column;
+    }
+
+    .actions .btn {
+        width: 100%;
+    }
+
+    .section {
+        padding: 70px 0;
+    }
+
+    .booking {
+        grid-template-columns: 1fr;
+
+        padding: 20px;
+    }
+
+    .booking .full,
+    .result {
+        grid-column: auto;
+    }
+
+    .section-video video {
+        height: 250px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+
+        gap: 18px;
+    }
+
+    .photo {
+        height: 230px;
+    }
+
+    .services {
+        grid-template-columns: 1fr;
+    }
+
+    .contact {
+        grid-template-columns: 1fr;
+
+        gap: 35px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .brand b {
+        font-size: 15px;
+    }
+
+    .brand small {
+        font-size: 7px;
+    }
+
+    .hero-content h1 {
+        font-size: 38px;
+    }
+
+    .section-video video {
+        height: 210px;
+    }
+
+}
