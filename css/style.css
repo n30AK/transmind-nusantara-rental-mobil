@@ -1059,3 +1059,494 @@ section[id]{
         transition:none!important;
     }
 }
+/* =========================================================
+   TRANSMIND PREMIUM V2
+   ========================================================= */
+
+.hero-copy{
+    position:relative;
+    z-index:2;
+}
+
+.hero-note{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:30px;
+    color:#777873;
+    font-size:9px;
+    letter-spacing:.16em;
+}
+
+.hero-note span{
+    width:28px;
+    height:1px;
+    background:var(--gold);
+}
+
+.hero-visual{
+    min-height:470px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+}
+
+.hero-orbit{
+    position:absolute;
+    width:390px;
+    height:390px;
+    border:1px solid rgba(201,170,103,.2);
+    border-radius:50%;
+}
+
+.hero-orbit:before{
+    content:"";
+    position:absolute;
+    inset:45px;
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:50%;
+}
+
+.hero-caption{
+    position:absolute;
+    right:0;
+    bottom:45px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    padding:15px 18px;
+    border-left:1px solid var(--gold);
+    background:rgba(10,11,13,.7);
+}
+
+.hero-caption b{
+    font-size:9px;
+    letter-spacing:.16em;
+    color:var(--gold-soft);
+}
+
+.hero-caption span{
+    font-size:10px;
+    color:#8e8f8a;
+}
+
+
+/* TRUST */
+
+.trust-strip{
+    border-bottom:1px solid var(--line);
+    background:#0d0f12;
+}
+
+.trust-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+}
+
+.trust-grid div{
+    padding:25px 20px;
+    border-right:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.trust-grid div:first-child{
+    border-left:1px solid var(--line);
+}
+
+.trust-grid strong{
+    color:var(--gold);
+    font-size:9px;
+    letter-spacing:.12em;
+}
+
+.trust-grid span{
+    font-size:11px;
+    color:#c5c5bf;
+}
+
+
+/* MOBILITY */
+
+.mobility-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.lux-card{
+    min-height:270px;
+    padding:28px;
+    border:1px solid var(--line);
+    border-radius:20px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.035),
+            rgba(255,255,255,.012)
+        );
+    position:relative;
+    overflow:hidden;
+    transition:.3s ease;
+}
+
+.lux-card:hover{
+    transform:translateY(-5px);
+    border-color:var(--line-gold);
+}
+
+.lux-card.active-service{
+    background:
+        linear-gradient(
+            145deg,
+            rgba(201,170,103,.1),
+            rgba(255,255,255,.02)
+        );
+}
+
+.card-number{
+    position:absolute;
+    top:22px;
+    right:25px;
+    color:#555750;
+    font-size:10px;
+}
+
+.card-kicker{
+    color:var(--gold);
+    font-size:8px;
+    letter-spacing:.18em;
+}
+
+.lux-card h3{
+    margin:14px 0 10px;
+    font-family:"Playfair Display",Georgia,serif;
+    font-size:31px;
+    font-weight:500;
+}
+
+.lux-card p{
+    color:var(--muted);
+    font-size:12px;
+    max-width:300px;
+}
+
+.lux-card a{
+    display:inline-block;
+    margin-top:12px;
+    color:var(--gold-soft);
+    font-size:9px;
+    letter-spacing:.12em;
+}
+
+.future-label{
+    display:inline-block;
+    margin-top:12px;
+    color:#777873;
+    font-size:8px;
+    letter-spacing:.12em;
+}
+
+
+/* JOURNEY */
+
+.journey-section{
+    background:
+        radial-gradient(
+            circle at 80% 50%,
+            rgba(201,170,103,.08),
+            transparent 30%
+        );
+}
+
+.journey-layout{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:100px;
+    align-items:center;
+}
+
+.journey-copy h2{
+    margin:15px 0 20px;
+    font-family:"Playfair Display",Georgia,serif;
+    font-size:clamp(38px,4vw,60px);
+    font-weight:500;
+    line-height:1.08;
+}
+
+.journey-copy h2 em{
+    color:var(--gold-soft);
+    font-weight:500;
+}
+
+.journey-copy p{
+    color:var(--muted);
+    max-width:520px;
+    margin-bottom:28px;
+}
+
+.journey-flow{
+    padding:20px 0;
+}
+
+.flow-item{
+    display:flex;
+    align-items:center;
+    gap:22px;
+}
+
+.flow-item > span{
+    width:48px;
+    height:48px;
+    border:1px solid var(--line-gold);
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--gold);
+    font-size:9px;
+}
+
+.flow-item div{
+    display:flex;
+    flex-direction:column;
+}
+
+.flow-item b{
+    font-size:11px;
+    letter-spacing:.16em;
+}
+
+.flow-item small{
+    margin-top:4px;
+    color:#777873;
+    font-size:10px;
+}
+
+.flow-line{
+    height:42px;
+    width:1px;
+    margin-left:24px;
+    background:var(--line);
+}
+
+
+/* BOOKING V2 */
+
+.booking-intro{
+    display:grid;
+    grid-template-columns:1fr .6fr;
+    gap:70px;
+    align-items:end;
+    margin-bottom:38px;
+}
+
+.booking-benefits{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+}
+
+.booking-benefits div{
+    padding-left:15px;
+    border-left:1px solid var(--line-gold);
+}
+
+.booking-benefits span{
+    display:block;
+    color:var(--gold);
+    font-size:8px;
+}
+
+.booking-benefits b{
+    display:block;
+    margin-top:5px;
+    font-size:11px;
+}
+
+.booking-benefits small{
+    color:#777873;
+    font-size:9px;
+}
+
+.booking-price{
+    padding:14px 0;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+}
+
+.booking-price span{
+    color:#777873;
+    font-size:8px;
+    letter-spacing:.12em;
+}
+
+.booking-price strong{
+    color:var(--gold-soft);
+    font-size:18px;
+}
+
+.booking-result{
+    color:var(--gold-soft);
+    font-size:12px;
+}
+
+
+/* CONCIERGE */
+
+.concierge-section{
+    background:#0d0f12;
+}
+
+.concierge{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:100px;
+    align-items:center;
+}
+
+.concierge h2{
+    margin:14px 0;
+    font-family:"Playfair Display",Georgia,serif;
+    font-size:clamp(40px,4vw,58px);
+    font-weight:500;
+    line-height:1.08;
+}
+
+.concierge p{
+    color:var(--muted);
+    max-width:520px;
+    margin-bottom:28px;
+}
+
+.concierge-list{
+    border-top:1px solid var(--line);
+}
+
+.concierge-list div{
+    padding:19px 0;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    gap:25px;
+    color:#c8c8c2;
+    font-size:13px;
+}
+
+.concierge-list span{
+    color:var(--gold);
+    font-size:9px;
+}
+
+
+/* FOOTER V2 */
+
+.footer-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:30px;
+    align-items:center;
+}
+
+.footer-grid b{
+    color:var(--gold-soft);
+    letter-spacing:.16em;
+}
+
+.footer-grid p{
+    color:#696a66;
+    margin:5px 0 0;
+}
+
+.footer-grid > div:nth-child(2){
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    color:#696a66;
+    font-size:8px;
+    letter-spacing:.13em;
+}
+
+.footer-grid small{
+    display:block;
+    text-align:right;
+    color:#60615e;
+}
+
+
+/* RESPONSIVE V2 */
+
+@media(max-width:900px){
+
+    .mobility-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .journey-layout,
+    .concierge{
+        grid-template-columns:1fr;
+        gap:50px;
+    }
+
+    .booking-intro{
+        grid-template-columns:1fr;
+        gap:20px;
+    }
+
+    .trust-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .trust-grid div:nth-child(2){
+        border-right:0;
+    }
+}
+
+@media(max-width:680px){
+
+    .hero-visual{
+        min-height:280px;
+    }
+
+    .hero-orbit{
+        width:240px;
+        height:240px;
+    }
+
+    .hero-caption{
+        right:10px;
+        bottom:10px;
+    }
+
+    .mobility-grid{
+        grid-template-columns:1fr;
+    }
+
+    .booking-benefits{
+        grid-template-columns:1fr;
+    }
+
+    .trust-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .trust-grid div{
+        border-bottom:1px solid var(--line);
+    }
+
+    .footer-grid{
+        grid-template-columns:1fr;
+        gap:20px;
+    }
+
+    .footer-grid > div:nth-child(2){
+        justify-content:flex-start;
+        flex-wrap:wrap;
+    }
+
+    .footer-grid small{
+        text-align:left;
+    }
+}
