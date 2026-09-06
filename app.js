@@ -1,3 +1,4 @@
+```javascript
 /* =========================================================
    TRANSMIND NUSANTARA RENTAL MOBIL
    APP.JS — GO LIVE FINAL
@@ -1205,6 +1206,12 @@ function openUnavailableWhatsApp(
         );
 
 
+    console.log(
+        'MEMBUKA WHATSAPP KENDARAAN TIDAK TERSEDIA:',
+        url
+    );
+
+
     window.location.href =
         url;
 
@@ -1221,15 +1228,29 @@ async function sendBookingEmail(
     result
 ) {
 
+    console.log(
+        'EMAIL BOOKING: MEMULAI PROSES...'
+    );
+
+
     try {
 
         if (!sb) {
 
+            const message =
+                'Supabase client belum tersedia.';
+
+
             console.warn(
-                'EMAIL BOOKING: Supabase client belum tersedia.'
+                'EMAIL BOOKING GAGAL:',
+                message
             );
 
-            return;
+
+            return {
+                success: false,
+                error: message
+            };
 
         }
 
@@ -1358,21 +1379,43 @@ async function sendBookingEmail(
         };
 
 
+        /* =====================================================
+           VALIDASI BOOKING CODE
+           ===================================================== */
+
         if (!payload.bookingCode) {
 
+            const message =
+                'bookingCode kosong.';
+
+
             console.error(
-                'EMAIL BOOKING DIBATALKAN: bookingCode kosong.',
+                'EMAIL BOOKING GAGAL:',
+                message,
                 result
             );
 
-            return;
+
+            return {
+                success: false,
+                error: message
+            };
 
         }
 
 
         console.log(
-            'MENGIRIM NOTIFIKASI EMAIL:',
+            'EMAIL BOOKING: PAYLOAD SIAP:',
             payload
+        );
+
+
+        /* =====================================================
+           PANGGIL EDGE FUNCTION
+           ===================================================== */
+
+        console.log(
+            'EMAIL BOOKING: MEMANGGIL send-booking-email...'
         );
 
 
@@ -1393,6 +1436,19 @@ async function sendBookingEmail(
             response?.error;
 
 
+        console.log(
+            'EMAIL BOOKING: RESPONSE EDGE FUNCTION:',
+            {
+                data: data,
+                error: error
+            }
+        );
+
+
+        /* =====================================================
+           ERROR SUPABASE
+           ===================================================== */
+
         if (error) {
 
             console.error(
@@ -1400,15 +1456,62 @@ async function sendBookingEmail(
                 error
             );
 
-            return;
+
+            return {
+                success: false,
+                error:
+                    error?.message ||
+                    'Edge Function gagal dipanggil.'
+            };
 
         }
 
+
+        /* =====================================================
+           ERROR DARI EDGE FUNCTION
+           ===================================================== */
+
+        if (
+            data &&
+            data.success === false
+        ) {
+
+            const message =
+                data.error ||
+                data.message ||
+                'Edge Function menolak pengiriman email.';
+
+
+            console.error(
+                'EMAIL BOOKING GAGAL:',
+                message,
+                data
+            );
+
+
+            return {
+                success: false,
+                error: message,
+                data: data
+            };
+
+        }
+
+
+        /* =====================================================
+           BERHASIL
+           ===================================================== */
 
         console.log(
             'EMAIL BOOKING BERHASIL DIKIRIM:',
             data
         );
+
+
+        return {
+            success: true,
+            data: data
+        };
 
 
     } catch (error) {
@@ -1417,6 +1520,14 @@ async function sendBookingEmail(
             'SEND BOOKING EMAIL ERROR:',
             error
         );
+
+
+        return {
+            success: false,
+            error:
+                error?.message ||
+                'Unknown email error'
+        };
 
     }
 
@@ -1480,10 +1591,19 @@ async function submitBooking(event) {
     try {
 
         console.log(
+            '=========================================='
+        );
+
+
+        console.log(
             'MENGIRIM BOOKING:',
             data
         );
 
+
+        /* =====================================================
+           CREATE BOOKING
+           ===================================================== */
 
         const response =
             await sb.rpc(
@@ -1542,7 +1662,10 @@ async function submitBooking(event) {
 
             resultBox.textContent =
                 'Terjadi kesalahan sistem: ' +
-                error.message;
+                (
+                    error?.message ||
+                    'Unknown error'
+                );
 
 
             return;
@@ -1633,33 +1756,168 @@ async function submitBooking(event) {
                 '-'
             ) +
 
-            '</b>';
+            '</b>' +
+
+            '<br><br>' +
+
+            'Mengirim konfirmasi ke email Transmind...';
 
 
         /* =================================================
            EMAIL OTOMATIS
+           PENTING:
+           WAJIB DI-AWAIT
            ================================================= */
 
-        sendBookingEmail(
-            data,
-            result
+        console.log(
+            '=========================================='
         );
+
+
+        console.log(
+            'EMAIL BOOKING: MENUNGGU PENGIRIMAN EMAIL...'
+        );
+
+
+        const emailResult =
+            await sendBookingEmail(
+                data,
+                result
+            );
+
+
+        if (emailResult?.success) {
+
+            console.log(
+                '=========================================='
+            );
+
+
+            console.log(
+                'EMAIL BOOKING: BERHASIL'
+            );
+
+
+            console.log(
+                'EMAIL BOOKING DATA:',
+                emailResult.data
+            );
+
+
+            resultBox.innerHTML =
+                '<b>Booking berhasil dibuat.</b>' +
+
+                '<br><br>' +
+
+                'Kode Booking: ' +
+
+                '<b>' +
+
+                escapeHtml(
+                    result.booking_code ||
+                    '-'
+                ) +
+
+                '</b>' +
+
+                '<br><br>' +
+
+                'Kendaraan: ' +
+
+                '<b>' +
+
+                escapeHtml(
+                    result.vehicle_name ||
+                    data.vehicleName ||
+                    '-'
+                ) +
+
+                '</b>' +
+
+                '<br><br>' +
+
+                '✓ Notifikasi email berhasil dikirim.';
+
+
+        } else {
+
+            console.warn(
+                '=========================================='
+            );
+
+
+            console.warn(
+                'EMAIL BOOKING: GAGAL'
+            );
+
+
+            console.warn(
+                'ALASAN:',
+                emailResult?.error ||
+                'Tidak diketahui'
+            );
+
+
+            /*
+             * BOOKING TETAP BERHASIL.
+             * Kegagalan email tidak membatalkan booking.
+             */
+
+            resultBox.innerHTML =
+                '<b>Booking berhasil dibuat.</b>' +
+
+                '<br><br>' +
+
+                'Kode Booking: ' +
+
+                '<b>' +
+
+                escapeHtml(
+                    result.booking_code ||
+                    '-'
+                ) +
+
+                '</b>' +
+
+                '<br><br>' +
+
+                'Kendaraan: ' +
+
+                '<b>' +
+
+                escapeHtml(
+                    result.vehicle_name ||
+                    data.vehicleName ||
+                    '-'
+                ) +
+
+                '</b>' +
+
+                '<br><br>' +
+
+                '⚠ Booking tersimpan, tetapi notifikasi email belum berhasil dikirim.';
+
+        }
 
 
         /* =================================================
            WHATSAPP
+           SEKARANG DIBUKA SETELAH EMAIL SELESAI
            ================================================= */
 
-        setTimeout(
-            () => {
+        console.log(
+            '=========================================='
+        );
 
-                openSuccessWhatsApp(
-                    data,
-                    result
-                );
 
-            },
-            800
+        console.log(
+            'MEMBUKA WHATSAPP SETELAH PROSES EMAIL SELESAI...'
+        );
+
+
+        openSuccessWhatsApp(
+            data,
+            result
         );
 
 
@@ -1888,3 +2146,4 @@ document.addEventListener(
     'DOMContentLoaded',
     init
 );
+```
