@@ -1245,7 +1245,123 @@ Terima kasih.`;
         url;
 
 }
+/* =========================================================
+   KIRIM EMAIL BOOKING
+   TAMBAHAN - TIDAK MENGUBAH SISTEM BOOKING
+   ========================================================= */
 
+async function sendBookingEmail(
+    formData,
+    result
+) {
+
+    try {
+
+        if (!sb) {
+
+            console.warn(
+                'EMAIL BOOKING: Supabase client belum tersedia.'
+            );
+
+            return;
+
+        }
+
+
+        const payload = {
+
+            booking_code:
+                result?.booking_code || '',
+
+            status:
+                result?.status || 'CONFIRMED',
+
+            customer_name:
+                formData?.name || '',
+
+            customer_phone:
+                formData?.phone || '',
+
+            vehicle_name:
+                result?.vehicle_name ||
+                formData?.vehicleName ||
+                '',
+
+            unit_code:
+                result?.unit_code ||
+                '',
+
+            source_type:
+                result?.source_type ||
+                '',
+
+            service:
+                formData?.service || '',
+
+            start_at:
+                result?.start_at ||
+                formData?.start ||
+                '',
+
+            end_at:
+                result?.end_at ||
+                formData?.end ||
+                '',
+
+            area:
+                formData?.area || '',
+
+            notes:
+                formData?.notes || ''
+
+        };
+
+
+        console.log(
+            'MENGIRIM NOTIFIKASI EMAIL:',
+            payload
+        );
+
+
+        const {
+            data,
+            error
+        } = await sb.functions.invoke(
+            'send-booking-email',
+            {
+                body: payload
+            }
+        );
+
+
+        if (error) {
+
+            console.error(
+                'EMAIL BOOKING GAGAL:',
+                error
+            );
+
+            return;
+
+        }
+
+
+        console.log(
+            'EMAIL BOOKING RESULT:',
+            data
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            'SEND BOOKING EMAIL ERROR:',
+            error
+        );
+
+    }
+
+}
 
 /* =========================================================
    SUBMIT BOOKING
@@ -1481,7 +1597,14 @@ async function submitBooking(event) {
 
         `;
 
+/* =================================================
+   EMAIL NOTIFICATION
+   ================================================= */
 
+sendBookingEmail(
+    data,
+    result
+);
         /* =================================================
            WHATSAPP
            ================================================= */
