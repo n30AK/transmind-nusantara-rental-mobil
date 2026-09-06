@@ -1117,3 +1117,448 @@ footer small {
     }
 
 }
+/* =========================================================
+   TRANSMIND NUSANTARA
+   ARMADA DISPLAY — PREMIUM FULL VEHICLE
+   ========================================================= */
+
+
+/* =========================================================
+   GRID ARMADA
+   ========================================================= */
+
+#cars {
+    width: 100%;
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 28px;
+
+    align-items: stretch;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   CARD ARMADA
+   ========================================================= */
+
+#cars .car-card {
+    width: 100%;
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    background:
+        linear-gradient(
+            180deg,
+            #0d0d0d 0%,
+            #080808 100%
+        );
+
+    border:
+        1px solid
+        rgba(201, 162, 39, 0.16);
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+
+#cars .car-card:hover {
+
+    transform:
+        translateY(-4px);
+
+    border-color:
+        rgba(201, 162, 39, .55);
+
+    box-shadow:
+        0 12px 32px
+        rgba(0, 0, 0, .45);
+}
+
+
+/* =========================================================
+   AREA FOTO
+   ========================================================= */
+
+#cars .car-image {
+
+    display: block;
+
+    width: 100%;
+
+    /*
+     * Semua kartu mempunyai
+     * tinggi area foto yang sama.
+     */
+    aspect-ratio: 16 / 10;
+
+    height: auto;
+
+    /*
+     * PENTING:
+     * Seluruh kendaraan tetap terlihat.
+     */
+    object-fit: contain;
+
+    object-position: center center;
+
+    /*
+     * Background hitam menyatu
+     * dengan tema website.
+     */
+    background:
+        #111;
+
+    margin: 0;
+
+    padding: 0;
+
+    border: 0;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   CONTENT CARD
+   ========================================================= */
+
+#cars .car-content {
+
+    display: flex;
+
+    flex-direction: column;
+
+    flex: 1;
+
+    padding:
+        18px
+        18px
+        20px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   NAMA KENDARAAN
+   ========================================================= */
+
+#cars .car-content h3 {
+
+    margin:
+        0
+        0
+        10px;
+
+    min-height: 50px;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    color:
+        #ffffff;
+
+    font-size:
+        19px;
+
+    line-height:
+        1.3;
+
+    font-weight:
+        700;
+
+}
+
+
+/* =========================================================
+   KATEGORI
+   ========================================================= */
+
+#cars .car-category {
+
+    margin:
+        0
+        0
+        8px;
+
+    min-height:
+        24px;
+
+    color:
+        #dddddd;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.5;
+}
+
+
+/* =========================================================
+   KAPASITAS
+   ========================================================= */
+
+#cars .car-capacity {
+
+    margin:
+        0
+        0
+        18px;
+
+    min-height:
+        24px;
+
+    color:
+        #f0f0f0;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.5;
+}
+
+
+/* =========================================================
+   TOMBOL
+   ========================================================= */
+
+#cars .car-content .btn {
+
+    margin-top:
+        auto;
+
+    align-self:
+        flex-start;
+
+    min-width:
+        140px;
+
+    min-height:
+        44px;
+
+    padding:
+        11px
+        20px;
+
+    border:
+        0;
+
+    border-radius:
+        5px;
+
+    cursor:
+        pointer;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        1px;
+
+    text-transform:
+        uppercase;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+
+/* =========================================================
+   GOLD BUTTON
+   ========================================================= */
+
+#cars .car-content .btn.gold {
+
+    background:
+        linear-gradient(
+            135deg,
+            #c9a227 0%,
+            #e8c66a 100%
+        );
+
+    color:
+        #111111;
+
+    box-shadow:
+        0 5px 15px
+        rgba(201, 162, 39, .15);
+}
+
+
+#cars .car-content .btn.gold:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 8px 22px
+        rgba(201, 162, 39, .28);
+}
+
+
+#cars .car-content .btn.gold:active {
+
+    transform:
+        translateY(0);
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+#cars .fleet-empty {
+
+    grid-column:
+        1 / -1;
+
+    padding:
+        50px
+        20px;
+
+    text-align:
+        center;
+
+    color:
+        #c9a227;
+
+    border:
+        1px dashed
+        rgba(201, 162, 39, .35);
+
+    border-radius:
+        10px;
+
+    background:
+        #080808;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
+    #cars {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap:
+            22px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 680px) {
+
+    #cars {
+
+        grid-template-columns:
+            1fr;
+
+        gap:
+            20px;
+    }
+
+
+    #cars .car-image {
+
+        aspect-ratio:
+            16 / 10;
+    }
+
+
+    #cars .car-content {
+
+        padding:
+            16px;
+    }
+
+
+    #cars .car-content h3 {
+
+        min-height:
+            auto;
+
+        font-size:
+            19px;
+    }
+
+
+    #cars .car-category,
+    #cars .car-capacity {
+
+        min-height:
+            auto;
+
+        font-size:
+            14px;
+    }
+
+
+    #cars .car-content .btn {
+
+        width:
+            100%;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 400px) {
+
+    #cars {
+
+        gap:
+            16px;
+    }
+
+
+    #cars .car-image {
+
+        aspect-ratio:
+            16 / 10;
+    }
+
+
+    #cars .car-content {
+
+        padding:
+            14px;
+    }
+
+}
