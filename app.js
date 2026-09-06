@@ -1,4 +1,3 @@
-```javascript
 /* =========================================================
    TRANSMIND NUSANTARA RENTAL MOBIL
    APP.JS — GO LIVE FINAL
@@ -95,49 +94,27 @@ function openBookingEmail() {
     const subject =
         'Permintaan Booking Rental Mobil - Transmind Nusantara';
 
-
     const body = [
-
-        'Yth. Tim Booking Transmind Nusantara Rental Mobil,',
-
+        'Yth. Tim Booking Transmind Nusantara Rental Mobil.',
         '',
-
         'Saya ingin mengajukan permintaan booking dengan data sebagai berikut:',
-
         '',
-
         'Nama :',
-
         'No. WhatsApp :',
-
         'Kendaraan :',
-
         'Layanan :',
-
         'Tanggal Mulai :',
-
         'Tanggal Selesai :',
-
         'Area :',
-
         '',
-
         'Catatan / Kebutuhan Khusus :',
-
         '',
-
         'Mohon informasi ketersediaan kendaraan, harga rental, dan ketentuan booking.',
-
         '',
-
         'Terima kasih.',
-
         '',
-
         'Hormat saya.'
-
     ].join('\r\n');
-
 
     openEmailClient(
         EMAIL_BOOKING,
@@ -157,39 +134,22 @@ function openAdminEmail() {
     const subject =
         'Kontak - Transmind Nusantara Rental Mobil';
 
-
     const body = [
-
-        'Yth. Admin Transmind Nusantara Rental Mobil,',
-
+        'Yth. Admin Transmind Nusantara Rental Mobil.',
         '',
-
         'Saya ingin menghubungi pihak Transmind Nusantara mengenai:',
-
         '',
-
         'Nama :',
-
         'No. WhatsApp :',
-
         '',
-
         'Pesan :',
-
         '',
-
         'Mohon informasi atau bantuan mengenai hal tersebut.',
-
         '',
-
         'Terima kasih.',
-
         '',
-
         'Hormat saya.'
-
     ].join('\r\n');
-
 
     openEmailClient(
         EMAIL_ADMIN,
@@ -207,15 +167,10 @@ function openAdminEmail() {
 function configured() {
 
     return Boolean(
-
         window.TRANSMIND_SUPABASE_URL &&
-
         window.TRANSMIND_SUPABASE_URL.startsWith('http') &&
-
         window.TRANSMIND_SUPABASE_ANON_KEY &&
-
         window.TRANSMIND_SUPABASE_ANON_KEY.length > 20
-
     );
 
 }
@@ -233,21 +188,15 @@ function setFleetStatus(
     const status =
         getElement('fleetStatus');
 
-
     if (!status) {
-
         return;
-
     }
-
 
     status.textContent =
         message;
 
-
     status.dataset.status =
         type;
-
 
     console.log(
         'FLEET STATUS:',
@@ -264,17 +213,13 @@ function setFleetStatus(
 function getVehicleImageUrl(vehicle) {
 
     if (!sb) {
-
         return '';
-
     }
-
 
     const imagePath =
         String(
             vehicle?.image_path || ''
         ).trim();
-
 
     if (!imagePath) {
 
@@ -287,31 +232,24 @@ function getVehicleImageUrl(vehicle) {
 
     }
 
-
     try {
 
-        const {
-            data
-        } =
+        const result =
             sb.storage
                 .from(VEHICLE_IMAGE_BUCKET)
                 .getPublicUrl(imagePath);
 
-
         const url =
-            data?.publicUrl || '';
-
+            result?.data?.publicUrl || '';
 
         console.log(
             'IMAGE:',
-            vehicle.name,
+            vehicle?.name,
             '=>',
             imagePath
         );
 
-
         return url;
-
 
     } catch (error) {
 
@@ -320,7 +258,6 @@ function getVehicleImageUrl(vehicle) {
             vehicle?.name,
             error
         );
-
 
         return '';
 
@@ -336,28 +273,21 @@ function getVehicleImageUrl(vehicle) {
 function handleVehicleImageError(img) {
 
     if (!img) {
-
         return;
-
     }
-
 
     console.warn(
         'GAMBAR GAGAL DIMUAT:',
         img.src
     );
 
-
     img.style.display =
         'none';
 
-
     const placeholder =
-        img.parentElement
-            ?.querySelector(
-                '.vehicle-placeholder'
-            );
-
+        img.parentElement?.querySelector(
+            '.vehicle-placeholder'
+        );
 
     if (placeholder) {
 
@@ -376,31 +306,25 @@ function handleVehicleImageError(img) {
 function filterValidVehicles(list) {
 
     if (!Array.isArray(list)) {
-
         return [];
-
     }
-
 
     const vehiclesWithImage =
         list.filter(vehicle => {
 
             const imagePath =
                 String(
-                    vehicle.image_path || ''
+                    vehicle?.image_path || ''
                 ).trim();
-
 
             return Boolean(imagePath);
 
         });
 
-
     console.log(
         'TOTAL ARMADA DENGAN GAMBAR:',
         vehiclesWithImage.length
     );
-
 
     return vehiclesWithImage.slice(
         0,
@@ -412,6 +336,7 @@ function filterValidVehicles(list) {
 
 /* =========================================================
    RENDER ARMADA
+   VERSI AMAN TANPA TEMPLATE LITERAL BERSARANG
    ========================================================= */
 
 function showCars(list) {
@@ -419,17 +344,14 @@ function showCars(list) {
     vehiclesCache =
         filterValidVehicles(list);
 
-
     console.log(
         'ARMADA VALID UNTUK DITAMPILKAN:',
         vehiclesCache.length,
         vehiclesCache
     );
 
-
     const vehicleSelect =
         getElement('vehicle');
-
 
     const cars =
         getElement('cars');
@@ -444,31 +366,22 @@ function showCars(list) {
         vehicleSelect.innerHTML =
             '<option value="">Pilih kendaraan</option>';
 
+        vehiclesCache.forEach(vehicle => {
 
-        vehiclesCache.forEach(
-            vehicle => {
+            const option =
+                document.createElement('option');
 
-                const option =
-                    document.createElement(
-                        'option'
-                    );
+            option.value =
+                vehicle.id || '';
 
+            option.textContent =
+                vehicle.name || 'Kendaraan';
 
-                option.value =
-                    vehicle.id || '';
+            vehicleSelect.appendChild(
+                option
+            );
 
-
-                option.textContent =
-                    vehicle.name ||
-                    'Kendaraan';
-
-
-                vehicleSelect.appendChild(
-                    option
-                );
-
-            }
-        );
+        });
 
     }
 
@@ -494,22 +407,12 @@ function showCars(list) {
 
     if (!vehiclesCache.length) {
 
-        cars.innerHTML = `
-
-            <div class="fleet-empty">
-
-                <strong>
-                    Armada belum tersedia.
-                </strong>
-
-                <br>
-
-                Silakan hubungi
-                Transmind Nusantara.
-
-            </div>
-
-        `;
+        cars.innerHTML =
+            '<div class="fleet-empty">' +
+                '<strong>Armada belum tersedia.</strong>' +
+                '<br>' +
+                'Silakan hubungi Transmind Nusantara.' +
+            '</div>';
 
         return;
 
@@ -520,125 +423,140 @@ function showCars(list) {
        BUAT KARTU ARMADA
        ===================================================== */
 
+    const cards =
+        vehiclesCache.map(vehicle => {
+
+            const name =
+                vehicle?.name ||
+                'Kendaraan';
+
+            const category =
+                vehicle?.category ||
+                'Armada Transmind';
+
+            const capacity =
+                vehicle?.capacity ||
+                'Kapasitas sesuai tipe kendaraan';
+
+            const id =
+                vehicle?.id ||
+                '';
+
+            const imageUrl =
+                getVehicleImageUrl(vehicle);
+
+
+            /* =================================================
+               GAMBAR
+               ================================================= */
+
+            let imageHtml = '';
+
+            if (imageUrl) {
+
+                imageHtml =
+                    '<img ' +
+                    'src="' +
+                    escapeHtml(imageUrl) +
+                    '" ' +
+                    'alt="' +
+                    escapeHtml(name) +
+                    '" ' +
+                    'loading="lazy" ' +
+                    'onerror="handleVehicleImageError(this)"' +
+                    '>';
+
+            }
+
+
+            const placeholderDisplay =
+                imageUrl
+                    ? 'none'
+                    : 'flex';
+
+
+            /* =================================================
+               KARTU
+               ================================================= */
+
+            return (
+                '<article ' +
+                    'class="car" ' +
+                    'data-vehicle-id="' +
+                    escapeHtml(id) +
+                '">' +
+
+                    '<div class="photo">' +
+
+                        imageHtml +
+
+                        '<div ' +
+                            'class="vehicle-placeholder" ' +
+                            'style="' +
+                                'display:' +
+                                placeholderDisplay +
+                                ';' +
+                                'width:100%;' +
+                                'height:220px;' +
+                                'align-items:center;' +
+                                'justify-content:center;' +
+                                'text-align:center;' +
+                                'padding:20px;' +
+                            '">' +
+
+                            '<strong>' +
+                                escapeHtml(name) +
+                            '</strong>' +
+
+                        '</div>' +
+
+                    '</div>' +
+
+                    '<div class="ci">' +
+
+                        '<h3 ' +
+                            'style="' +
+                                'margin:0 0 8px;' +
+                                'color:#ffffff;' +
+                                'font-size:17px;' +
+                                'line-height:1.35;' +
+                            '">' +
+
+                            escapeHtml(name) +
+
+                        '</h3>' +
+
+                        '<b>' +
+                            'JENIS: ' +
+                            escapeHtml(category) +
+                        '</b>' +
+
+                        '<p>' +
+                            escapeHtml(capacity) +
+                            '&nbsp;•&nbsp; Jabodetabek' +
+                        '</p>' +
+
+                        '<button ' +
+                            'type="button" ' +
+                            'class="btn gold" ' +
+                            'data-select-vehicle="' +
+                            escapeHtml(id) +
+                            '">' +
+
+                            'PILIH KENDARAAN' +
+
+                        '</button>' +
+
+                    '</div>' +
+
+                '</article>'
+            );
+
+        });
+
+
     cars.innerHTML =
-        vehiclesCache
-            .map(vehicle => {
-
-                const name =
-                    vehicle.name ||
-                    'Kendaraan';
-
-
-                const category =
-                    vehicle.category ||
-                    'Armada Transmind';
-
-
-                const capacity =
-                    vehicle.capacity ||
-                    'Kapasitas sesuai tipe kendaraan';
-
-
-                const id =
-                    vehicle.id ||
-                    '';
-
-
-                const imageUrl =
-                    getVehicleImageUrl(
-                        vehicle
-                    );
-
-
-                return `
-
-                    <article
-                        class="car"
-                        data-vehicle-id="${escapeHtml(id)}"
-                    >
-
-                        <div class="photo">
-
-                            ${
-                                imageUrl
-                                    ?
-                                `
-                                    <img
-                                        src="${escapeHtml(imageUrl)}"
-                                        alt="${escapeHtml(name)}"
-                                        loading="lazy"
-                                        onerror="handleVehicleImageError(this)"
-                                    >
-                                `
-                                    :
-                                ''
-                            }
-
-                            <div
-                                class="vehicle-placeholder"
-                                style="
-                                    display:${imageUrl ? 'none' : 'flex'};
-                                    width:100%;
-                                    height:220px;
-                                    align-items:center;
-                                    justify-content:center;
-                                    text-align:center;
-                                    padding:20px;
-                                "
-                            >
-
-                                <strong>
-                                    ${escapeHtml(name)}
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="ci">
-
-                            <h3
-                                style="
-                                    margin:0 0 8px;
-                                    color:#ffffff;
-                                    font-size:17px;
-                                    line-height:1.35;
-                                "
-                            >
-                                ${escapeHtml(name)}
-                            </h3>
-
-
-                            <b>
-                                JENIS:
-                                ${escapeHtml(category)}
-                            </b>
-
-
-                            <p>
-                                ${escapeHtml(capacity)}
-                                &nbsp;•&nbsp;
-                                Jabodetabek
-                            </p>
-
-
-                            <button
-                                type="button"
-                                class="btn gold"
-                                data-select-vehicle="${escapeHtml(id)}"
-                            >
-                                PILIH KENDARAAN
-                            </button>
-
-                        </div>
-
-                    </article>
-
-                `;
-
-            })
-            .join('');
+        cards.join('');
 
 
     /* =====================================================
@@ -676,7 +594,6 @@ function selectVehicle(vehicleId) {
     const select =
         getElement('vehicle');
 
-
     if (!select) {
 
         console.error(
@@ -687,10 +604,8 @@ function selectVehicle(vehicleId) {
 
     }
 
-
     select.value =
         vehicleId || '';
-
 
     if (
         select.value !== vehicleId
@@ -705,15 +620,12 @@ function selectVehicle(vehicleId) {
 
     }
 
-
     updateVehicleInfo(
         vehicleId
     );
 
-
     window.location.hash =
         'booking';
-
 
     setTimeout(
         () => {
@@ -736,13 +648,9 @@ function updateVehicleInfo(vehicleId) {
     const priceBox =
         getElement('vehiclePrice');
 
-
     if (!priceBox) {
-
         return;
-
     }
-
 
     if (!vehicleId) {
 
@@ -753,14 +661,12 @@ function updateVehicleInfo(vehicleId) {
 
     }
 
-
     const vehicle =
         vehiclesCache.find(
             item =>
-                String(item.id) ===
+                String(item?.id) ===
                 String(vehicleId)
         );
-
 
     if (!vehicle) {
 
@@ -771,15 +677,18 @@ function updateVehicleInfo(vehicleId) {
 
     }
 
-
     priceBox.textContent =
-        `${vehicle.name} • ${
+        vehicle.name +
+        ' • ' +
+        (
             vehicle.category ||
             'Armada'
-        } • ${
+        ) +
+        ' • ' +
+        (
             vehicle.capacity ||
             'Kapasitas sesuai tipe kendaraan'
-        }`;
+        );
 
 }
 
@@ -795,49 +704,39 @@ async function loadVehicles() {
         'loading'
     );
 
-
     if (!configured()) {
 
         console.error(
             'SUPABASE BELUM DIKONFIGURASI'
         );
 
-
         setFleetStatus(
             'Konfigurasi database belum tersedia.',
             'error'
         );
 
-
         return;
 
     }
 
-
     if (
-
         !window.supabase ||
-
         typeof window.supabase.createClient !==
         'function'
-
     ) {
 
         console.error(
             'SUPABASE LIBRARY TIDAK TERMUAT'
         );
 
-
         setFleetStatus(
             'Library Supabase gagal dimuat.',
             'error'
         );
 
-
         return;
 
     }
-
 
     try {
 
@@ -847,28 +746,17 @@ async function loadVehicles() {
                 window.TRANSMIND_SUPABASE_ANON_KEY
             );
 
-
         console.log(
             'SUPABASE CLIENT BERHASIL DIBUAT'
         );
 
 
-        const {
-            data,
-            error
-        } =
+        const response =
             await sb
                 .from('vehicles')
-                .select(`
-                    id,
-                    name,
-                    slug,
-                    category,
-                    capacity,
-                    active,
-                    sort_order,
-                    image_path
-                `)
+                .select(
+                    'id, name, slug, category, capacity, active, sort_order, image_path'
+                )
                 .not(
                     'image_path',
                     'is',
@@ -886,6 +774,13 @@ async function loadVehicles() {
                         ascending: true
                     }
                 );
+
+
+        const data =
+            response?.data;
+
+        const error =
+            response?.error;
 
 
         if (error) {
@@ -923,16 +818,16 @@ async function loadVehicles() {
                 vehicle => ({
 
                     name:
-                        vehicle.name,
+                        vehicle?.name,
 
                     category:
-                        vehicle.category,
+                        vehicle?.category,
 
                     active:
-                        vehicle.active,
+                        vehicle?.active,
 
                     image_path:
-                        vehicle.image_path
+                        vehicle?.image_path
 
                 })
             )
@@ -957,7 +852,8 @@ async function loadVehicles() {
 
 
         setFleetStatus(
-            `${validVehicles.length} armada tersedia`,
+            validVehicles.length +
+            ' armada tersedia',
             'success'
         );
 
@@ -969,34 +865,24 @@ async function loadVehicles() {
             error
         );
 
-
         setFleetStatus(
             'Gagal memuat armada dari database.',
             'error'
         );
 
-
         const cars =
             getElement('cars');
 
-
         if (cars) {
 
-            cars.innerHTML = `
-
-                <div class="fleet-empty">
-
-                    <strong>
-                        Armada sedang tidak dapat dimuat.
-                    </strong>
-
-                    <br>
-
-                    Silakan refresh halaman.
-
-                </div>
-
-            `;
+            cars.innerHTML =
+                '<div class="fleet-empty">' +
+                    '<strong>' +
+                        'Armada sedang tidak dapat dimuat.' +
+                    '</strong>' +
+                    '<br>' +
+                    'Silakan refresh halaman.' +
+                '</div>';
 
         }
 
@@ -1014,13 +900,11 @@ function getFormData() {
     const vehicleSelect =
         getElement('vehicle');
 
-
     const selectedOption =
         vehicleSelect &&
         vehicleSelect.options[
             vehicleSelect.selectedIndex
         ];
-
 
     return {
 
@@ -1029,46 +913,38 @@ function getFormData() {
                 ?.value
                 .trim() || '',
 
-
         phone:
             getElement('phone')
                 ?.value
                 .trim() || '',
-
 
         vehicleId:
             vehicleSelect
                 ?.value
                 .trim() || '',
 
-
         vehicleName:
             selectedOption
                 ?.textContent
                 .trim() || '',
-
 
         service:
             getElement('service')
                 ?.value
                 .trim() || '',
 
-
         start:
             getElement('start')
                 ?.value || '',
-
 
         end:
             getElement('end')
                 ?.value || '',
 
-
         area:
             getElement('area')
                 ?.value
                 .trim() || '',
-
 
         notes:
             getElement('notes')
@@ -1098,7 +974,6 @@ function validateBooking(
 
     }
 
-
     if (!data.name) {
 
         resultBox.textContent =
@@ -1107,7 +982,6 @@ function validateBooking(
         return false;
 
     }
-
 
     if (!data.phone) {
 
@@ -1118,7 +992,6 @@ function validateBooking(
 
     }
 
-
     if (!data.service) {
 
         resultBox.textContent =
@@ -1127,7 +1000,6 @@ function validateBooking(
         return false;
 
     }
-
 
     if (
         !data.start ||
@@ -1141,7 +1013,6 @@ function validateBooking(
 
     }
 
-
     if (
         data.end < data.start
     ) {
@@ -1152,7 +1023,6 @@ function validateBooking(
         return false;
 
     }
-
 
     return true;
 
@@ -1169,46 +1039,60 @@ function openSuccessWhatsApp(
 ) {
 
     if (Array.isArray(result)) {
-
-        result =
-            result[0];
-
+        result = result[0];
     }
-
 
     const code =
         result?.booking_code ||
         'TRM-BOOKING';
-
 
     const vehicleName =
         result?.vehicle_name ||
         formData?.vehicleName ||
         '-';
 
-
     const message =
-`Halo Transmind Nusantara,
+        'Halo Transmind Nusantara,\n\n' +
 
-Booking saya sudah dibuat.
+        'Booking saya sudah dibuat.\n\n' +
 
-Kode Booking: ${code}
+        'Kode Booking: ' +
+        code +
+        '\n\n' +
 
-Nama: ${formData?.name || '-'}
-WhatsApp: ${formData?.phone || '-'}
+        'Nama: ' +
+        (formData?.name || '-') +
+        '\n' +
 
-Kendaraan: ${vehicleName}
-Layanan: ${formData?.service || '-'}
+        'WhatsApp: ' +
+        (formData?.phone || '-') +
+        '\n\n' +
 
-Tanggal:
-${formData?.start || '-'} s/d ${formData?.end || '-'}
+        'Kendaraan: ' +
+        vehicleName +
+        '\n' +
 
-Area: ${formData?.area || '-'}
-Catatan: ${formData?.notes || '-'}
+        'Layanan: ' +
+        (formData?.service || '-') +
+        '\n\n' +
 
-Mohon konfirmasi booking saya.
+        'Tanggal:\n' +
+        (formData?.start || '-') +
+        ' s/d ' +
+        (formData?.end || '-') +
+        '\n\n' +
 
-Terima kasih.`;
+        'Area: ' +
+        (formData?.area || '-') +
+        '\n' +
+
+        'Catatan: ' +
+        (formData?.notes || '-') +
+        '\n\n' +
+
+        'Mohon konfirmasi booking saya.\n\n' +
+
+        'Terima kasih.';
 
 
     const url =
@@ -1240,25 +1124,35 @@ function openUnavailableWhatsApp(
 ) {
 
     const message =
-`Halo Transmind Nusantara.
+        'Halo Transmind Nusantara.\n\n' +
 
-Saya ingin menyewa kendaraan, tetapi kendaraan yang saya pilih sedang tidak tersedia.
+        'Saya ingin menyewa kendaraan, tetapi kendaraan yang saya pilih sedang tidak tersedia.\n\n' +
 
-Kendaraan: ${formData.vehicleName || '-'}
-Layanan: ${formData.service || '-'}
+        'Kendaraan: ' +
+        (formData?.vehicleName || '-') +
+        '\n' +
 
-Tanggal:
-${formData.start || '-'} s/d ${formData.end || '-'}
+        'Layanan: ' +
+        (formData?.service || '-') +
+        '\n\n' +
 
-Area:
-${formData.area || '-'}
+        'Tanggal:\n' +
+        (formData?.start || '-') +
+        ' s/d ' +
+        (formData?.end || '-') +
+        '\n\n' +
 
-Keterangan sistem:
-${messageText || '-'}
+        'Area:\n' +
+        (formData?.area || '-') +
+        '\n\n' +
 
-Mohon dibantu mencarikan kendaraan alternatif.
+        'Keterangan sistem:\n' +
+        (messageText || '-') +
+        '\n\n' +
 
-Terima kasih.`;
+        'Mohon dibantu mencarikan kendaraan alternatif.\n\n' +
+
+        'Terima kasih.';
 
 
     const url =
@@ -1439,16 +1333,20 @@ async function sendBookingEmail(
         );
 
 
-        const {
-            data,
-            error
-        } =
+        const response =
             await sb.functions.invoke(
                 'send-booking-email',
                 {
                     body: payload
                 }
             );
+
+
+        const data =
+            response?.data;
+
+        const error =
+            response?.error;
 
 
         if (error) {
@@ -1489,25 +1387,18 @@ async function submitBooking(event) {
 
     event.preventDefault();
 
-
     const form =
         event.currentTarget;
-
 
     const resultBox =
         getElement('result');
 
-
     if (!resultBox) {
-
         return;
-
     }
-
 
     const data =
         getFormData();
-
 
     if (
         !validateBooking(
@@ -1520,7 +1411,6 @@ async function submitBooking(event) {
 
     }
 
-
     if (!sb) {
 
         resultBox.textContent =
@@ -1529,7 +1419,6 @@ async function submitBooking(event) {
         return;
 
     }
-
 
     resultBox.textContent =
         'Memproses booking...';
@@ -1543,10 +1432,7 @@ async function submitBooking(event) {
         );
 
 
-        const {
-            data: rpcData,
-            error
-        } =
+        const response =
             await sb.rpc(
                 'create_booking',
                 {
@@ -1579,6 +1465,13 @@ async function submitBooking(event) {
             );
 
 
+        const rpcData =
+            response?.data;
+
+        const error =
+            response?.error;
+
+
         console.log(
             'CREATE BOOKING RESULT:',
             rpcData
@@ -1592,11 +1485,9 @@ async function submitBooking(event) {
                 error
             );
 
-
             resultBox.textContent =
                 'Terjadi kesalahan sistem: ' +
                 error.message;
-
 
             return;
 
@@ -1631,7 +1522,9 @@ async function submitBooking(event) {
 
 
             resultBox.innerHTML =
-                `<b>${escapeHtml(message)}</b>`;
+                '<b>' +
+                escapeHtml(message) +
+                '</b>';
 
 
             if (
@@ -1656,34 +1549,24 @@ async function submitBooking(event) {
            BOOKING BERHASIL
            ================================================= */
 
-        resultBox.innerHTML = `
-
-            <b>
-                Booking berhasil dibuat.
-            </b>
-
-            <br><br>
-
-            Kode Booking:
-
-            <b>
-                ${escapeHtml(
-                    result.booking_code || '-'
-                )}
-            </b>
-
-            <br><br>
-
-            Kendaraan:
-
-            <b>
-                ${escapeHtml(
-                    result.vehicle_name ||
-                    data.vehicleName
-                )}
-            </b>
-
-        `;
+        resultBox.innerHTML =
+            '<b>Booking berhasil dibuat.</b>' +
+            '<br><br>' +
+            'Kode Booking: ' +
+            '<b>' +
+            escapeHtml(
+                result.booking_code || '-'
+            ) +
+            '</b>' +
+            '<br><br>' +
+            'Kendaraan: ' +
+            '<b>' +
+            escapeHtml(
+                result.vehicle_name ||
+                data.vehicleName ||
+                '-'
+            ) +
+            '</b>';
 
 
         /* =================================================
@@ -1722,10 +1605,8 @@ async function submitBooking(event) {
 
                 form.reset();
 
-
                 const vehicleSelect =
                     getElement('vehicle');
-
 
                 if (vehicleSelect) {
 
@@ -1734,11 +1615,9 @@ async function submitBooking(event) {
 
                 }
 
-
                 updateVehicleInfo(
                     ''
                 );
-
 
             },
             1500
@@ -1751,7 +1630,6 @@ async function submitBooking(event) {
             'SUBMIT BOOKING ERROR:',
             error
         );
-
 
         resultBox.textContent =
             'Terjadi kesalahan: ' +
@@ -1778,7 +1656,6 @@ function setupEvents() {
     const form =
         getElement('bookingForm');
 
-
     if (form) {
 
         form.addEventListener(
@@ -1795,7 +1672,6 @@ function setupEvents() {
 
     const vehicle =
         getElement('vehicle');
-
 
     if (vehicle) {
 
@@ -1820,10 +1696,8 @@ function setupEvents() {
     const start =
         getElement('start');
 
-
     const end =
         getElement('end');
-
 
     const today =
         new Date()
@@ -1858,7 +1732,6 @@ function setupEvents() {
 
                 end.min =
                     start.value;
-
 
                 if (
                     end.value &&
@@ -1940,11 +1813,9 @@ async function init() {
         '=========================================='
     );
 
-
     console.log(
         'TRANSMIND INITIALIZATION DIMULAI'
     );
-
 
     console.log(
         '=========================================='
@@ -1961,11 +1832,9 @@ async function init() {
         '=========================================='
     );
 
-
     console.log(
         'TRANSMIND INITIALIZATION SELESAI'
     );
-
 
     console.log(
         '=========================================='
@@ -1981,10 +1850,8 @@ async function init() {
 window.handleVehicleImageError =
     handleVehicleImageError;
 
-
 window.openBookingEmail =
     openBookingEmail;
-
 
 window.openAdminEmail =
     openAdminEmail;
@@ -1998,4 +1865,3 @@ document.addEventListener(
     'DOMContentLoaded',
     init
 );
-```
