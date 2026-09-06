@@ -1,6 +1,6 @@
 /* =========================================================
    TRANSMIND NUSANTARA RENTAL MOBIL
-   APP.JS — GO LIVE FINAL STABLE
+   APP.JS — GO LIVE FINAL
    MODE:
    DATABASE + IMAGE_PATH + MAX 26 ARMADA
    BOOKING + WHATSAPP + EMAIL OTOMATIS
@@ -31,7 +31,7 @@ let vehiclesCache = [];
 
 
 /* =========================================================
-   HELPER ELEMENT
+   HELPER
    ========================================================= */
 
 function getElement(id) {
@@ -44,7 +44,11 @@ function getElement(id) {
    ========================================================= */
 
 function escapeHtml(value) {
-    if (value === null || value === undefined) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
         return '';
     }
 
@@ -58,20 +62,37 @@ function escapeHtml(value) {
 
 
 /* =========================================================
-   CHECK SUPABASE CONFIG
+   SUPABASE CONFIG
    ========================================================= */
 
 function configured() {
 
-    if (!window.SUPABASE_URL) {
-        console.error('SUPABASE_URL tidak ditemukan.');
+    const url =
+        window.TRANSMIND_SUPABASE_URL;
+
+    const key =
+        window.TRANSMIND_SUPABASE_ANON_KEY;
+
+
+    if (!url) {
+
+        console.error(
+            'TRANSMIND_SUPABASE_URL tidak ditemukan.'
+        );
+
         return false;
     }
 
-    if (!window.SUPABASE_ANON_KEY) {
-        console.error('SUPABASE_ANON_KEY tidak ditemukan.');
+
+    if (!key) {
+
+        console.error(
+            'TRANSMIND_SUPABASE_ANON_KEY tidak ditemukan.'
+        );
+
         return false;
     }
+
 
     return true;
 }
@@ -83,10 +104,12 @@ function configured() {
 
 function setFleetStatus(message) {
 
-    const status = getElement('fleetStatus');
+    const status =
+        getElement('fleetStatus');
 
     if (status) {
-        status.textContent = message || '';
+        status.textContent =
+            message || '';
     }
 }
 
@@ -101,35 +124,59 @@ function getVehicleImageUrl(vehicle) {
         return '';
     }
 
-    const imagePath = vehicle.image_path;
+
+    const imagePath =
+        vehicle.image_path;
+
 
     if (!imagePath) {
         return '';
     }
 
-    /* Jika sudah URL lengkap */
+
     if (
         imagePath.startsWith('http://') ||
         imagePath.startsWith('https://')
     ) {
+
         return imagePath;
     }
+
 
     if (!sb) {
         return '';
     }
 
-    const result = sb
-        .storage
-        .from(VEHICLE_IMAGE_BUCKET)
-        .getPublicUrl(imagePath);
 
-    return result?.data?.publicUrl || '';
+    try {
+
+        const result =
+            sb.storage
+                .from(VEHICLE_IMAGE_BUCKET)
+                .getPublicUrl(
+                    imagePath
+                );
+
+
+        return (
+            result?.data?.publicUrl ||
+            ''
+        );
+
+    } catch (error) {
+
+        console.error(
+            'GAGAL MEMBUAT URL GAMBAR:',
+            error
+        );
+
+        return '';
+    }
 }
 
 
 /* =========================================================
-   IMAGE ERROR HANDLER
+   IMAGE ERROR
    ========================================================= */
 
 function handleVehicleImageError(img) {
@@ -138,12 +185,15 @@ function handleVehicleImageError(img) {
         return;
     }
 
+
     console.warn(
         'Gambar armada gagal dimuat:',
         img.getAttribute('src')
     );
 
+
     img.onerror = null;
+
 
     img.src =
         'data:image/svg+xml;charset=UTF-8,' +
@@ -153,25 +203,31 @@ function handleVehicleImageError(img) {
                  height="500"
                  viewBox="0 0 800 500">
 
-                <rect width="800"
-                      height="500"
-                      fill="#111"/>
+                <rect
+                    width="800"
+                    height="500"
+                    fill="#111"
+                />
 
-                <text x="400"
-                      y="245"
-                      text-anchor="middle"
-                      fill="#c9a227"
-                      font-size="30"
-                      font-family="Arial">
+                <text
+                    x="400"
+                    y="245"
+                    text-anchor="middle"
+                    fill="#c9a227"
+                    font-size="30"
+                    font-family="Arial"
+                >
                     TRANSMIND
                 </text>
 
-                <text x="400"
-                      y="285"
-                      text-anchor="middle"
-                      fill="#fff"
-                      font-size="18"
-                      font-family="Arial">
+                <text
+                    x="400"
+                    y="285"
+                    text-anchor="middle"
+                    fill="#fff"
+                    font-size="18"
+                    font-family="Arial"
+                >
                     Armada
                 </text>
 
@@ -181,7 +237,7 @@ function handleVehicleImageError(img) {
 
 
 /* =========================================================
-   VALID VEHICLE FILTER
+   FILTER VEHICLES
    ========================================================= */
 
 function filterValidVehicles(vehicles) {
@@ -190,15 +246,18 @@ function filterValidVehicles(vehicles) {
         return [];
     }
 
-    return vehicles.filter(function(vehicle) {
 
-        return (
-            vehicle &&
-            vehicle.id &&
-            vehicle.name
-        );
+    return vehicles.filter(
+        function(vehicle) {
 
-    });
+            return (
+                vehicle &&
+                vehicle.id &&
+                vehicle.name
+            );
+
+        }
+    );
 }
 
 
@@ -208,20 +267,27 @@ function filterValidVehicles(vehicles) {
 
 function showCars(vehicles) {
 
-    const carsContainer = getElement('cars');
+    const carsContainer =
+        getElement('cars');
+
 
     if (!carsContainer) {
 
-        console.warn(
-            'Element #cars tidak ditemukan.'
+        console.error(
+            'ELEMENT #cars TIDAK DITEMUKAN.'
         );
 
         return;
     }
 
+
     carsContainer.innerHTML = '';
 
-    if (!Array.isArray(vehicles) || vehicles.length === 0) {
+
+    if (
+        !Array.isArray(vehicles) ||
+        vehicles.length === 0
+    ) {
 
         carsContainer.innerHTML = `
             <div class="fleet-empty">
@@ -229,7 +295,9 @@ function showCars(vehicles) {
             </div>
         `;
 
-        setFleetStatus('Armada belum tersedia.');
+        setFleetStatus(
+            'Armada belum tersedia.'
+        );
 
         return;
     }
@@ -242,164 +310,226 @@ function showCars(vehicles) {
     );
 
 
-    vehicles.forEach(function(vehicle) {
+    vehicles.forEach(
+        function(vehicle) {
 
-        const imageUrl =
-            getVehicleImageUrl(vehicle);
-
-
-        const card =
-            document.createElement('div');
-
-        card.className =
-            'car-card';
-
-
-        const image =
-            document.createElement('img');
-
-        image.className =
-            'car-image';
-
-        image.alt =
-            vehicle.name || 'Armada Transmind';
-
-        image.loading =
-            'lazy';
-
-
-        if (imageUrl) {
-
-            image.src =
-                imageUrl;
-
-        } else {
-
-            image.src =
-                'data:image/svg+xml;charset=UTF-8,' +
-                encodeURIComponent(`
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         width="800"
-                         height="500"
-                         viewBox="0 0 800 500">
-
-                        <rect width="800"
-                              height="500"
-                              fill="#111"/>
-
-                        <text x="400"
-                              y="245"
-                              text-anchor="middle"
-                              fill="#c9a227"
-                              font-size="30"
-                              font-family="Arial">
-                            TRANSMIND
-                        </text>
-
-                        <text x="400"
-                              y="285"
-                              text-anchor="middle"
-                              fill="#fff"
-                              font-size="18"
-                              font-family="Arial">
-                            ${escapeHtml(vehicle.name)}
-                        </text>
-
-                    </svg>
-                `);
-        }
-
-
-        image.onerror =
-            function() {
-                handleVehicleImageError(this);
-            };
-
-
-        const content =
-            document.createElement('div');
-
-        content.className =
-            'car-content';
-
-
-        const title =
-            document.createElement('h3');
-
-        title.textContent =
-            vehicle.name;
-
-
-        content.appendChild(title);
-
-
-        if (vehicle.category) {
-
-            const category =
-                document.createElement('p');
-
-            category.className =
-                'car-category';
-
-            category.textContent =
-                vehicle.category;
-
-            content.appendChild(category);
-        }
-
-
-        if (vehicle.capacity) {
-
-            const capacity =
-                document.createElement('p');
-
-            capacity.className =
-                'car-capacity';
-
-            capacity.textContent =
-                'Kapasitas: ' +
-                vehicle.capacity +
-                ' orang';
-
-            content.appendChild(capacity);
-        }
-
-
-        const button =
-            document.createElement('button');
-
-        button.type =
-            'button';
-
-        button.className =
-            'btn gold';
-
-        button.textContent =
-            'PILIH ARMADA';
-
-
-        button.addEventListener(
-            'click',
-            function() {
-
-                selectVehicle(
-                    vehicle.id
+            const imageUrl =
+                getVehicleImageUrl(
+                    vehicle
                 );
 
+
+            const card =
+                document.createElement(
+                    'div'
+                );
+
+
+            card.className =
+                'car-card';
+
+
+            const image =
+                document.createElement(
+                    'img'
+                );
+
+
+            image.className =
+                'car-image';
+
+
+            image.alt =
+                vehicle.name ||
+                'Armada Transmind';
+
+
+            image.loading =
+                'lazy';
+
+
+            if (imageUrl) {
+
+                image.src =
+                    imageUrl;
+
+            } else {
+
+                image.src =
+                    'data:image/svg+xml;charset=UTF-8,' +
+                    encodeURIComponent(`
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="800"
+                             height="500"
+                             viewBox="0 0 800 500">
+
+                            <rect
+                                width="800"
+                                height="500"
+                                fill="#111"
+                            />
+
+                            <text
+                                x="400"
+                                y="245"
+                                text-anchor="middle"
+                                fill="#c9a227"
+                                font-size="30"
+                                font-family="Arial"
+                            >
+                                TRANSMIND
+                            </text>
+
+                            <text
+                                x="400"
+                                y="285"
+                                text-anchor="middle"
+                                fill="#fff"
+                                font-size="18"
+                                font-family="Arial"
+                            >
+                                ${escapeHtml(
+                                    vehicle.name
+                                )}
+                            </text>
+
+                        </svg>
+                    `);
             }
-        );
 
 
-        content.appendChild(button);
+            image.onerror =
+                function() {
+
+                    handleVehicleImageError(
+                        this
+                    );
+
+                };
 
 
-        card.appendChild(image);
+            const content =
+                document.createElement(
+                    'div'
+                );
 
-        card.appendChild(content);
 
-        carsContainer.appendChild(card);
+            content.className =
+                'car-content';
 
-    });
+
+            const title =
+                document.createElement(
+                    'h3'
+                );
+
+
+            title.textContent =
+                vehicle.name;
+
+
+            content.appendChild(
+                title
+            );
+
+
+            if (vehicle.category) {
+
+                const category =
+                    document.createElement(
+                        'p'
+                    );
+
+
+                category.className =
+                    'car-category';
+
+
+                category.textContent =
+                    vehicle.category;
+
+
+                content.appendChild(
+                    category
+                );
+            }
+
+
+            if (vehicle.capacity) {
+
+                const capacity =
+                    document.createElement(
+                        'p'
+                    );
+
+
+                capacity.className =
+                    'car-capacity';
+
+
+                capacity.textContent =
+                    'Kapasitas: ' +
+                    vehicle.capacity +
+                    ' orang';
+
+
+                content.appendChild(
+                    capacity
+                );
+            }
+
+
+            const button =
+                document.createElement(
+                    'button'
+                );
+
+
+            button.type =
+                'button';
+
+
+            button.className =
+                'btn gold';
+
+
+            button.textContent =
+                'PILIH ARMADA';
+
+
+            button.addEventListener(
+                'click',
+                function() {
+
+                    selectVehicle(
+                        vehicle.id
+                    );
+
+                }
+            );
+
+
+            content.appendChild(
+                button
+            );
+
+
+            card.appendChild(
+                image
+            );
+
+
+            card.appendChild(
+                content
+            );
+
+
+            carsContainer.appendChild(
+                card
+            );
+
+        }
+    );
 
 
     setFleetStatus(
@@ -443,14 +573,16 @@ async function loadVehicles() {
     try {
 
         /*
-         * PENTING:
-         * Jangan gunakan sort_order di sini.
-         * Jangan filter image_path di query.
+         * Query dibuat sederhana.
          *
-         * Kita ambil data dasar terlebih dahulu.
+         * Tidak menggunakan sort_order.
+         * Tidak membatasi active.
+         *
+         * Ini untuk memastikan armada
+         * kembali muncul terlebih dahulu.
          */
 
-        const result =
+        const response =
             await sb
                 .from('vehicles')
                 .select(
@@ -465,10 +597,11 @@ async function loadVehicles() {
 
 
         const data =
-            result?.data;
+            response?.data;
+
 
         const error =
-            result?.error;
+            response?.error;
 
 
         if (error) {
@@ -478,9 +611,11 @@ async function loadVehicles() {
                 error
             );
 
+
             setFleetStatus(
                 'Armada gagal dimuat.'
             );
+
 
             return;
         }
@@ -499,9 +634,11 @@ async function loadVehicles() {
                 data
             );
 
+
             setFleetStatus(
                 'Data armada tidak valid.'
             );
+
 
             return;
         }
@@ -513,7 +650,7 @@ async function loadVehicles() {
 
         const validVehicles =
             filterValidVehicles(
-                vehiclesCache
+                data
             );
 
 
@@ -524,25 +661,11 @@ async function loadVehicles() {
 
 
         /*
-         * Tidak menggunakan active=false
-         * sebagai filter tampilan.
-         *
-         * Karena sebelumnya website memang
-         * menggunakan data armada yang mempunyai
-         * image_path.
+         * Tampilkan maksimal 26 armada.
          */
-
 
         const vehiclesToDisplay =
             validVehicles
-                .filter(function(vehicle) {
-
-                    return (
-                        vehicle.image_path ||
-                        vehicle.name
-                    );
-
-                })
                 .slice(
                     0,
                     MAX_DISPLAY_VEHICLES
@@ -560,10 +683,6 @@ async function loadVehicles() {
         );
 
 
-        /*
-         * Isi dropdown kendaraan booking.
-         */
-
         populateVehicleSelect(
             vehiclesToDisplay
         );
@@ -575,6 +694,7 @@ async function loadVehicles() {
             'ERROR LOAD VEHICLES:',
             error
         );
+
 
         setFleetStatus(
             'Terjadi kesalahan saat memuat armada.'
@@ -598,16 +718,12 @@ function populateVehicleSelect(
     if (!select) {
 
         console.warn(
-            'Element #vehicle tidak ditemukan.'
+            'ELEMENT #vehicle TIDAK DITEMUKAN.'
         );
 
         return;
     }
 
-
-    /*
-     * Simpan pilihan default.
-     */
 
     const currentValue =
         select.value;
@@ -633,8 +749,10 @@ function populateVehicleSelect(
                     'option'
                 );
 
+
             option.value =
                 vehicle.id;
+
 
             option.textContent =
                 vehicle.name;
@@ -667,17 +785,21 @@ function populateVehicleSelect(
                 select.options
             ).some(
                 function(option) {
+
                     return (
                         option.value ===
                         currentValue
                     );
+
                 }
             );
 
 
         if (exists) {
+
             select.value =
                 currentValue;
+
         }
     }
 
@@ -711,7 +833,9 @@ function selectVehicle(
 
 
     const bookingForm =
-        getElement('bookingForm');
+        getElement(
+            'bookingForm'
+        );
 
 
     if (bookingForm) {
@@ -768,34 +892,6 @@ function updateVehicleInfo() {
         );
 
 
-    const vehiclePrice =
-        getElement('vehiclePrice');
-
-
-    if (vehiclePrice) {
-
-        /*
-         * Harga tetap mengikuti sistem
-         * yang sudah ada.
-         *
-         * Jangan memaksakan harga dari
-         * tabel vehicles.
-         */
-
-        if (vehiclePrice.value === '') {
-
-            vehiclePrice.value =
-                '';
-
-        }
-    }
-
-
-    /*
-     * Event custom untuk kode lain
-     * jika masih menggunakannya.
-     */
-
     window.selectedVehicle =
         vehicle || null;
 
@@ -816,45 +912,68 @@ function getFormData() {
     return {
 
         name:
-            getElement('name')?.value?.trim() || '',
+            getElement(
+                'name'
+            )?.value?.trim() || '',
+
 
         phone:
-            getElement('phone')?.value?.trim() || '',
+            getElement(
+                'phone'
+            )?.value?.trim() || '',
+
 
         vehicleId:
-            getElement('vehicle')?.value || '',
+            getElement(
+                'vehicle'
+            )?.value || '',
+
 
         vehicleName:
-            getElement('vehicle')
-                ?.selectedOptions?.[0]
-                ?.textContent
-                ?.trim() || '',
+            getElement(
+                'vehicle'
+            )
+            ?.selectedOptions?.[0]
+            ?.textContent
+            ?.trim() || '',
+
 
         vehiclePrice:
-            getElement('vehiclePrice')
-                ?.value || '',
+            getElement(
+                'vehiclePrice'
+            )?.value || '',
+
 
         service:
-            getElement('service')
-                ?.value || '',
+            getElement(
+                'service'
+            )?.value || '',
+
 
         start:
-            getElement('start')
-                ?.value || '',
+            getElement(
+                'start'
+            )?.value || '',
+
 
         end:
-            getElement('end')
-                ?.value || '',
+            getElement(
+                'end'
+            )?.value || '',
+
 
         area:
-            getElement('area')
-                ?.value
-                ?.trim() || '',
+            getElement(
+                'area'
+            )?.value
+            ?.trim() || '',
+
 
         notes:
-            getElement('notes')
-                ?.value
-                ?.trim() || ''
+            getElement(
+                'notes'
+            )?.value
+            ?.trim() || ''
 
     };
 }
@@ -872,25 +991,31 @@ function validateBooking(
         return 'Nama wajib diisi.';
     }
 
+
     if (!data.phone) {
         return 'Nomor WhatsApp wajib diisi.';
     }
+
 
     if (!data.vehicleId) {
         return 'Silakan pilih kendaraan.';
     }
 
+
     if (!data.service) {
         return 'Silakan pilih layanan.';
     }
+
 
     if (!data.start) {
         return 'Tanggal mulai wajib diisi.';
     }
 
+
     if (!data.end) {
         return 'Tanggal selesai wajib diisi.';
     }
+
 
     if (!data.area) {
         return 'Area wajib diisi.';
@@ -916,7 +1041,7 @@ function validateBooking(
 
 
 /* =========================================================
-   OPEN WHATSAPP SUCCESS
+   WHATSAPP SUCCESS
    ========================================================= */
 
 function openSuccessWhatsApp(
@@ -993,7 +1118,7 @@ function openSuccessWhatsApp(
 
 
 /* =========================================================
-   OPEN WHATSAPP UNAVAILABLE
+   WHATSAPP UNAVAILABLE
    ========================================================= */
 
 function openUnavailableWhatsApp(
@@ -1066,6 +1191,7 @@ async function sendBookingEmail(
             'EMAIL BOOKING: Supabase belum siap.'
         );
 
+
         return {
             success: false,
             error:
@@ -1073,10 +1199,6 @@ async function sendBookingEmail(
         };
     }
 
-
-    /*
-     * Normalisasi data RPC.
-     */
 
     const bookingCode =
         result?.booking_code ||
@@ -1148,10 +1270,6 @@ async function sendBookingEmail(
         );
 
 
-    /*
-     * Edge Function menggunakan camelCase.
-     */
-
     const payload = {
 
         bookingCode:
@@ -1214,6 +1332,7 @@ async function sendBookingEmail(
             'EMAIL BOOKING: bookingCode kosong.'
         );
 
+
         return {
             success: false,
             error:
@@ -1241,6 +1360,7 @@ async function sendBookingEmail(
         const data =
             response?.data;
 
+
         const error =
             response?.error;
 
@@ -1251,6 +1371,7 @@ async function sendBookingEmail(
                 'EMAIL BOOKING GAGAL:',
                 error
             );
+
 
             return {
                 success: false,
@@ -1276,6 +1397,7 @@ async function sendBookingEmail(
                 'EMAIL BOOKING DITOLAK FUNCTION:',
                 data
             );
+
 
             return {
                 success: false,
@@ -1332,6 +1454,7 @@ async function submitBooking(
     console.log(
         '=========================================='
     );
+
 
     console.log(
         'SUBMIT BOOKING DIMULAI'
@@ -1423,8 +1546,10 @@ async function submitBooking(
         submitButton.disabled =
             true;
 
+
         submitButton.dataset.originalText =
             submitButton.textContent;
+
 
         submitButton.textContent =
             'MEMPROSES...';
@@ -1474,6 +1599,7 @@ async function submitBooking(
         const result =
             rpcResponse?.data;
 
+
         const error =
             rpcResponse?.error;
 
@@ -1521,11 +1647,6 @@ async function submitBooking(
         }
 
 
-        /*
-         * Beberapa RPC mengembalikan object.
-         * Beberapa dapat mengembalikan array.
-         */
-
         const bookingResult =
             Array.isArray(result)
                 ? result[0]
@@ -1559,10 +1680,6 @@ async function submitBooking(
             return;
         }
 
-
-        /*
-         * Jika RPC sendiri mengembalikan success=false.
-         */
 
         if (
             bookingResult.success === false
@@ -1601,10 +1718,6 @@ async function submitBooking(
             return;
         }
 
-
-        /*
-         * TAMPILKAN HASIL BOOKING.
-         */
 
         const bookingCode =
             bookingResult.booking_code ||
@@ -1661,9 +1774,8 @@ async function submitBooking(
 
 
         /*
-         * =================================================
-         * EMAIL HARUS DITUNGGU SEBELUM WHATSAPP
-         * =================================================
+         * EMAIL DIKIRIM DAN DITUNGGU
+         * SEBELUM PINDAH KE WHATSAPP.
          */
 
         const emailResult =
@@ -1690,7 +1802,7 @@ async function submitBooking(
 
 
         /*
-         * Setelah proses email selesai,
+         * Setelah email selesai,
          * baru buka WhatsApp.
          */
 
@@ -1700,10 +1812,6 @@ async function submitBooking(
         );
 
 
-        /*
-         * Reset form setelah proses.
-         */
-
         setTimeout(
             function() {
 
@@ -1711,6 +1819,7 @@ async function submitBooking(
                     getElement(
                         'bookingForm'
                     );
+
 
                 if (form) {
                     form.reset();
@@ -1761,6 +1870,7 @@ async function submitBooking(
             submitButton.disabled =
                 false;
 
+
             submitButton.textContent =
                 submitButton.dataset.originalText ||
                 'KIRIM BOOKING';
@@ -1783,7 +1893,9 @@ function setupEvents() {
 
 
     const bookingForm =
-        getElement('bookingForm');
+        getElement(
+            'bookingForm'
+        );
 
 
     if (bookingForm) {
@@ -1803,7 +1915,9 @@ function setupEvents() {
 
 
     const vehicleSelect =
-        getElement('vehicle');
+        getElement(
+            'vehicle'
+        );
 
 
     if (vehicleSelect) {
@@ -1834,117 +1948,92 @@ async function init() {
 
 
     /*
-     * Cek Supabase client yang sudah
-     * dibuat oleh config.js.
+     * Pastikan Supabase CDN tersedia.
      */
 
     if (
-        window.supabaseClient
-    ) {
-
-        sb =
-            window.supabaseClient;
-
-    }
-
-
-    /*
-     * Jika project sebelumnya menggunakan
-     * window.sb, tetap dukung.
-     */
-
-    if (
-        !sb &&
-        window.sb
-    ) {
-
-        sb =
-            window.sb;
-
-    }
-
-
-    /*
-     * Jika config.js membuat
-     * window.supabase, tetap dukung.
-     */
-
-    if (
-        !sb &&
-        window.supabase &&
-        typeof window.supabase
-            .from === 'function'
-    ) {
-
-        sb =
-            window.supabase;
-
-    }
-
-
-    /*
-     * Fallback membuat client dari config.
-     */
-
-    if (
-        !sb &&
-        configured() &&
-        window.supabase &&
-        typeof window.supabase.createClient ===
+        !window.supabase ||
+        typeof window.supabase.createClient !==
             'function'
     ) {
 
-        try {
-
-            sb =
-                window.supabase.createClient(
-                    window.SUPABASE_URL,
-                    window.SUPABASE_ANON_KEY
-                );
-
-            console.log(
-                'SUPABASE CLIENT berhasil dibuat.'
-            );
-
-        } catch (error) {
-
-            console.error(
-                'GAGAL MEMBUAT SUPABASE CLIENT:',
-                error
-            );
-
-        }
-    }
-
-
-    if (!sb) {
-
         console.error(
-            'SUPABASE CLIENT TIDAK TERSEDIA.'
+            'LIBRARY SUPABASE CDN TIDAK TERSEDIA.'
         );
+
 
         setFleetStatus(
-            'Database belum terhubung.'
+            'Library Supabase belum tersedia.'
         );
+
 
         return;
     }
 
 
-    console.log(
-        'SUPABASE CLIENT SIAP.'
-    );
+    /*
+     * Gunakan konfigurasi asli Transmind.
+     */
+
+    if (!configured()) {
+
+        console.error(
+            'KONFIGURASI SUPABASE TRANSMIND TIDAK TERSEDIA.'
+        );
 
 
-    setupEvents();
+        setFleetStatus(
+            'Konfigurasi database belum tersedia.'
+        );
 
 
-    await loadVehicles();
+        return;
+    }
 
 
-    console.log(
-        'TRANSMIND INIT SELESAI.'
-    );
+    try {
+
+        sb =
+            window.supabase.createClient(
+                window.TRANSMIND_SUPABASE_URL,
+                window.TRANSMIND_SUPABASE_ANON_KEY
+            );
+
+
+        console.log(
+            'SUPABASE CLIENT BERHASIL DIBUAT.'
+        );
+
+
+        /*
+         * Jangan tampilkan API key
+         * ke console.
+         */
+
+
+        setupEvents();
+
+
+        await loadVehicles();
+
+
+        console.log(
+            'TRANSMIND INIT SELESAI.'
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            'GAGAL MEMBUAT SUPABASE CLIENT:',
+            error
+        );
+
+
+        setFleetStatus(
+            'Database gagal terhubung.'
+        );
+    }
 }
 
 
