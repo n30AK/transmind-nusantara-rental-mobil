@@ -2020,3 +2020,81 @@ document.addEventListener(
     'DOMContentLoaded',
     init
 );
+// =========================================================
+// TRANSMIND EMAIL CONTACT
+// Membuka aplikasi/email client milik pelanggan
+// =========================================================
+
+function openBookingEmail() {
+
+  const to = 'booking@transmindnusantararentalmobil.co.id';
+
+  const subject = 'Permintaan Booking Rental Mobil - Transmind Nusantara';
+
+  const body = [
+    'Yth. Tim Booking Transmind Nusantara Rental Mobil,',
+    '',
+    'Saya ingin mengajukan permintaan booking dengan data sebagai berikut:',
+    '',
+    'Nama :',
+    'No. WhatsApp :',
+    'Kendaraan :',
+    'Layanan :',
+    'Tanggal Mulai :',
+    'Tanggal Selesai :',
+    'Area :',
+    '',
+    'Catatan / Kebutuhan Khusus :',
+    '',
+    'Mohon informasi ketersediaan kendaraan, harga rental, dan ketentuan booking.',
+    '',
+    'Terima kasih.',
+    '',
+    'Hormat saya.'
+  ].join('\r\n');
+
+  const mailto =
+    'mailto:' +
+    to +
+    '?subject=' +
+    encodeURIComponent(subject) +
+    '&body=' +
+    encodeURIComponent(body);
+
+  window.location.href = mailto;
+}
+
+
+function openAdminEmail() {
+
+  const to = 'admin@transmindnusantararentalmobil.co.id';
+
+  const subject = 'Kontak - Transmind Nusantara Rental Mobil';
+
+  const body = [
+    'Yth. Admin Transmind Nusantara Rental Mobil,',
+    '',
+    'Saya ingin menghubungi pihak Transmind Nusantara mengenai:',
+    '',
+    'Nama :',
+    'No. WhatsApp :',
+    '',
+    'Pesan :',
+    '',
+    'Mohon informasi atau bantuan mengenai hal tersebut.',
+    '',
+    'Terima kasih.',
+    '',
+    'Hormat saya.'
+  ].join('\r\n');
+
+  const mailto =
+    'mailto:' +
+    to +
+    '?subject=' +
+    encodeURIComponent(subject) +
+    '&body=' +
+    encodeURIComponent(body);
+
+  window.location.href = mailto;
+}
