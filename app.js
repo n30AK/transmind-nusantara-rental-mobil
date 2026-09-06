@@ -572,6 +572,7 @@ function showCars(list) {
 
 }
 
+
 /* =========================================================
    PILIH KENDARAAN
    ========================================================= */
@@ -1245,6 +1246,8 @@ Terima kasih.`;
         url;
 
 }
+
+
 /* =========================================================
    KIRIM EMAIL BOOKING
    TAMBAHAN - TIDAK MENGUBAH SISTEM BOOKING
@@ -1257,6 +1260,10 @@ async function sendBookingEmail(
 
     try {
 
+        /* =================================================
+           CEK SUPABASE CLIENT
+           ================================================= */
+
         if (!sb) {
 
             console.warn(
@@ -1268,53 +1275,198 @@ async function sendBookingEmail(
         }
 
 
+        /* =================================================
+           NORMALISASI HASIL RPC
+           Mendukung beberapa kemungkinan nama field
+           ================================================= */
+
+        const bookingCode =
+
+            result?.booking_code ||
+
+            result?.bookingCode ||
+
+            '';
+
+
+        const vehicleName =
+
+            result?.vehicle_name ||
+
+            result?.vehicleName ||
+
+            formData?.vehicleName ||
+
+            '';
+
+
+        const unitCode =
+
+            result?.unit_code ||
+
+            result?.unitCode ||
+
+            '';
+
+
+        const sourceType =
+
+            result?.source_type ||
+
+            result?.sourceType ||
+
+            '';
+
+
+        const allocationStatus =
+
+            result?.allocation_status ||
+
+            result?.allocationStatus ||
+
+            result?.status ||
+
+            'CONFIRMED';
+
+
+        const start =
+
+            result?.start_date ||
+
+            result?.start_at ||
+
+            result?.startDate ||
+
+            result?.start ||
+
+            formData?.start ||
+
+            '';
+
+
+        const end =
+
+            result?.end_date ||
+
+            result?.end_at ||
+
+            result?.endDate ||
+
+            result?.end ||
+
+            formData?.end ||
+
+            '';
+
+
+        const totalDays =
+
+            Number(
+
+                result?.total_days ??
+
+                result?.totalDays ??
+
+                0
+
+            );
+
+
+        const dailyPrice =
+
+            Number(
+
+                result?.daily_price ??
+
+                result?.dailyPrice ??
+
+                0
+
+            );
+
+
+        const totalPrice =
+
+            Number(
+
+                result?.total_price ??
+
+                result?.totalPrice ??
+
+                0
+
+            );
+
+
+        /* =================================================
+           PAYLOAD
+           HARUS SESUAI EDGE FUNCTION
+           ================================================= */
+
         const payload = {
 
-            booking_code:
-                result?.booking_code || '',
+            bookingCode:
+                bookingCode,
 
-            status:
-                result?.status || 'CONFIRMED',
-
-            customer_name:
+            name:
                 formData?.name || '',
 
-            customer_phone:
+            phone:
                 formData?.phone || '',
 
-            vehicle_name:
-                result?.vehicle_name ||
-                formData?.vehicleName ||
-                '',
-
-            unit_code:
-                result?.unit_code ||
-                '',
-
-            source_type:
-                result?.source_type ||
-                '',
+            vehicleName:
+                vehicleName,
 
             service:
                 formData?.service || '',
 
-            start_at:
-                result?.start_at ||
-                formData?.start ||
-                '',
+            start:
+                start,
 
-            end_at:
-                result?.end_at ||
-                formData?.end ||
-                '',
+            end:
+                end,
 
             area:
                 formData?.area || '',
 
             notes:
-                formData?.notes || ''
+                formData?.notes || '',
+
+            totalDays:
+                totalDays,
+
+            dailyPrice:
+                dailyPrice,
+
+            totalPrice:
+                totalPrice,
+
+            allocationStatus:
+                allocationStatus,
+
+            unitCode:
+                unitCode,
+
+            sourceType:
+                sourceType
 
         };
+
+
+        /* =================================================
+           VALIDASI BOOKING CODE
+           ================================================= */
+
+        if (!payload.bookingCode) {
+
+            console.error(
+                'EMAIL BOOKING DIBATALKAN: bookingCode kosong.',
+                result
+            );
+
+            return;
+
+        }
 
 
         console.log(
@@ -1323,16 +1475,27 @@ async function sendBookingEmail(
         );
 
 
+        /* =================================================
+           PANGGIL EDGE FUNCTION
+           ================================================= */
+
         const {
             data,
             error
         } = await sb.functions.invoke(
+
             'send-booking-email',
+
             {
                 body: payload
             }
+
         );
 
+
+        /* =================================================
+           HANDLE ERROR
+           ================================================= */
 
         if (error) {
 
@@ -1346,8 +1509,12 @@ async function sendBookingEmail(
         }
 
 
+        /* =================================================
+           BERHASIL
+           ================================================= */
+
         console.log(
-            'EMAIL BOOKING RESULT:',
+            'EMAIL BOOKING BERHASIL DIKIRIM:',
             data
         );
 
@@ -1362,6 +1529,7 @@ async function sendBookingEmail(
     }
 
 }
+
 
 /* =========================================================
    SUBMIT BOOKING
@@ -1597,14 +1765,17 @@ async function submitBooking(event) {
 
         `;
 
-/* =================================================
-   EMAIL NOTIFICATION
-   ================================================= */
 
-sendBookingEmail(
-    data,
-    result
-);
+        /* =================================================
+           EMAIL NOTIFICATION
+           ================================================= */
+
+        sendBookingEmail(
+            data,
+            result
+        );
+
+
         /* =================================================
            WHATSAPP
            ================================================= */
