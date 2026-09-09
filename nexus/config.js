@@ -10,9 +10,13 @@ window.addEventListener('DOMContentLoaded', () => {
   s.defer = true;
   document.head.appendChild(s);
 
-  // Social Media Marketing / attribution layer.
   const sm = document.createElement('script');
   sm.src = './social-marketing.js?v=1';
   sm.defer = true;
   document.head.appendChild(sm);
+
+  const gi = document.createElement('script');
+  gi.src = './growth-intelligence.js?v=1';
+  gi.defer = true;
+  document.head.appendChild(gi);
 });
