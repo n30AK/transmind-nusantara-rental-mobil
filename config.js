@@ -109,55 +109,11 @@ window.TRANSMIND_SUPABASE_ANON_KEY =
             document.head.appendChild(css);
         }
 
+        /* NEXUS -> PUBLIC WEBSITE bridge. WhatsApp contact injection is handled
+           in website-live.js only, so the number can never be duplicated. */
         var w = document.createElement('script');
         w.src = './website-live.js?v=3';
         w.defer = true;
         document.head.appendChild(w);
-
-        /* =====================================================
-           WHATSAPP CONTACT
-           Keep the existing number and add the new number below it.
-           Both numbers open WhatsApp when clicked.
-           ===================================================== */
-        function setupWhatsAppContact() {
-            var contact = document.querySelector('#kontak');
-            if (!contact) return;
-
-            var newNumber = '08816654141';
-            var newLink = contact.querySelector('[data-transmind-wa-new]');
-            if (newLink) return;
-
-            var links = contact.querySelectorAll('a');
-            var oldLink = null;
-            for (var i = 0; i < links.length; i++) {
-                var text = (links[i].textContent || '').replace(/\s+/g, '');
-                if (text.indexOf('0812-9267-7888'.replace(/\s+/g, '')) !== -1 || text.indexOf('081292677888') !== -1) {
-                    oldLink = links[i];
-                    break;
-                }
-            }
-
-            if (oldLink) {
-                oldLink.href = 'https://wa.me/6281292677888';
-                oldLink.target = '_blank';
-                oldLink.rel = 'noopener noreferrer';
-            }
-
-            var row = document.createElement('p');
-            row.setAttribute('data-transmind-wa-new', '1');
-            row.innerHTML = '<b>WhatsApp:</b> <a href="https://wa.me/628816654141" target="_blank" rel="noopener noreferrer">' + newNumber + '</a>';
-
-            var anchorRow = oldLink ? oldLink.closest('p') : null;
-            if (anchorRow && anchorRow.parentNode) {
-                anchorRow.parentNode.insertBefore(row, anchorRow.nextSibling);
-            } else {
-                var head = contact.querySelector('.head');
-                if (head) head.appendChild(row);
-                else contact.appendChild(row);
-            }
-        }
-
-        setupWhatsAppContact();
-        setTimeout(setupWhatsAppContact, 700);
     });
 })();
