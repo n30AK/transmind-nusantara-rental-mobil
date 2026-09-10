@@ -16,7 +16,8 @@ window.addEventListener('DOMContentLoaded', () => {
     ['./operations-command.js?v=1'],
     ['./driver-management.js?v=4'],
     ['./driver-workflow.js?v=1'],
-    ['./growth-command-center.js?v=1']
+    ['./growth-command-center.js?v=1'],
+    ['./demand-supply-command-center.js?v=1']
   ];
   for (const [src] of scripts) {
     const s = document.createElement('script');
