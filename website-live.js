@@ -6,11 +6,13 @@
 (function(){
   'use strict';
 
+  const WA_ICON='<svg class="tm-wa-icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path fill="currentColor" d="M16 3.2A12.8 12.8 0 0 0 5.1 22.7L3.3 28.7l6.2-1.8A12.8 12.8 0 1 0 16 3.2Zm0 23.2a10.4 10.4 0 0 1-5.3-1.5l-.4-.2-3.7 1.1 1.1-3.6-.2-.4A10.4 10.4 0 1 1 16 26.4Zm5.7-7.8c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.3-.6.1-1.6-.8-2.7-1.5-3.8-3.3-.3-.5.3-.5.8-1.6.1-.2.1-.4 0-.6-.1-.2-.7-1.7-.9-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1-1.1 2.5s1.1 2.9 1.2 3.1c.2.2 2.2 3.4 5.4 4.8 2 .9 2.8 1 3.8.9.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.4Z"/></svg>';
+
   function setupWhatsAppContact(){
     const contact=document.querySelector('#kontak');
     if(!contact) return;
 
-    const paragraphs=contact.querySelectorAll('p');
+    const paragraphs=Array.from(contact.querySelectorAll('p'));
     let waParagraph=null;
     paragraphs.forEach(p=>{
       if(/WhatsApp/i.test(p.textContent||'')) waParagraph=p;
@@ -25,16 +27,24 @@
           a.href='https://wa.me/'+normalized;
           a.target='_blank';
           a.rel='noopener noreferrer';
+          a.classList.add('tm-wa-link');
+          if(!a.querySelector('.tm-wa-icon')) a.insertAdjacentHTML('afterbegin',WA_ICON);
         }
       });
     }
 
-    if(contact.querySelector('[data-transmind-wa="08816654141"]')) return;
+    if(!contact.querySelector('[data-transmind-wa="08816654141"]')){
+      const p=document.createElement('p');
+      p.innerHTML='<b>WhatsApp:</b> <a class="tm-wa-link" data-transmind-wa="08816654141" href="https://wa.me/628816654141" target="_blank" rel="noopener noreferrer">'+WA_ICON+'<span>08816654141</span></a>';
+      contact.appendChild(p);
+    }
 
-    const p=document.createElement('p');
-    p.innerHTML='<b>WhatsApp:</b> <a data-transmind-wa="08816654141" href="https://wa.me/628816654141" target="_blank" rel="noopener noreferrer">08816654141</a>';
-    const anchor=waParagraph||contact.querySelector('.head')||contact.firstElementChild;
-    if(anchor) anchor.appendChild(p); else contact.appendChild(p);
+    if(!document.getElementById('tm-wa-contact-style')){
+      const style=document.createElement('style');
+      style.id='tm-wa-contact-style';
+      style.textContent='.tm-wa-link{display:inline-flex;align-items:center;gap:6px}.tm-wa-icon{width:18px;height:18px;display:inline-block;flex:0 0 18px;vertical-align:-4px}.tm-wa-link:hover{opacity:.86}.tm-wa-link:focus-visible{outline:2px solid currentColor;outline-offset:3px;border-radius:4px}';
+      document.head.appendChild(style);
+    }
   }
 
   function boot(){
