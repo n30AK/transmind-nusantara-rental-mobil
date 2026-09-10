@@ -1,0 +1,368 @@
+/* =========================================================
+   TRANSMIND RESPONSIVE LAYER
+   Mobile / tablet / narrow desktop optimization.
+   Loaded after style.css so the existing desktop design remains intact.
+   ========================================================= */
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Tablet: preserve the premium desktop character while giving content room. */
+@media (max-width: 1000px) {
+    .wrap {
+        width: min(var(--wrap), calc(100% - 40px));
+    }
+
+    .nav {
+        gap: 20px;
+    }
+
+    nav {
+        gap: 18px;
+    }
+
+    .hero-in {
+        gap: 35px;
+    }
+
+    .hero-content h1 {
+        font-size: clamp(38px, 6vw, 60px);
+    }
+
+    .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .services {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .section-video video {
+        height: 360px;
+    }
+}
+
+/* Phone: single-column composition, comfortable touch targets and no overflow. */
+@media (max-width: 700px) {
+    :root {
+        --mobile-gutter: 20px;
+    }
+
+    .wrap {
+        width: calc(100% - (var(--mobile-gutter) * 2));
+    }
+
+    header {
+        background: rgba(5, 5, 5, .94);
+    }
+
+    .nav {
+        min-height: auto;
+        padding: 12px 0 10px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .brand {
+        justify-content: center;
+        gap: 9px;
+    }
+
+    .brand img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .brand b {
+        font-size: 15px;
+        letter-spacing: 1.7px;
+    }
+
+    .brand small {
+        font-size: 7px;
+        letter-spacing: 1.2px;
+    }
+
+    nav {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 1px 2px 4px;
+        white-space: nowrap;
+    }
+
+    nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    nav a {
+        flex: 0 0 auto;
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 12px;
+        font-size: 9px;
+        letter-spacing: .9px;
+    }
+
+    nav a::after {
+        bottom: 1px;
+    }
+
+    .hero {
+        min-height: 680px;
+    }
+
+    .hero-in {
+        min-height: 680px;
+        padding-top: 125px;
+        padding-bottom: 55px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-content {
+        width: 100%;
+        max-width: none;
+    }
+
+    .hero-content label,
+    .head label,
+    .services-section > .wrap > label,
+    .contact-section label {
+        margin-bottom: 11px;
+        font-size: 9px;
+        letter-spacing: 1.7px;
+    }
+
+    .hero-content h1 {
+        max-width: 100%;
+        font-size: clamp(34px, 10vw, 52px);
+        line-height: 1.04;
+        letter-spacing: -1.4px;
+    }
+
+    .hero-content p {
+        max-width: 100%;
+        margin-top: 18px;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .hero-logo {
+        display: none;
+    }
+
+    .actions {
+        width: 100%;
+        gap: 10px;
+        margin-top: 24px;
+    }
+
+    .actions .btn {
+        flex: 1 1 100%;
+        min-height: 48px;
+        padding: 0 16px;
+    }
+
+    .section {
+        padding: 68px 0;
+    }
+
+    .head {
+        margin-bottom: 28px;
+    }
+
+    .head h2,
+    .services-section h2,
+    .contact-section h2 {
+        font-size: clamp(27px, 8vw, 38px);
+        line-height: 1.08;
+        letter-spacing: -.7px;
+    }
+
+    .head p {
+        margin-top: 12px;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .booking {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+        padding: 18px;
+        border-radius: 9px;
+    }
+
+    .booking input,
+    .booking select {
+        height: 48px;
+        font-size: 16px;
+    }
+
+    .booking > div > label {
+        font-size: 9px;
+        letter-spacing: 1.1px;
+    }
+
+    .booking .full,
+    .result {
+        grid-column: 1;
+    }
+
+    .booking .btn.full {
+        min-height: 50px;
+    }
+
+    .section-video {
+        margin-bottom: 28px;
+        border-radius: 8px;
+    }
+
+    .section-video video {
+        height: clamp(210px, 58vw, 300px);
+    }
+
+    .grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .car {
+        border-radius: 9px;
+    }
+
+    .photo {
+        height: clamp(205px, 58vw, 280px);
+    }
+
+    .ci {
+        padding: 17px;
+    }
+
+    .ci > h3 {
+        font-size: 17px;
+    }
+
+    .ci > p {
+        font-size: 12px;
+        line-height: 1.65;
+    }
+
+    .ci button {
+        height: 46px;
+        font-size: 10px;
+    }
+
+    .services {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .services article {
+        min-height: 0;
+        padding: 21px;
+    }
+
+    .services article h3 {
+        margin: 18px 0 9px;
+        font-size: 18px;
+    }
+
+    .services article p {
+        font-size: 12px;
+        line-height: 1.65;
+    }
+
+    /* Prevent long phone/email/address strings from widening the viewport. */
+    .contact,
+    footer,
+    .contact * {
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+}
+
+/* Very small phones: keep everything balanced at 320–380px widths. */
+@media (max-width: 380px) {
+    :root {
+        --mobile-gutter: 16px;
+    }
+
+    .nav {
+        padding-top: 10px;
+    }
+
+    nav a {
+        padding: 0 10px;
+        font-size: 8.5px;
+    }
+
+    .hero-in {
+        padding-top: 120px;
+        padding-bottom: 45px;
+    }
+
+    .hero-content h1 {
+        font-size: clamp(31px, 10vw, 43px);
+    }
+
+    .hero-content p {
+        font-size: 12px;
+    }
+
+    .section {
+        padding: 58px 0;
+    }
+
+    .booking {
+        padding: 15px;
+    }
+
+    .photo {
+        height: 205px;
+    }
+}
+
+/* Landscape phones: avoid an oversized hero. */
+@media (max-width: 900px) and (orientation: landscape) {
+    .hero,
+    .hero-in {
+        min-height: 560px;
+    }
+
+    .hero-in {
+        padding-top: 105px;
+        padding-bottom: 35px;
+    }
+
+    .hero-content h1 {
+        font-size: clamp(34px, 7vw, 52px);
+    }
+}
+
+/* Respect reduced-motion preferences. */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
