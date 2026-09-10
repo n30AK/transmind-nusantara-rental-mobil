@@ -110,7 +110,7 @@ window.TRANSMIND_SUPABASE_ANON_KEY =
         }
 
         var w = document.createElement('script');
-        w.src = './website-live.js?v=2';
+        w.src = './website-live.js?v=3';
         w.defer = true;
         document.head.appendChild(w);
 
@@ -119,26 +119,45 @@ window.TRANSMIND_SUPABASE_ANON_KEY =
            Keep the existing number and add the new number below it.
            Both numbers open WhatsApp when clicked.
            ===================================================== */
-        var contact = document.querySelector('#kontak');
-        if (!contact) return;
+        function setupWhatsAppContact() {
+            var contact = document.querySelector('#kontak');
+            if (!contact) return;
 
-        var links = contact.querySelectorAll('a');
-        for (var i = 0; i < links.length; i++) {
-            var text = (links[i].textContent || '').replace(/\s+/g, '');
-            if (text.indexOf('0812-9267-7888'.replace(/\s+/g, '')) !== -1 || text.indexOf('081292677888') !== -1) {
-                links[i].href = 'https://wa.me/6281292677888';
-                links[i].target = '_blank';
-                links[i].rel = 'noopener noreferrer';
+            var newNumber = '08816654141';
+            var newLink = contact.querySelector('[data-transmind-wa-new]');
+            if (newLink) return;
 
-                var currentRow = links[i].closest('p');
-                if (currentRow && !contact.querySelector('[data-transmind-wa-new]')) {
-                    var newRow = document.createElement('p');
-                    newRow.setAttribute('data-transmind-wa-new', '1');
-                    newRow.innerHTML = '<b>WhatsApp:</b> <a href="https://wa.me/628816654141" target="_blank" rel="noopener noreferrer">08816654141</a>';
-                    currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
+            var links = contact.querySelectorAll('a');
+            var oldLink = null;
+            for (var i = 0; i < links.length; i++) {
+                var text = (links[i].textContent || '').replace(/\s+/g, '');
+                if (text.indexOf('0812-9267-7888'.replace(/\s+/g, '')) !== -1 || text.indexOf('081292677888') !== -1) {
+                    oldLink = links[i];
+                    break;
                 }
-                break;
+            }
+
+            if (oldLink) {
+                oldLink.href = 'https://wa.me/6281292677888';
+                oldLink.target = '_blank';
+                oldLink.rel = 'noopener noreferrer';
+            }
+
+            var row = document.createElement('p');
+            row.setAttribute('data-transmind-wa-new', '1');
+            row.innerHTML = '<b>WhatsApp:</b> <a href="https://wa.me/628816654141" target="_blank" rel="noopener noreferrer">' + newNumber + '</a>';
+
+            var anchorRow = oldLink ? oldLink.closest('p') : null;
+            if (anchorRow && anchorRow.parentNode) {
+                anchorRow.parentNode.insertBefore(row, anchorRow.nextSibling);
+            } else {
+                var head = contact.querySelector('.head');
+                if (head) head.appendChild(row);
+                else contact.appendChild(row);
             }
         }
+
+        setupWhatsAppContact();
+        setTimeout(setupWhatsAppContact, 700);
     });
 })();
