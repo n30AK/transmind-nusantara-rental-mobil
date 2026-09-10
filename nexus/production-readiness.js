@@ -1,0 +1,12 @@
+(function(){
+  function boot(){
+    if(!window.NXSB || !document.querySelector('#pages')) return setTimeout(boot,500);
+    if(document.getElementById('nav-production-readiness')) return;
+    const section=[...document.querySelectorAll('.nav-section')].find(x=>/management/i.test(x.textContent||''))||document.querySelector('.nav-section');
+    if(section){const a=document.createElement('a');a.id='nav-production-readiness';a.href='#';a.textContent='Production Readiness';a.style.cursor='pointer';a.onclick=e=>{e.preventDefault();show();};(section.querySelector('.submenu')||section).appendChild(a);}
+    const pages=document.querySelector('#pages'); const page=document.createElement('section'); page.className='page'; page.id='page-production-readiness'; page.style.display='none'; page.innerHTML='<div class="page-header"><h2>Production Readiness</h2><button id="pr-refresh">Refresh</button></div><div id="pr-status" class="card">Memeriksa sistem…</div><div id="pr-grid" class="grid"></div>'; pages.appendChild(page);
+    document.getElementById('pr-refresh').onclick=load;
+    async function load(){const box=document.getElementById('pr-status');try{const {data,error}=await window.NXSB.rpc('nexus_production_readiness_check');if(error)throw error;const d=data||{};box.innerHTML='<strong>Status:</strong> '+(d.status||'UNKNOWN')+'<br><small>Diperiksa: '+(d.checked_at||'-')+'</small>';const fields=[['Bookings',d.bookings],['Customers',d.customers],['Events',d.events],['Operations',d.operations_tasks],['CRM Tasks',d.crm_tasks],['Finance',d.finance_rows],['Vehicle Units',d.vehicle_units],['Drivers',d.drivers],['Assignments',d.assignments],['Partner Vehicles',d.partner_vehicles],['Match Results',d.match_results],['Open Alerts',d.alerts],['Open Signals',d.signals],['Open Actions',d.actions],['Pending Approvals',d.approvals],['Public Price Policies',d.public_price_select_policies],['Non-NEXUS anon SECURITY DEFINER',d.non_nexus_anon_security_definer_functions]];document.getElementById('pr-grid').innerHTML=fields.map(x=>'<div class="card"><div>'+x[0]+'</div><h3>'+Number(x[1]||0).toLocaleString('id-ID')+'</h3></div>').join('');}catch(e){box.innerHTML='<strong>CHECK FAILED</strong><br>'+String(e.message||e);}}
+    function show(){document.querySelectorAll('.page').forEach(p=>p.style.display='none');page.style.display='block';load();}
+  }boot();
+})();
