@@ -1,127 +1,44 @@
-/* TRANSMIND FLEET HARD FIX v1
-   Production rule: render the 24 active vehicles that have real image_path values.
-   This layer intentionally runs after the legacy fleet renderer so it can correct
-   stale/partial rendering without changing the public design.
-*/
+/* TRANSMIND FLEET STORAGE RENDERER v2 */
 (function(){
   'use strict';
-
-  const MAX=24;
-  const BUCKET='vehicle-images';
-
-  function esc(v){
-    return String(v==null?'':v)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-  }
-
+  const MAX=24,BUCKET='vehicle-images',IMAGE_EXT=/\.(jpe?g|png|webp|gif)$/i;
   function client(){
-    const url=window.TRANSMIND_SUPABASE_URL;
-    const key=window.TRANSMIND_SUPABASE_ANON_KEY;
-    if(!url||!key||!window.supabase||typeof window.supabase.createClient!=='function') return null;
-    return window.supabase.createClient(url,key);
+    const u=window.TRANSMIND_SUPABASE_URL,k=window.TRANSMIND_SUPABASE_ANON_KEY;
+    if(!u||!k||!window.supabase||typeof window.supabase.createClient!=='function') return null;
+    return window.supabase.createClient(u,k,{auth:{persistSession:false,autoRefreshToken:false}});
   }
-
-  function imageUrl(sb,path){
-    if(!path) return '';
-    if(/^https?:\\/\\//i.test(path)) return path;
-    return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl||'';
+  function imageUrl(sb,path){return path&&/^https?:\/\//i.test(path)?path:(path?sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl||'':'');}
+  async function storageFiles(sb){
+    const r=await sb.storage.from(BUCKET).list('',{limit:100,offset:0,sortBy:{column:'name',order:'asc'}});
+    if(r.error) throw r.error;
+    const s=new Set();(r.data||[]).forEach(x=>{if(x&&x.id!==null&&x.name&&IMAGE_EXT.test(x.name))s.add(x.name);});return s;
   }
-
-  function render(sb,vehicles){
-    const box=document.querySelector('#cars');
-    if(!box) return;
-    box.innerHTML='';
-
-    vehicles.slice(0,MAX).forEach(function(v){
-      const card=document.createElement('div');
-      card.className='car-card';
-      card.dataset.vehicleId=v.id;
-
-      const img=document.createElement('img');
-      img.className='car-image';
-      img.alt=v.name||'Armada Transmind';
-      img.loading='lazy';
-      img.src=imageUrl(sb,v.image_path);
-      img.onerror=function(){
-        console.warn('Armada image failed:',v.name,v.image_path);
-        card.remove();
-        updateStatus();
-      };
-
-      const content=document.createElement('div');
-      content.className='car-content';
-
-      const title=document.createElement('h3');
-      title.textContent=v.name||'';
-      content.appendChild(title);
-
-      if(v.category){
-        const category=document.createElement('p');
-        category.className='car-category';
-        category.textContent=v.category;
-        content.appendChild(category);
-      }
-
-      if(v.capacity){
-        const capacity=document.createElement('p');
-        capacity.className='car-capacity';
-        capacity.textContent='Kapasitas: '+v.capacity+' orang';
-        content.appendChild(capacity);
-      }
-
-      const button=document.createElement('button');
-      button.type='button';
-      button.className='btn gold';
-      button.textContent='PILIH ARMADA';
-      button.addEventListener('click',function(){
-        if(typeof window.selectVehicle==='function') window.selectVehicle(v.id);
-      });
-      content.appendChild(button);
-
-      card.appendChild(img);
-      card.appendChild(content);
-      box.appendChild(card);
+  function updateStatus(){const b=document.querySelector('#cars'),s=document.querySelector('#fleetStatus');if(s&&b)s.textContent='Menampilkan '+b.querySelectorAll('.car').length+' unit armada.';}
+  function render(sb,vehicles,files){
+    const box=document.querySelector('#cars');if(!box)return;box.innerHTML='';
+    vehicles.filter(v=>v&&v.id&&v.name&&v.image_path&&files.has(v.image_path)).slice(0,MAX).forEach(v=>{
+      const card=document.createElement('article');card.className='car';card.dataset.vehicleId=v.id;
+      const photo=document.createElement('div');photo.className='photo';
+      const img=document.createElement('img');img.src=imageUrl(sb,v.image_path);img.alt=v.name+' — Transmind Nusantara Rental Mobil';img.loading='lazy';img.decoding='async';img.onerror=()=>{card.remove();updateStatus()};photo.appendChild(img);card.appendChild(photo);
+      const info=document.createElement('div');info.className='ci';
+      if(v.category){const b=document.createElement('b');b.textContent=v.category;info.appendChild(b);}
+      const h=document.createElement('h3');h.textContent=v.name;info.appendChild(h);
+      if(v.capacity){const p=document.createElement('p');p.textContent=v.capacity;info.appendChild(p);}
+      const btn=document.createElement('button');btn.type='button';btn.className='btn gold';btn.textContent='PILIH ARMADA';btn.onclick=()=>{if(typeof window.selectVehicle==='function')window.selectVehicle(v.id)};info.appendChild(btn);
+      card.appendChild(info);box.appendChild(card);
     });
-
-    updateStatus();
+    updateStatus();console.log('TRANSMIND FLEET STORAGE:',box.querySelectorAll('.car').length,'/ 24');
   }
-
-  function updateStatus(){
-    const box=document.querySelector('#cars');
-    const status=document.querySelector('#fleetStatus');
-    if(status&&box) status.textContent='Menampilkan '+box.querySelectorAll('.car-card').length+' unit armada.';
-  }
-
   async function boot(){
-    const box=document.querySelector('#cars');
-    if(!box) return;
-    const sb=client();
-    if(!sb) return;
-
+    const box=document.querySelector('#cars'),sb=client();if(!box||!sb)return;
     try{
-      const res=await sb.from('vehicles')
-        .select('id,name,category,capacity,active,image_path,sort_order')
-        .eq('active',true)
-        .not('image_path','is',null)
-        .order('sort_order',{ascending:true,nullsFirst:false})
-        .order('name',{ascending:true})
-        .limit(MAX);
-
-      if(res.error) throw res.error;
-      const vehicles=(res.data||[]).filter(v=>v&&v.id&&v.name&&v.image_path);
-      console.log('TRANSMIND FLEET HARD FIX:',vehicles.length,'photo-ready vehicles');
-      render(sb,vehicles);
-    }catch(err){
-      console.error('TRANSMIND FLEET HARD FIX gagal:',err);
-    }
+      const [vr,files]=await Promise.all([
+        sb.from('vehicles').select('id,name,category,capacity,active,image_path,sort_order').eq('active',true).not('image_path','is',null).order('sort_order',{ascending:true,nullsFirst:false}).order('name',{ascending:true}).limit(MAX),
+        storageFiles(sb)
+      ]);
+      if(vr.error)throw vr.error;render(sb,vr.data||[],files);
+    }catch(e){console.error('TRANSMIND FLEET STORAGE gagal:',e);box.innerHTML='';updateStatus();}
   }
-
-  function start(){
-    setTimeout(boot,900);
-    setTimeout(boot,2200);
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start);
-  else start();
+  function start(){boot();setTimeout(boot,1200)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
