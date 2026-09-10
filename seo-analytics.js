@@ -3,27 +3,27 @@
   'use strict';
   if (location.pathname.indexOf('/nexus') === 0 || !window.supabase || !window.TRANSMIND_SUPABASE_URL || !window.TRANSMIND_SUPABASE_ANON_KEY) return;
 
-  var KEY='transmind_visitor_session_v1';
+  var KEY='transmind_visitor_session_v2';
   var sessionId='';
-  try { sessionId=localStorage.getItem(KEY)||''; } catch(_){}
+  try { sessionId=sessionStorage.getItem(KEY)||''; } catch(_){}
   if(!sessionId){
     sessionId=(crypto&&crypto.randomUUID)?crypto.randomUUID():'tm-'+Date.now()+'-'+Math.random().toString(36).slice(2);
-    try{localStorage.setItem(KEY,sessionId);}catch(_){}
+    try{sessionStorage.setItem(KEY,sessionId);}catch(_){}
   }
-
   var attribution=window.TRANSMIND_ATTRIBUTION||{};
-  var touch=attribution.last_touch||attribution.first_touch||{};
+  var touch=attribution.first_touch||attribution.last_touch||{};
   var sb=window.supabase.createClient(window.TRANSMIND_SUPABASE_URL,window.TRANSMIND_SUPABASE_ANON_KEY);
   var sent={};
-  function clean(v,n){return String(v||'').slice(0,n||500);}
+  function clean(v,n){return String(v||'').trim().slice(0,n||500);}
   function refHost(){try{return document.referrer?new URL(document.referrer).host:'';}catch(_){return '';}}
   function send(type,meta){
     var key=type+'|'+location.pathname;
-    if(type==='page_view'&&sent[key]) return;
+    if((type==='page_view'||type==='session_start')&&sent[key]) return;
     sent[key]=1;
     sb.from('website_analytics_events').insert({
       event_type:type,
       visitor_session_id:sessionId,
+      occurred_at:new Date().toISOString(),
       path:clean(location.pathname+location.search,1000),
       title:clean(document.title,250),
       source:clean(touch.source||'direct',100),
@@ -32,20 +32,25 @@
       content:clean(touch.content,150),
       term:clean(touch.term,150),
       referrer_host:clean(refHost(),250),
-      metadata:meta||{}
+      metadata:Object.assign({screen_width:innerWidth,device:innerWidth<700?'mobile':innerWidth<1100?'tablet':'desktop'},meta||{})
     }).then(function(){}).catch(function(){});
   }
-
+  function clickHandler(e){
+    var el=e.target&&e.target.closest?e.target.closest('a,button'):null;
+    if(!el) return;
+    var href=el.getAttribute('href')||'';
+    var text=clean(el.textContent||el.getAttribute('aria-label'),180);
+    if(/wa\.me\//i.test(href)||/whatsapp/i.test(text)) send('whatsapp_click',{href:clean(href,500),label:text});
+    else if(/booking|pesan|sewa|reserv/i.test(text+' '+href)) send('booking_cta_click',{href:clean(href,500),label:text});
+    else if(/^tel:/i.test(href)) send('phone_click',{href:clean(href,500),label:text});
+  }
   function boot(){
+    send('session_start',{landing_page:location.pathname});
     send('page_view',{screen_width:innerWidth,device:innerWidth<700?'mobile':innerWidth<1100?'tablet':'desktop'});
-    document.addEventListener('click',function(e){
-      var a=e.target&&e.target.closest?e.target.closest('a'):null;
-      if(!a) return;
-      var href=a.getAttribute('href')||'';
-      if(/wa\.me\//i.test(href) || /whatsapp/i.test(a.textContent||'')) send('whatsapp_click',{href:clean(href,500)});
-      else if(/booking|pesan|sewa|reserv/i.test((a.textContent||'')+' '+href)) send('cta_click',{href:clean(href,500),label:clean(a.textContent,150)});
-    },{passive:true});
-    setInterval(function(){send('heartbeat',{visible:document.visibilityState==='visible'});},60000);
+    document.addEventListener('click',clickHandler,{passive:true});
+    var engaged=false;
+    setTimeout(function(){if(!engaged&&document.visibilityState==='visible'){engaged=true;send('session_engaged',{seconds:15});}},15000);
+    setInterval(function(){if(document.visibilityState==='visible') send('heartbeat',{visible:true});},60000);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
 })();
