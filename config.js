@@ -96,10 +96,6 @@ window.TRANSMIND_SUPABASE_ANON_KEY =
         };
     }
 
-    /* =========================================================
-       RESPONSIVE PRESENTATION LAYER
-       Loaded after the main stylesheet so desktop remains unchanged.
-       ========================================================= */
     window.addEventListener('DOMContentLoaded', function () {
         if (!document.querySelector('link[data-transmind-responsive]')) {
             var css = document.createElement('link');
@@ -109,11 +105,14 @@ window.TRANSMIND_SUPABASE_ANON_KEY =
             document.head.appendChild(css);
         }
 
-        /* NEXUS -> PUBLIC WEBSITE bridge. WhatsApp contact injection is handled
-           in website-live.js only, so the number can never be duplicated. */
         var w = document.createElement('script');
-        w.src = './website-live.js?v=3';
+        w.src = './website-live.js?v=4';
         w.defer = true;
         document.head.appendChild(w);
+
+        var a = document.createElement('script');
+        a.src = './seo-analytics.js?v=1';
+        a.defer = true;
+        document.head.appendChild(a);
     });
 })();
