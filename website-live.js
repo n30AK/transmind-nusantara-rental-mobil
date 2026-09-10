@@ -5,7 +5,41 @@
    ========================================================= */
 (function(){
   'use strict';
+
+  function setupWhatsAppContact(){
+    const contact=document.querySelector('#kontak');
+    if(!contact) return;
+
+    const paragraphs=contact.querySelectorAll('p');
+    let waParagraph=null;
+    paragraphs.forEach(p=>{
+      if(/WhatsApp/i.test(p.textContent||'')) waParagraph=p;
+    });
+
+    if(waParagraph){
+      const links=waParagraph.querySelectorAll('a');
+      links.forEach(a=>{
+        const raw=(a.textContent||'').replace(/\D/g,'');
+        if(raw.length>=10){
+          const normalized=raw.startsWith('0')?'62'+raw.slice(1):raw;
+          a.href='https://wa.me/'+normalized;
+          a.target='_blank';
+          a.rel='noopener noreferrer';
+        }
+      });
+    }
+
+    if(contact.querySelector('[data-transmind-wa="08816654141"]')) return;
+
+    const p=document.createElement('p');
+    p.innerHTML='<b>WhatsApp:</b> <a data-transmind-wa="08816654141" href="https://wa.me/628816654141" target="_blank" rel="noopener noreferrer">08816654141</a>';
+    const anchor=waParagraph||contact.querySelector('.head')||contact.firstElementChild;
+    if(anchor) anchor.appendChild(p); else contact.appendChild(p);
+  }
+
   function boot(){
+    setupWhatsAppContact();
+
     if(!window.supabase || !window.TRANSMIND_SUPABASE_URL || !window.TRANSMIND_SUPABASE_ANON_KEY) return;
     const sb=window.supabase.createClient(window.TRANSMIND_SUPABASE_URL,window.TRANSMIND_SUPABASE_ANON_KEY);
     const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
