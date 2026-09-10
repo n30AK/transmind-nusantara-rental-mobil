@@ -14,7 +14,7 @@ window.addEventListener('DOMContentLoaded', () => {
     ['./accounting-driver.js?v=2'],
     ['./accounting-arap.js?v=1'],
     ['./operations-command.js?v=1'],
-    ['./driver-management.js?v=1']
+    ['./driver-management.js?v=4']
   ];
   for (const [src] of scripts) {
     const s = document.createElement('script');
