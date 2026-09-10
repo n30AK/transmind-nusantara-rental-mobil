@@ -17,6 +17,6 @@ window.supabase.createClient=function(){var client=original.apply(window.supabas
 }
 window.addEventListener('DOMContentLoaded',function(){
 if(!document.querySelector('link[data-transmind-responsive]')){var css=document.createElement('link');css.rel='stylesheet';css.href='./css/responsive.css?v=3';css.dataset.transmindResponsive='1';document.head.appendChild(css)}
-['website-live.js?v=8','live-repair.js?v=1','seo-schema.js?v=2','seo-analytics.js?v=4'].forEach(function(src){var s=document.createElement('script');s.src='./'+src;s.defer=true;document.body.appendChild(s)})
+['website-live.js?v=8','live-repair.js?v=1','conversion-bridge.js?v=1','seo-schema.js?v=2','seo-analytics.js?v=4'].forEach(function(src){var s=document.createElement('script');s.src='./'+src;s.defer=true;document.body.appendChild(s)})
 });
 })();
