@@ -28,7 +28,7 @@ window.TRANSMIND_SUPABASE_ANON_KEY =
         try {
             var refHost = new URL(referrer).host.toLowerCase();
             if (!refHost || refHost === host.toLowerCase()) return 'direct';
-            if (/google\\.|bing\\.|yahoo\\.|duckduckgo\\.|yandex\\./i.test(refHost)) return 'organic';
+            if (/google\.|bing\.|yahoo\.|duckduckgo\.|yandex\./i.test(refHost)) return 'organic';
             return 'referral';
         } catch (_) {
             return 'referral';
@@ -96,8 +96,19 @@ window.TRANSMIND_SUPABASE_ANON_KEY =
         };
     }
 
-    /* Existing optional live-content hooks. */
+    /* =========================================================
+       RESPONSIVE PRESENTATION LAYER
+       Loaded after the main stylesheet so desktop remains unchanged.
+       ========================================================= */
     window.addEventListener('DOMContentLoaded', function () {
+        if (!document.querySelector('link[data-transmind-responsive]')) {
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.href = './css/responsive.css?v=1';
+            css.dataset.transmindResponsive = '1';
+            document.head.appendChild(css);
+        }
+
         var w = document.createElement('script');
         w.src = './website-live.js?v=2';
         w.defer = true;
