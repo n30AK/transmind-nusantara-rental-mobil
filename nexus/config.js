@@ -19,6 +19,7 @@ window.addEventListener('DOMContentLoaded', () => {
     ['./driver-management.js?v=4'],
     ['./driver-workflow.js?v=1'],
     ['./growth-command-center.js?v=1'],
+    ['./growth-channel-center.js?v=1'],
     ['./demand-supply-command-center.js?v=1'],
     ['./matching-command-center.js?v=1'],
     ['./executive-command-center.js?v=1']
