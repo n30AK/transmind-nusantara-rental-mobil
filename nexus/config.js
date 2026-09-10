@@ -9,6 +9,7 @@ window.addEventListener('DOMContentLoaded', () => {
     ['./social-marketing.js?v=1'],
     ['./growth-intelligence.js?v=2'],
     ['./crud-control.js?v=1'],
+    ['./manual-controls.js?v=1'],
     ['./seo-stakeholder.js?v=1'],
     ['./accounting-driver.js?v=2'],
     ['./accounting-arap.js?v=1']
