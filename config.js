@@ -1,8 +1,8 @@
 window.TRANSMIND_SUPABASE_URL =
-    'https://unbysxbtzuncifugiqql.supabase.co';
+    'https://ynigwuutmqpnfnkhlaip.supabase.co';
 
 window.TRANSMIND_SUPABASE_ANON_KEY =
-    'sb_publishable_VAdOaPHUniU8qRRex4anQQ_46IgVo_C';
+    'sb_publishable_MycpkacWOWLwO2gXclp2Cw_ApWaeeAw';
 
 /* =========================================================
    TRANSMIND ATTRIBUTION ENGINE
@@ -96,15 +96,10 @@ window.TRANSMIND_SUPABASE_ANON_KEY =
         };
     }
 
-    /* Growth + NEXUS live content bootstrap. */
+    /* Existing optional live-content hooks. */
     window.addEventListener('DOMContentLoaded', function () {
-        var g = document.createElement('script');
-        g.src = './growth-live.js?v=1';
-        g.defer = true;
-        document.head.appendChild(g);
-
         var w = document.createElement('script');
-        w.src = './website-live.js?v=1';
+        w.src = './website-live.js?v=2';
         w.defer = true;
         document.head.appendChild(w);
     });
