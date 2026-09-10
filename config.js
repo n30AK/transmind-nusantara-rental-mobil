@@ -4,21 +4,11 @@ window.TRANSMIND_SUPABASE_URL =
 window.TRANSMIND_SUPABASE_ANON_KEY =
     'sb_publishable_MycpkacWOWLwO2gXclp2Cw_ApWaeeAw';
 
-/* =========================================================
-   TRANSMIND ATTRIBUTION ENGINE
-   Invisible first-touch / last-touch capture.
-   No public UI changes.
-   ========================================================= */
 (function () {
     'use strict';
-
     var STORAGE_KEY = 'transmind_attribution_v1';
     var host = window.location.host;
-
-    function clean(value, max) {
-        return String(value || '').trim().slice(0, max || 500);
-    }
-
+    function clean(value, max) { return String(value || '').trim().slice(0, max || 500); }
     function classifySource(params, referrer) {
         var utmSource = clean(params.get('utm_source'), 100).toLowerCase();
         if (utmSource) return utmSource;
@@ -30,11 +20,8 @@ window.TRANSMIND_SUPABASE_ANON_KEY =
             if (!refHost || refHost === host.toLowerCase()) return 'direct';
             if (/google\.|bing\.|yahoo\.|duckduckgo\.|yandex\./i.test(refHost)) return 'organic';
             return 'referral';
-        } catch (_) {
-            return 'referral';
-        }
+        } catch (_) { return 'referral'; }
     }
-
     var params = new URLSearchParams(window.location.search);
     var referrer = clean(document.referrer, 1000);
     var current = {
@@ -47,37 +34,20 @@ window.TRANSMIND_SUPABASE_ANON_KEY =
         referrer_url: referrer,
         captured_at: new Date().toISOString()
     };
-
     var stored = null;
-    try {
-        stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-    } catch (_) {}
-
-    if (!stored || !stored.first_touch) {
-        stored = { first_touch: current, last_touch: current };
-    } else {
-        stored.last_touch = current;
-    }
-
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
-    } catch (_) {}
-
+    try { stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch (_) {}
+    if (!stored || !stored.first_touch) stored = { first_touch: current, last_touch: current };
+    else stored.last_touch = current;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(stored)); } catch (_) {}
     window.TRANSMIND_ATTRIBUTION = stored;
 
-    /* Patch Supabase before app.js initializes its client. */
     if (window.supabase && typeof window.supabase.createClient === 'function') {
         var originalCreateClient = window.supabase.createClient.bind(window.supabase);
-
         window.supabase.createClient = function () {
             var client = originalCreateClient.apply(window.supabase, arguments);
             var originalRpc = client.rpc.bind(client);
-
             client.rpc = function (fn, args, options) {
-                if (fn !== 'create_booking' || !args) {
-                    return originalRpc(fn, args, options);
-                }
-
+                if (fn !== 'create_booking' || !args) return originalRpc(fn, args, options);
                 var touch = stored.first_touch || stored.last_touch || {};
                 var enriched = Object.assign({}, args, {
                     p_attribution_source: clean(touch.source, 100) || 'unknown',
@@ -88,31 +58,18 @@ window.TRANSMIND_SUPABASE_ANON_KEY =
                     p_landing_page: clean((stored.first_touch && stored.first_touch.landing_page) || touch.landing_page, 1000),
                     p_referrer_url: clean((stored.first_touch && stored.first_touch.referrer_url) || touch.referrer_url, 1000)
                 });
-
                 return originalRpc('create_booking_with_attribution', enriched, options);
             };
-
             return client;
         };
     }
 
     window.addEventListener('DOMContentLoaded', function () {
         if (!document.querySelector('link[data-transmind-responsive]')) {
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.href = './css/responsive.css?v=1';
-            css.dataset.transmindResponsive = '1';
-            document.head.appendChild(css);
+            var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = './css/responsive.css?v=1'; css.dataset.transmindResponsive = '1'; document.head.appendChild(css);
         }
-
-        var w = document.createElement('script');
-        w.src = './website-live.js?v=4';
-        w.defer = true;
-        document.head.appendChild(w);
-
-        var a = document.createElement('script');
-        a.src = './seo-analytics.js?v=1';
-        a.defer = true;
-        document.head.appendChild(a);
+        var w = document.createElement('script'); w.src = './website-live.js?v=4'; w.defer = true; document.head.appendChild(w);
+        var s = document.createElement('script'); s.src = './seo-schema.js?v=1'; s.defer = true; document.head.appendChild(s);
+        var a = document.createElement('script'); a.src = './seo-analytics.js?v=1'; a.defer = true; document.head.appendChild(a);
     });
 })();
