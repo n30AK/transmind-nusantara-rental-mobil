@@ -113,5 +113,32 @@ window.TRANSMIND_SUPABASE_ANON_KEY =
         w.src = './website-live.js?v=2';
         w.defer = true;
         document.head.appendChild(w);
+
+        /* =====================================================
+           WHATSAPP CONTACT
+           Keep the existing number and add the new number below it.
+           Both numbers open WhatsApp when clicked.
+           ===================================================== */
+        var contact = document.querySelector('#kontak');
+        if (!contact) return;
+
+        var links = contact.querySelectorAll('a');
+        for (var i = 0; i < links.length; i++) {
+            var text = (links[i].textContent || '').replace(/\s+/g, '');
+            if (text.indexOf('0812-9267-7888'.replace(/\s+/g, '')) !== -1 || text.indexOf('081292677888') !== -1) {
+                links[i].href = 'https://wa.me/6281292677888';
+                links[i].target = '_blank';
+                links[i].rel = 'noopener noreferrer';
+
+                var currentRow = links[i].closest('p');
+                if (currentRow && !contact.querySelector('[data-transmind-wa-new]')) {
+                    var newRow = document.createElement('p');
+                    newRow.setAttribute('data-transmind-wa-new', '1');
+                    newRow.innerHTML = '<b>WhatsApp:</b> <a href="https://wa.me/628816654141" target="_blank" rel="noopener noreferrer">08816654141</a>';
+                    currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
+                }
+                break;
+            }
+        }
     });
 })();
