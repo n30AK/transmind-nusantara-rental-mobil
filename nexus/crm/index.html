@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TRANSMIND NEXUS — CRM Command Center</title>
+<link rel="stylesheet" href="./crm.css?v=1">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../config.js?v=1"></script>
+</head>
+<body>
+<div id="login" class="login"><div class="login-card"><div class="brand">TRANSMIND NEXUS</div><div class="eyebrow">CRM COMMAND CENTER</div><p>Internal sales workspace. Akses dibatasi untuk pengguna NEXUS yang berwenang.</p><form id="loginForm"><label>Email<input id="email" type="email" autocomplete="username" required></label><label>Password<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">Masuk</button></form><div id="loginMsg" class="msg"></div></div></div>
+<div id="app" class="hidden"><header><div><div class="eyebrow">TRANSMIND NEXUS / CRM</div><h1>Command Center</h1><p>Kelola lead, follow-up, quotation, dan konversi dari satu antrean.</p></div><div class="head-actions"><span id="connection" class="pill">● CONNECTING</span><a class="ghost" href="../">NEXUS</a><button id="logout" class="ghost">Keluar</button></div></header>
+<main><section id="metrics" class="metrics"></section>
+<section class="toolbar"><input id="search" placeholder="Cari nama, WhatsApp, booking code..."><select id="stage"><option value="">Semua tahap</option><option>NEW</option><option>CONTACTED</option><option>QUALIFIED</option><option>QUOTED</option><option>NEGOTIATION</option><option>CONFIRMED</option><option>PAID</option><option>COMPLETED</option><option>LOST</option><option>CANCELLED</option></select><select id="scope"><option value="all">Semua task aktif</option><option value="due">Follow-up jatuh tempo</option><option value="priority">Prioritas tinggi</option></select><button id="refresh" class="primary">Refresh</button></section>
+<section class="workspace"><div class="panel"><div class="panel-head"><div><h2>Sales Queue</h2><span id="queueCount" class="muted">0 task</span></div><span class="muted">Klik customer untuk detail</span></div><div id="queue" class="queue"></div></div><aside id="detail" class="panel detail"><div class="empty">Pilih satu customer dari antrean.</div></aside></section></main></div>
+<script src="./app.js?v=1"></script>
+</body></html>
