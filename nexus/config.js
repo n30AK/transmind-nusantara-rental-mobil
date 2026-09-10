@@ -24,7 +24,8 @@ window.addEventListener('DOMContentLoaded', () => {
     ['./matching-command-center.js?v=1'],
     ['./executive-command-center.js?v=1'],
     ['./erp-governance.js?v=1'],
-    ['./erp-master-data.js?v=1']
+    ['./erp-master-data.js?v=1'],
+    ['./production-readiness.js?v=1']
   ];
   for (const [src] of scripts) {
     const s = document.createElement('script');
