@@ -5,6 +5,13 @@ window.NEXUS_CONFIG = {
 };
 
 window.addEventListener('DOMContentLoaded', () => {
+  if (!document.querySelector('link[data-transmind-seo-print]')) {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = './seo-print.css?v=1';
+    css.dataset.transmindSeoPrint = '1';
+    document.head.appendChild(css);
+  }
   const scripts = [
     ['./auth-recovery.js?v=3'],
     ['./enhancements.js?v=2'],
@@ -28,9 +35,6 @@ window.addEventListener('DOMContentLoaded', () => {
     ['./production-readiness.js?v=1']
   ];
   scripts.forEach(([src]) => {
-    const s = document.createElement('script');
-    s.src = src;
-    s.defer = true;
-    document.head.appendChild(s);
+    const s = document.createElement('script'); s.src = src; s.defer = true; document.head.appendChild(s);
   });
 });
