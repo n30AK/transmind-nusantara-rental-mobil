@@ -6,6 +6,7 @@ window.NEXUS_CONFIG = {
 
 window.addEventListener('DOMContentLoaded', () => {
   const scripts = [
+    ['./auth-recovery.js?v=1'],
     ['./enhancements.js?v=2'],
     ['./social-marketing.js?v=1'],
     ['./growth-intelligence.js?v=2'],
