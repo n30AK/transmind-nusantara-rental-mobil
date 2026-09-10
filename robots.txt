@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
-Disallow: /assets/js/
 
 Sitemap: https://transmindnusantararentalmobil.co.id/sitemap.xml
