@@ -8,4 +8,5 @@ window.addEventListener('DOMContentLoaded', () => {
   const sm = document.createElement('script'); sm.src = './social-marketing.js?v=1'; sm.defer = true; document.head.appendChild(sm);
   const gi = document.createElement('script'); gi.src = './growth-intelligence.js?v=2'; gi.defer = true; document.head.appendChild(gi);
   const cr = document.createElement('script'); cr.src = './crud-control.js?v=1'; cr.defer = true; document.head.appendChild(cr);
+  const seo = document.createElement('script'); seo.src = './seo-stakeholder.js?v=1'; seo.defer = true; document.head.appendChild(seo);
 });
