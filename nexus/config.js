@@ -32,7 +32,8 @@ window.addEventListener('DOMContentLoaded', () => {
     ['./executive-command-center.js?v=1'],
     ['./erp-governance.js?v=1'],
     ['./erp-master-data.js?v=1'],
-    ['./production-readiness.js?v=1']
+    ['./production-readiness.js?v=1'],
+    ['./navigation-bridge.js?v=1']
   ];
   scripts.forEach(([src]) => {
     const s = document.createElement('script'); s.src = src; s.defer = true; document.head.appendChild(s);
