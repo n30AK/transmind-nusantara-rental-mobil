@@ -1,0 +1,1 @@
+Production NEXUS release note: frontend configuration must target the current Supabase project ref unbysxbtzuncifugiqql. The publishable API key is managed as deployment configuration and must not be replaced with a service-role secret.
