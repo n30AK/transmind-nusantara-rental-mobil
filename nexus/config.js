@@ -17,7 +17,6 @@ window.addEventListener('DOMContentLoaded', () => {
     ['./enhancements.js?v=2'],
     ['./social-marketing.js?v=2'],
     ['./growth-intelligence.js?v=2'],
-    ['./manual-controls.js?v=4'],
     ['./seo-stakeholder.js?v=1'],
     ['./seo-live-center.js?v=2'],
     ['./accounting-driver.js?v=2'],
