@@ -1,5 +1,5 @@
-window.TRANSMIND_SUPABASE_URL='https://ynigwuutmqpnfnkhlaip.supabase.co';
-window.TRANSMIND_SUPABASE_ANON_KEY='sb_publishable_MycpkacWOWLwO2gXclp2Cw_ApWaeeAw';
+window.TRANSMIND_SUPABASE_URL='https://unbysxbtzuncifugiqql.supabase.co';
+window.TRANSMIND_SUPABASE_ANON_KEY='sb_publishable_VAdOaPHUniU8qRRex4anQQ_46IgVo_C';
 (function(){
 'use strict';
 var STORAGE_KEY='transmind_attribution_v1',SESSION_KEY='transmind_visitor_session_v1',host=location.host;
