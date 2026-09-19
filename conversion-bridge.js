@@ -1,29 +1,33 @@
 /* TRANSMIND CONVERSION BRIDGE
-   Public funnel telemetry only. No visual changes, no prices, no customer PII.
+   Real first-party funnel telemetry. No fake conversions, no customer PII.
 */
 (function(){
   'use strict';
   var EVENT_TABLE='website_analytics_events';
-  function sid(){return window.TRANSMIND_VISITOR_SESSION_ID||''}
+  function sid(){return window.TRANSMIND_VISITOR_SESSION_ID||sessionStorage.getItem('transmind_visitor_session_v2')||''}
   function clean(v,n){return String(v==null?'':v).slice(0,n||300)}
   function track(type,meta){
     try{
-      if(!window.supabase||!window.TRANSMIND_SUPABASE_URL||!window.TRANSMIND_SUPABASE_ANON_KEY||!sid()) return;
+      if(!window.supabase||!window.TRANSMIND_SUPABASE_URL||!window.TRANSMIND_SUPABASE_ANON_KEY||!sid()) return Promise.resolve(false);
       var sb=window.supabase.createClient(window.TRANSMIND_SUPABASE_URL,window.TRANSMIND_SUPABASE_ANON_KEY);
-      var a=window.TRANSMIND_ATTRIBUTION||{}, t=a.first_touch||a.last_touch||{};
-      sb.from(EVENT_TABLE).insert({event_type:type,visitor_session_id:sid(),occurred_at:new Date().toISOString(),path:location.pathname,title:document.title,source:clean(t.source,100),medium:clean(t.medium,100),campaign:clean(t.campaign,150),content:clean(t.content,150),term:clean(t.term,150),referrer_host:clean(document.referrer?new URL(document.referrer).host:'',150),metadata:meta||{}}).then(function(){}).catch(function(){});
-    }catch(_){ }
+      var a=window.TRANSMIND_ATTRIBUTION||window.TRANSMIND_GROWTH_ATTRIBUTION||{};
+      var source=a.source||a.utm_source||'', medium=a.medium||a.utm_medium||'', campaign=a.campaign||a.utm_campaign||'', content=a.content||a.utm_content||'', term=a.term||a.utm_term||'';
+      var row={event_type:type,visitor_session_id:sid(),occurred_at:new Date().toISOString(),path:location.pathname+location.search,title:document.title,source:clean(source,100),medium:clean(medium,100),campaign:clean(campaign,150),content:clean(content,150),term:clean(term,150),referrer_host:clean(document.referrer?new URL(document.referrer).host:'',150),metadata:meta||{}};
+      if(meta&&meta.booking_id) row.booking_id=meta.booking_id;
+      if(meta&&meta.booking_code) row.booking_code=clean(meta.booking_code,100);
+      return sb.from(EVENT_TABLE).insert(row).then(function(){return true}).catch(function(){return false});
+    }catch(_){ return Promise.resolve(false); }
   }
   function boot(){
     document.addEventListener('click',function(e){
       var el=e.target&&e.target.closest?e.target.closest('a,button'):null;if(!el)return;
       var href=el.getAttribute('href')||'',txt=clean(el.textContent,120);
-      if(/wa\.me|whatsapp/i.test(href+txt))track('whatsapp_click',{label:txt.slice(0,80),href:clean(href,300)});
+      if(/wa\\.me|whatsapp/i.test(href+txt))track('whatsapp_click',{label:txt.slice(0,80),href:clean(href,300)});
       else if(el.matches('button,[role="button"]'))track('cta_click',{label:txt.slice(0,100)});
     },true);
     document.addEventListener('submit',function(e){
-      var f=e.target;if(!f||!(f instanceof HTMLFormElement))return;
-      track('booking_start',{form_id:clean(f.id,80)});
+      var form=e.target;if(!form||!(form instanceof HTMLFormElement))return;
+      track('booking_start',{form_id:clean(form.id,80)});
     },true);
   }
   window.TRANSMIND_TRACK_CONVERSION=track;
