@@ -61,10 +61,20 @@
 
     const sb=window.supabase.createClient(window.TRANSMIND_SUPABASE_URL,window.TRANSMIND_SUPABASE_ANON_KEY);
     sb.from('website_campaigns')
-      .select('campaign_type,title,subtitle,body,cta_label,cta_url,image_url')
+      .select('campaign_type,title,subtitle,body,cta_label,cta_url,image_url,priority,active,starts_at,ends_at')
+      .eq('active',true)
       .order('priority',{ascending:true})
-      .limit(1)
-      .then(({data,error})=>{ if(!error&&data&&data[0]) mountCampaign(data[0]); })
+      .limit(20)
+      .then(({data,error})=>{
+        if(error||!Array.isArray(data)) return;
+        const now=Date.now();
+        const live=data.filter(function(c){
+          const start=c.starts_at?Date.parse(c.starts_at):0;
+          const end=c.ends_at?Date.parse(c.ends_at):Infinity;
+          return start<=now && now<=end;
+        });
+        if(live[0]) mountCampaign(live[0]);
+      })
       .catch(()=>{});
   }
 
