@@ -1636,13 +1636,6 @@ async function submitBooking(
                     `;
 
             }
-
-
-            openUnavailableWhatsApp(
-                formData
-            );
-
-
             return;
         }
 
@@ -1708,13 +1701,6 @@ async function submitBooking(
                     `;
 
             }
-
-
-            openUnavailableWhatsApp(
-                formData
-            );
-
-
             return;
         }
 
@@ -1731,7 +1717,7 @@ async function submitBooking(
          * This is the source of truth for Nexus conversion reporting.
          */
         if (typeof window.TRANSMIND_TRACK_CONVERSION === 'function') {
-            window.TRANSMIND_TRACK_CONVERSION('booking_success', {
+            await window.TRANSMIND_TRACK_CONVERSION('booking_success', {
                 booking_id: bookingResult.id || bookingResult.booking_id || null,
                 booking_code: bookingCode,
                 vehicle_id: formData.vehicleId || null,
