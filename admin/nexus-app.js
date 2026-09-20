@@ -210,8 +210,51 @@ const r=await client.from(table).select('*').eq('id',id).maybeSingle();const row
 async function openModule(m){current=m;setHeader(modules[m].title,modules[m].desc);document.querySelector('[data-module="'+m+'"]')?.classList.add('active');if(m==='analytics'){const r=await client.from('website_analytics_events').select('*').order('occurred_at',{ascending:false}).limit(300);rows=r.data||[];return renderGenericTable(m,rows)}const table=modules[m].table;if(!table)return home();const r=await client.from(table).select('*').order('created_at',{ascending:false}).limit(500);if(r.error){$('content').innerHTML='<div class="notice error">'+esc(r.error.message)+'</div>';return}rows=r.data||[];renderGenericTable(m,rows)}
 function renderGenericTable(m,data){const writable=canWrite(m),cols=(data[0]?Object.keys(data[0]):fallback[modules[m].table]||[]).filter(c=>!['id','created_at','updated_at'].includes(c)).slice(0,10);$('content').innerHTML='<div class="module-head"><div><b>'+data.length+' record</b><div class="muted">Production data • authority: '+esc(role)+'</div></div><div class="module-actions">'+(writable?'<button class="btn primary" id="insertBtn">＋ Insert</button>':'')+'<button class="btn ghost" id="exportBtn">Export CSV</button><button class="btn ghost" id="printBtn">Print</button></div></div>'+txToolbar()+'<div class="table-card"><table class="table"><thead><tr>'+cols.map(c=>'<th>'+c.replaceAll('_',' ')+'</th>').join('')+'<th>Aksi</th></tr></thead><tbody id="tbody"></tbody></table></div>';const draw=()=>{const q=($('filter').value||'').toLowerCase();const vis=data.filter(r=>JSON.stringify(r).toLowerCase().includes(q));$('tbody').innerHTML=vis.map(r=>'<tr>'+cols.map(c=>'<td>'+esc(r[c]??'—')+'</td>').join('')+'<td><div class="row-actions"><button class="btn ghost" data-gview="'+r.id+'">View</button>'+(writable?'<button class="btn ghost" data-gedit="'+r.id+'">Update</button>':'')+(canDelete()&&writable?'<button class="btn danger" data-gdel="'+r.id+'">Delete</button>':'')+'</div></td></tr>').join('')||'<tr><td colspan="'+(cols.length+1)+'" class="empty">Tidak ada data.</td></tr>';document.querySelectorAll('[data-gview],[data-gedit]').forEach(b=>b.onclick=()=>openGenericRecord(modules[m].table,b.dataset.gview||b.dataset.gedit));document.querySelectorAll('[data-gdel]').forEach(b=>b.onclick=()=>requestDelete(modules[m].table,b.dataset.gdel))};$('filter').oninput=draw;$('clearFilter').onclick=()=>{$('filter').value='';draw()};draw();if(writable)$('insertBtn').onclick=()=>openGenericRecord(modules[m].table,null);$('exportBtn').onclick=()=>exportRows(data,m);$('printBtn').onclick=()=>window.print()}
 async function openAuth(){const s=await client.auth.getSession();if(s.data.session)return true;$('authModal').classList.remove('hidden');return new Promise(resolve=>{$('authForm').onsubmit=async e=>{e.preventDefault();$('authError').textContent='';const r=await client.auth.signInWithPassword({email:$('authEmail').value.trim(),password:$('authPassword').value});if(r.error){$('authError').textContent=r.error.message;return}$('authModal').classList.add('hidden');resolve(true)}})}
+
+function domainReadonly(title,obj,fields){
+  return '<section class="related-section"><div class="related-head"><h3>'+esc(title)+'</h3><span>read only</span></div><div class="field-grid readonly-grid">'+fields.map(f=>'<div class="field"><label>'+esc(f.replaceAll('_',' '))+'</label><div class="readonly-value">'+esc(obj?.[f]??'—')+'</div></div>').join('')+'</div></section>';
+}
+async function domainTabView(tab){
+  const s=domainState,row=s.row||{};
+  if(!s.kind)return;
+  document.querySelectorAll('.domain-tab').forEach(x=>x.classList.toggle('active',x.dataset.domainTab===tab));
+  if((s.kind==='payment'&&tab==='payment')){await openPaymentRecord(row.id);return}
+  if((s.kind==='refund'&&tab==='refund')){await openRefundRecord(row.id);return}
+  if((s.kind==='cancellation'&&tab==='cancellation')){await openCancellationRecord(row.id);return}
+  let tx=null,b=null,c=null,v=null,u=null;
+  tx=lookups.transactions[row.transaction_id]||(await client.from('transactions').select('*').eq('id',row.transaction_id).maybeSingle()).data;
+  if(s.kind==='cancellation')tx=lookups.transactions[row.transaction_id]||(await client.from('transactions').select('*').eq('id',row.transaction_id).maybeSingle()).data;
+  const bookingId=row.booking_id||tx?.booking_id;
+  b=bookingId?(lookups.bookings[bookingId]||(await client.from('bookings').select('*').eq('id',bookingId).maybeSingle()).data):null;
+  const customerId=b?.customer_id||tx?.customer_id;
+  c=customerId?(lookups.customers[customerId]||(await client.from('customers').select('*').eq('id',customerId).maybeSingle()).data):null;
+  v=tx?.vehicle_id?(lookups.vehicles[tx.vehicle_id]||(await client.from('vehicles').select('*').eq('id',tx.vehicle_id).maybeSingle()).data):null;
+  u=tx?.unit_id?(lookups.units[tx.unit_id]||(await client.from('vehicle_units').select('*').eq('id',tx.unit_id).maybeSingle()).data):null;
+  let h='<div class="related-panel domain-related"><div class="eyebrow">NEXUS / TRANSACTION RECORD / RELATED</div>';
+  if(tab==='transaction')h+=domainReadonly('Transaction',tx,['id','transaction_code','booking_id','customer_id','vehicle_id','unit_id','gross_amount','transaction_status','currency','source','created_at','confirmed_at','successful_at','cancelled_at']);
+  else if(tab==='booking')h+=domainReadonly('Booking',b,['id','booking_code','customer_id','customer_name','customer_phone','vehicle_id','unit_id','service','start_date','end_date','area','status','total_price','verification_status','created_at']);
+  else if(tab==='customer')h+=domainReadonly('Customer',c,['id','full_name','phone','nik','address','phone_verified','identity_verified','verification_status','risk_level','created_at']);
+  else if(tab==='armada'){h+=domainReadonly('Vehicle',v,['id','name','slug','category','capacity','active']);h+=domainReadonly('Unit',u,['id','unit_code','vehicle_id','status','active']);}
+  else if(tab==='allocation')h+=domainReadonly('Payment Allocation',row,['allocation_type','allocation_notes','amount','fee_amount','tax_amount','net_amount']);
+  else if(tab==='verification')h+=domainReadonly('Payment Verification',row,['verification_status','verified_at','verified_by','verification_notes','proof_url','gateway_status']);
+  else if(tab==='accounting')h+=domainReadonly('Payment Accounting',row,['accounting_reference','fee_amount','tax_amount','net_amount','approved_at','approved_by']);
+  else if(tab==='refund'){
+    const rs=(await client.from('refunds').select('*').eq('transaction_id',row.transaction_id).order('created_at',{ascending:false})).data||[];
+    h+='<section class="related-section"><div class="related-head"><h3>Refund</h3><span>'+rs.length+' record</span></div><div class="mini-table"><table><thead><tr><th>Reference</th><th>Amount</th><th>Reason</th><th>Status</th><th>Processed</th></tr></thead><tbody>'+(rs.length?rs.map(x=>'<tr><td>'+esc(x.refund_reference)+'</td><td>'+Number(x.refund_amount||0).toLocaleString('id-ID')+'</td><td>'+esc(x.refund_reason||'—')+'</td><td>'+esc(x.refund_status)+'</td><td>'+esc(x.processed_at||'—')+'</td></tr>').join(''):'<tr><td colspan="5" class="empty">Tidak ada refund terkait.</td></tr>')+'</tbody></table></div></section>';
+  } else if(tab==='history')h+=domainReadonly('Audit / History',row,['id','created_at','updated_at','paid_at','verified_at','approved_at','cancelled_at','processed_at']);
+  h+='</div>';$('formBody').innerHTML=h;
+}
+function bindDomainTabs(){
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('.domain-tab');
+    if(!b)return;
+    e.preventDefault();
+    e.stopPropagation();
+    domainTabView(b.dataset.domainTab);
+  });
+}
 async function init(){
-bindNavigation();$('cancelDelete').onclick=()=>{$('confirmModal').classList.add('hidden');pendingDelete=null};$('confirmDelete').onclick=executeDelete;document.querySelectorAll('[data-close]').forEach(x=>x.onclick=()=>x.closest('.drawer-wrap')?.classList.add('hidden'));$('refreshBtn').onclick=()=>current==='home'?home():(current==='transactions'||current==='customers'||current==='crm_tasks'||current==='interactions'||current==='operations_tasks'||current==='growth_actions'||current==='opportunities'||current==='campaign_queue'||current==='website_campaigns'||current==='signals'||current==='analytics'?openModule(current):openTxView(txView));$('logoutBtn').onclick=async()=>{await client.auth.signOut();location.reload()};if(!(await openAuth()))return;const s=await client.auth.getSession(),uid=s.data.session.user.id,p=await client.from('user_profiles').select('role,full_name').eq('id',uid).maybeSingle();role=p.data?.role||s.data.session.user.app_metadata?.role||'viewer';$('roleBadge').textContent=(p.data?.full_name||s.data.session.user.email||'User')+' · '+role;$('dbStatus').textContent='Production DB · authenticated';home()
+bindNavigation();bindDomainTabs();$('cancelDelete').onclick=()=>{$('confirmModal').classList.add('hidden');pendingDelete=null};$('confirmDelete').onclick=executeDelete;document.querySelectorAll('[data-close]').forEach(x=>x.onclick=()=>x.closest('.drawer-wrap')?.classList.add('hidden'));$('refreshBtn').onclick=()=>current==='home'?home():(current==='transactions'||current==='customers'||current==='crm_tasks'||current==='interactions'||current==='operations_tasks'||current==='growth_actions'||current==='opportunities'||current==='campaign_queue'||current==='website_campaigns'||current==='signals'||current==='analytics'?openModule(current):openTxView(txView));$('logoutBtn').onclick=async()=>{await client.auth.signOut();location.reload()};if(!(await openAuth()))return;const s=await client.auth.getSession(),uid=s.data.session.user.id,p=await client.from('user_profiles').select('role,full_name').eq('id',uid).maybeSingle();role=p.data?.role||s.data.session.user.app_metadata?.role||'viewer';$('roleBadge').textContent=(p.data?.full_name||s.data.session.user.email||'User')+' · '+role;$('dbStatus').textContent='Production DB · authenticated';home()
 }
 init()
 })();
