@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="id">
 
@@ -550,7 +549,12 @@
             <p>
                 Isi data perjalanan Anda untuk mengirim
                 permintaan booking kepada Transmind Nusantara.
+                Data dapat dilanjutkan kembali bila halaman sempat tertutup.
             </p>
+            <div class="booking-guidance" aria-label="Panduan booking">
+                <strong>3 langkah:</strong> pilih armada → tentukan tanggal & layanan → kirim booking.
+                Setelah terkirim, kode booking digunakan untuk proses lanjutan melalui WhatsApp.
+            </div>
 
         </div>
 
@@ -777,11 +781,18 @@
             <button
                 class="btn gold full"
                 type="submit"
+                id="bookingSubmit"
             >
-
                 KIRIM BOOKING
-
             </button>
+
+            <a class="booking-secondary-cta"
+               href="https://wa.me/6281292677888"
+               target="_blank"
+               rel="noopener noreferrer"
+               data-nexus-channel="whatsapp">
+                Butuh bantuan sebelum booking? Chat WhatsApp Transmind
+            </a>
 
 
             <!-- HASIL -->
