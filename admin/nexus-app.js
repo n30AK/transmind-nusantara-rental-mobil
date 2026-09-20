@@ -214,7 +214,7 @@ async function openAuth(){const s=await client.auth.getSession();if(s.data.sessi
 function domainReadonly(title,obj,fields){
   return '<section class="related-section"><div class="related-head"><h3>'+esc(title)+'</h3><span>read only</span></div><div class="field-grid readonly-grid">'+fields.map(f=>'<div class="field"><label>'+esc(f.replaceAll('_',' '))+'</label><div class="readonly-value">'+esc(obj?.[f]??'—')+'</div></div>').join('')+'</div></section>';
 }
-async async function domainTabView(tab){
+async function domainTabView(tab){
   const s=domainState,row=s.row||{};
   if(!s.kind)return;
   document.querySelectorAll('.domain-tab').forEach(x=>x.classList.toggle('active',x.dataset.domainTab===tab));
