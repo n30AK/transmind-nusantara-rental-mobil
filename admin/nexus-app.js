@@ -62,6 +62,8 @@ function bindNavigation(){
 document.querySelectorAll('.nav-section').forEach(b=>b.onclick=()=>{b.classList.toggle('open');b.querySelector('b').textContent=b.classList.contains('open')?'−':'+'});
 document.querySelectorAll('#nav a[data-module]').forEach(a=>a.onclick=e=>{e.preventDefault();openModule(a.dataset.module)});
 document.querySelectorAll('#nav a[data-management]').forEach(a=>a.onclick=e=>{e.preventDefault();renderManagementDashboard(a.dataset.management)});
+document.querySelectorAll('#nav a[data-management]').forEach(a=>a.onclick=e=>{e.preventDefault();renderManagementDashboard(a.dataset.management)});
+document.querySelectorAll('#nav a[data-master]').forEach(a=>a.onclick=e=>{e.preventDefault();renderMasterData()});
 document.querySelectorAll('#nav a[data-tx-view]').forEach(a=>a.onclick=e=>{e.preventDefault();openTxView(a.dataset.txView)});
 }
 function markActive(selector,value){document.querySelectorAll(selector).forEach(a=>a.classList.toggle('active',a.getAttribute(selector.includes('tx-view')?'data-tx-view':'data-module')===value))}
@@ -141,6 +143,29 @@ async function renderManagementDashboard(kind){
   $('content').innerHTML='<div class="hero"><div><div class="eyebrow">TRANSMIND NEXUS / MANAGEMENT</div><h2 style="margin:6px 0">'+cfg.title+'</h2><p class="muted">'+cfg.desc+' Semua angka berasal dari production database.</p></div><div class="module-actions"><button class="btn ghost" id="mgmtRefresh">↻ Refresh</button><button class="btn ghost" id="mgmtPrint">Print</button></div></div>'+html+'<div class="notice" style="margin-top:14px">Dashboard Management adalah read-only command surface. Perubahan data dilakukan melalui aplikasi domain terkait dengan authority dan audit yang berlaku.</div>';
   $('mgmtRefresh').onclick=()=>renderManagementDashboard(kind);
   $('mgmtPrint').onclick=()=>window.print();
+}
+
+async function renderMasterData(){
+  setHeader('ERP Master Data','Master data terhubung: Customer, Booking, Transaction, Armada, Payment dan Partner.');
+  await loadLookups();
+  const defs=[
+    ['CUSTOMER','customers','Customer Master',Object.values(lookups.customers)],
+    ['BOOKING','bookings','Booking Master',Object.values(lookups.bookings)],
+    ['TRANSACTION','transactions','Transaction Master',Object.values(lookups.transactions)],
+    ['ARMADA UNIT','vehicle_units','Vehicle Unit Master',Object.values(lookups.units)],
+    ['ARMADA HARGA','vehicle_prices','Vehicle Price Master',[]],
+    ['PARTNER','partners','Partner Master',[]]
+  ];
+  const tabs=defs.map((d,i)=>'<button class="domain-tab '+(i===0?'active':'')+'" data-master-tab="'+d[0]+'">'+d[2]+'</button>').join('');
+  $('content').innerHTML='<div class="module-head"><div><b>ERP Master Data</b><div class="muted">Satu master data, banyak relasi. Perubahan dilakukan melalui aplikasi domain dengan authority yang berlaku.</div></div><div class="module-actions"><button class="btn ghost" id="masterRefresh">↻ Refresh</button><button class="btn ghost" id="masterPrint">Print</button></div></div><div class="detail-tabs" id="masterTabs">'+tabs+'</div><div id="masterBody"></div>';
+  const render=(key)=>{
+    const d=defs.find(x=>x[0]===key)||defs[0], data=d[3];
+    const fields=d[0]==='CUSTOMER'?['id','full_name','phone','verification_status','risk_level']:d[0]==='BOOKING'?['id','booking_code','customer_id','vehicle_id','status','start_date','end_date','total_price']:d[0]==='TRANSACTION'?['id','transaction_code','booking_id','gross_amount','transaction_status']:d[0]==='ARMADA UNIT'?['id','unit_code','vehicle_id','status','active']:['id'];
+    $('masterBody').innerHTML='<div class="seo-panel" style="margin-top:14px"><div class="module-head"><div><b>'+data.length+' record</b><div class="muted">'+d[2]+' • relational master</div></div><div class="module-actions"><button class="btn ghost" id="masterExport">Export CSV</button></div></div><div class="table-scroll"><table class="table"><thead><tr>'+fields.map(x=>'<th>'+x.replaceAll('_',' ')+'</th>').join('')+'</tr></thead><tbody>'+(data.slice(0,100).map(r=>'<tr>'+fields.map(x=>'<td>'+esc(r[x]??'—')+'</td>').join('')+'</tr>').join('')||'<tr><td colspan="'+fields.length+'" class="empty">Belum ada data.</td></tr>')+'</tbody></table></div></div>';
+    $('masterExport').onclick=()=>exportRows(data,d[1]);
+  };
+  document.querySelectorAll('[data-master-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-master-tab]').forEach(x=>x.classList.toggle('active',x===b));render(b.dataset.masterTab)});
+  $('masterRefresh').onclick=()=>renderMasterData();$('masterPrint').onclick=()=>window.print();render('CUSTOMER');
 }
 
 async function loadLookups(){
