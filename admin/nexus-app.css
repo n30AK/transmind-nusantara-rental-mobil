@@ -34,6 +34,7 @@ body{background:radial-gradient(900px 500px at 85% -10%,#332b12 0%,transparent 5
 .brand{padding:4px 9px 16px;border-bottom:1px solid var(--bos-line);margin-bottom:8px}
 .brand strong{font-size:17px;letter-spacing:2px;color:var(--bos-gold2)}
 .brand span{display:block;font-size:9px;color:var(--bos-muted);letter-spacing:1.8px;margin-top:5px}
+.nav-access-state{padding:4px 14px 8px;color:#8b8b8b;font-size:11px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nav-access-state::first-letter{color:#b78a35}
 .nav-command{display:flex!important;align-items:center;gap:9px;margin:6px 4px 13px;padding:10px 11px!important;border:1px solid #3c3420;border-radius:9px!important;background:#17140b!important;color:var(--bos-gold2)!important;font-size:10px!important;font-weight:850;letter-spacing:.8px}
 .nav-command em{margin-left:auto;color:#8e949f;font-style:normal}
 .nav-section{color:#676d78;padding:11px 9px 5px;font-size:9px;letter-spacing:1.5px}
