@@ -2,23 +2,30 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Transmind Nexus — ERP / CRM Application Suite</title>
-<link rel="stylesheet" href="./nexus-app.css?v=20260920-responsive-v4">
+<title>TRANSMIND NEXUS — Business Operating System</title>
+<link rel="stylesheet" href="./nexus-app.css?v=20260921-bos-shell-v1">
 <script src="../config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="app-shell">
 <aside class="sidebar">
-  <div class="brand"><strong>TRANSMIND NEXUS</strong><span>ERP / CRM APPLICATION SUITE</span></div>
+  <div class="brand"><strong>TRANSMIND NEXUS</strong><span>BUSINESS OPERATING SYSTEM</span></div>
   <nav id="nav" class="nav">
-    <button class="nav-section open" type="button"><span>WORKSPACE</span><b>−</b></button>
-    <div class="nav-items"><a data-module="home" class="active"><i>⌂</i> Workspace</a></div>
+    <a class="nav-command" href="../nexus/crm/" title="CRM Command Center"><span>◈</span><b>CRM COMMAND CENTER</b><em>↗</em></a>
 
-    <button class="nav-section open" type="button"><span>MASTER DATA</span><b>−</b></button>
-    <div class="nav-items"><a data-module="customers"><i>◎</i> Customers</a><a href="./fleet.html"><i>▣</i> Armada <em>↗</em></a></div>
+    <button class="nav-section open" type="button"><span>🏠 MANAGEMENT</span><b>−</b></button>
+    <div class="nav-items">
+      <a data-module="home"><i>⌂</i> Executive Dashboard</a>
+      <a data-module="operations_tasks"><i>⚙</i> Operational Dashboard</a>
+      <a data-module="growth_actions"><i>▣</i> Sales Dashboard</a>
+      <a data-module="transactions"><i>¤</i> Finance Dashboard</a>
+      <a data-module="customers"><i>▤</i> ERP Master Data</a>
+      <a data-module="signals"><i>⌁</i> ERP Governance</a>
+      <a data-module="analytics"><i>◫</i> Production Readiness</a>
+    </div>
 
-    <button class="nav-section open" type="button"><span>TRANSAKSI</span><b>−</b></button>
+    <button class="nav-section open" type="button"><span>📥 TRANSAKSI</span><b>−</b></button>
     <div class="nav-items transaction-menu">
       <div class="tx-subgroup"><div class="tx-subtitle">BOOKING</div>
         <a data-tx-view="all"><i>▤</i> Semua Booking</a><a data-tx-view="new"><i>＋</i> Booking Baru</a><a data-tx-view="today"><i>●</i> Booking Hari Ini</a><a data-tx-view="upcoming"><i>◷</i> Booking Mendatang</a><a data-tx-view="calendar"><i>▦</i> Kalender Rental</a><a data-tx-view="pending"><i>!</i> Booking Pending</a><a data-tx-view="confirmed"><i>✓</i> Booking Confirmed</a><a data-tx-view="running"><i>▶</i> Booking Berjalan</a><a data-tx-view="completed"><i>■</i> Booking Selesai</a>
@@ -34,24 +41,60 @@
       </div>
     </div>
 
-    <button class="nav-section open" type="button"><span>SALES & CRM</span><b>−</b></button>
-    <div class="nav-items"><a data-module="crm_tasks"><i>✓</i> CRM Tasks</a><a data-module="interactions"><i>◌</i> Interactions</a><a data-module="transactions"><i>¤</i> Transactions Ledger</a></div>
+    <button class="nav-section open" type="button"><span>🚗 ARMADA</span><b>−</b></button>
+    <div class="nav-items"><a href="./fleet.html"><i>▣</i> Armada Application <em>↗</em></a></div>
 
-    <button class="nav-section open" type="button"><span>OPERATIONS</span><b>−</b></button>
-    <div class="nav-items"><a data-module="operations_tasks"><i>☑</i> Operations Tasks</a></div>
+    <button class="nav-section open" type="button"><span>👥 CUSTOMER / CRM</span><b>−</b></button>
+    <div class="nav-items"><a data-module="customers"><i>◎</i> Customer Master</a><a data-module="crm_tasks"><i>✓</i> Follow Up / CRM Tasks</a><a data-module="interactions"><i>◌</i> Interaksi</a></div>
 
-    <button class="nav-section open" type="button"><span>GROWTH & MARKETING</span><b>−</b></button>
-    <div class="nav-items"><a data-module="growth_actions"><i>↗</i> Growth Actions</a><a data-module="opportunities"><i>◇</i> Opportunities</a><a data-module="campaign_queue"><i>▸</i> Campaign Queue</a><a data-module="website_campaigns"><i>◈</i> Website Campaigns</a></div>
+    <button class="nav-section open" type="button"><span>📢 SALES & MARKETING</span><b>−</b></button>
+    <div class="nav-items"><a data-module="growth_actions"><i>↗</i> Growth Actions</a><a data-module="opportunities"><i>◇</i> Lead / Opportunities</a><a data-module="campaign_queue"><i>▸</i> Campaign Queue</a><a data-module="website_campaigns"><i>◈</i> Website Campaigns</a></div>
 
-    <button class="nav-section open" type="button"><span>INTELLIGENCE</span><b>−</b></button>
-    <div class="nav-items"><a data-module="signals"><i>⌁</i> Intelligence Signals</a><a data-module="analytics"><i>◫</i> Production Analytics</a></div>
+    <button class="nav-section open" type="button"><span>🤝 PARTNER</span><b>−</b></button>
+    <div class="nav-items"><a data-module="opportunities"><i>◇</i> Partner Opportunities</a><a data-module="transactions"><i>¤</i> Partner Transaction Ledger</a></div>
+
+    <button class="nav-section open" type="button"><span>💰 KEUANGAN</span><b>−</b></button>
+    <div class="nav-items"><a data-module="transactions"><i>¤</i> Finance / Transaction Ledger</a><a data-tx-view="payment_all"><i>◉</i> Payment Management</a><a data-tx-view="refund_all"><i>↩</i> Refund Management</a><a data-tx-view="cancellation_all"><i>⌫</i> Cancellation Management</a></div>
+
+    <button class="nav-section open" type="button"><span>📊 LAPORAN</span><b>−</b></button>
+    <div class="nav-items"><a data-module="analytics"><i>▤</i> Production Reports / Analytics</a><a data-module="transactions"><i>¤</i> Transaction Ledger Report</a></div>
+
+    <button class="nav-section open" type="button"><span>🔮 FORECASTING</span><b>−</b></button>
+    <div class="nav-items"><a data-module="opportunities"><i>◇</i> Demand / Opportunity Forecast</a><a data-module="analytics"><i>◫</i> Traffic & Conversion Forecast Data</a></div>
+
+    <button class="nav-section open" type="button"><span>📈 BUSINESS INTELLIGENCE</span><b>−</b></button>
+    <div class="nav-items"><a data-module="analytics"><i>◫</i> Production BI</a><a data-module="signals"><i>⌁</i> Intelligence Signals</a></div>
+
+    <button class="nav-section open" type="button"><span>⚙️ OPERASIONAL</span><b>−</b></button>
+    <div class="nav-items"><a data-module="operations_tasks"><i>☑</i> Operations Tasks</a><a data-module="crm_tasks"><i>✓</i> Work / Follow Up Queue</a></div>
+
+    <button class="nav-section open" type="button"><span>📦 PROCUREMENT & INVENTORY</span><b>−</b></button>
+    <div class="nav-items"><a data-module="operations_tasks"><i>▤</i> Operational Procurement Queue</a></div>
+
+    <button class="nav-section open" type="button"><span>👨‍💼 HR & ORGANIZATION</span><b>−</b></button>
+    <div class="nav-items"><a data-module="customers"><i>◎</i> Organization Master Foundation</a></div>
+
+    <button class="nav-section open" type="button"><span>📁 DOKUMEN</span><b>−</b></button>
+    <div class="nav-items"><a data-module="customers"><i>▤</i> Customer Documents Foundation</a><a data-module="analytics"><i>◫</i> Production Document / Audit Data</a></div>
+
+    <button class="nav-section open" type="button"><span>🤖 AI INTELLIGENCE</span><b>−</b></button>
+    <div class="nav-items"><a data-module="signals"><i>⌁</i> Intelligence Signals</a><a data-module="opportunities"><i>◇</i> AI Opportunity Queue</a></div>
+
+    <button class="nav-section open" type="button"><span>⚙️ ADMIN</span><b>−</b></button>
+    <div class="nav-items"><a data-module="home"><i>⌘</i> Authority / System Workspace</a><a data-module="signals"><i>⌁</i> Audit / Governance Signals</a></div>
+
+    <button class="nav-section open" type="button"><span>🧠 GROWTH INTELLIGENCE</span><b>−</b></button>
+    <div class="nav-items"><a data-module="growth_actions"><i>↗</i> Growth Actions</a><a data-module="opportunities"><i>◇</i> Demand Opportunities</a><a data-module="analytics"><i>◫</i> Live Production Analytics</a></div>
+
+    <button class="nav-section open" type="button"><span>SEO / LIVE TRAFFIC</span><b>−</b></button>
+    <div class="nav-items"><a data-module="seo_live"><i>●</i> SEO & Live Traffic Command Center</a></div>
   </nav>
   <div class="side-foot"><span id="roleBadge">Checking authority…</span><button id="logoutBtn" class="link-btn">Keluar</button></div>
 </aside>
 
 <main class="main">
   <header class="topbar">
-    <div><div class="eyebrow">NEXUS / ERP / CRM / TRANSAKSI</div><h1 id="moduleTitle">Workspace</h1><p id="moduleDesc" class="muted">Pintu masuk pekerjaan dan seluruh modul aplikasi Nexus.</p></div>
+    <div><div class="eyebrow">NEXUS / BUSINESS OPERATING SYSTEM</div><h1 id="moduleTitle">Executive Dashboard</h1><p id="moduleDesc" class="muted">Command Center TransMind Nexus — data produksi, transaksi, operasi, growth dan intelligence.</p></div>
     <div class="top-actions"><span id="dbStatus" class="status">Connecting…</span><button id="refreshBtn" class="btn ghost">↻ Refresh</button></div>
   </header>
   <section id="content"></section>
@@ -69,5 +112,5 @@
 
 <div id="confirmModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card"><h2 id="confirmTitle">Hapus record?</h2><p id="confirmText">Tindakan ini akan tercatat pada database.</p><div class="modal-actions"><button id="cancelDelete" class="btn ghost">Batal</button><button id="confirmDelete" class="btn danger">Delete</button></div></div></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script src="./nexus-app.js?v=20260920-refund-related-v5"></script>
+<script src="./nexus-app.js?v=20260921-bos-shell-v1"></script>
 </body></html>
