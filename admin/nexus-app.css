@@ -25,3 +25,51 @@ html,body{min-height:100%;overflow:hidden}
  #formBody{overflow:auto}.readonly-grid{grid-template-columns:1fr!important}
 }
 @media(max-width:430px){.sidebar{max-height:38dvh}.record-nav .position{display:none}.detail-tabs .tab{padding:7px 9px;font-size:10px}}
+
+/* TransMind Nexus original Business Operating System visual layer v1 */
+:root{--bos-bg:#07080b;--bos-side:#0b0d11;--bos-panel:#11141a;--bos-panel2:#171a21;--bos-line:#272c35;--bos-gold:#d2ad32;--bos-gold2:#f0cf68;--bos-text:#f5f5f2;--bos-muted:#8e949f}
+body{background:radial-gradient(900px 500px at 85% -10%,#332b12 0%,transparent 55%),var(--bos-bg);color:var(--bos-text)}
+.app-shell{grid-template-columns:290px minmax(0,1fr)}
+.sidebar{background:rgba(9,11,15,.98);border-right:1px solid var(--bos-line);padding:18px 12px}
+.brand{padding:4px 9px 16px;border-bottom:1px solid var(--bos-line);margin-bottom:8px}
+.brand strong{font-size:17px;letter-spacing:2px;color:var(--bos-gold2)}
+.brand span{display:block;font-size:9px;color:var(--bos-muted);letter-spacing:1.8px;margin-top:5px}
+.nav-command{display:flex!important;align-items:center;gap:9px;margin:6px 4px 13px;padding:10px 11px!important;border:1px solid #3c3420;border-radius:9px!important;background:#17140b!important;color:var(--bos-gold2)!important;font-size:10px!important;font-weight:850;letter-spacing:.8px}
+.nav-command em{margin-left:auto;color:#8e949f;font-style:normal}
+.nav-section{color:#676d78;padding:11px 9px 5px;font-size:9px;letter-spacing:1.5px}
+.nav-section.open{color:var(--bos-gold2)}
+.nav-items a{color:#9298a3;padding:7px 9px;border-radius:7px;font-size:12px}
+.nav-items a:hover,.nav-items a.active{background:#191c22;color:#fff}
+.nav-items a.active{box-shadow:inset 2px 0 var(--bos-gold);color:var(--bos-gold2)}
+.nav-items a i{color:#747b86}
+.transaction-menu a{font-size:11px;padding-left:18px}
+.tx-subgroup{border-bottom:1px solid rgba(148,163,184,.10);margin:4px 0 8px}
+.tx-subtitle{color:#747b86;padding:7px 9px 4px;font-size:9px;letter-spacing:1.3px}
+.side-foot{border-top:1px solid var(--bos-line);color:var(--bos-muted)}
+.main{padding:22px 26px 40px}
+.topbar{border-bottom:1px solid var(--bos-line);padding-bottom:18px;margin-bottom:22px}
+.eyebrow{color:var(--bos-gold2);font-weight:850;letter-spacing:1.8px}
+.topbar h1{font-size:30px;letter-spacing:-.6px}
+.muted{color:var(--bos-muted)}
+.status{border-color:#3b3520;background:#17140b;color:var(--bos-gold2)}
+.btn{border-color:#343943;background:#0d1015}
+.btn.primary{background:var(--bos-gold);border-color:var(--bos-gold);color:#111;font-weight:800}
+.summary{gap:12px}
+.metric{background:linear-gradient(145deg,var(--bos-panel2),var(--bos-panel));border-color:var(--bos-line);border-radius:14px;padding:15px}
+.metric span{color:var(--bos-muted)}
+.metric b{font-size:24px}
+.seo-range{display:flex;gap:7px;flex-wrap:wrap}
+.seo-range .btn.active{border-color:#68551d;color:var(--bos-gold2);background:#18150c}
+.seo-layout{display:grid;grid-template-columns:1.5fr .9fr;gap:13px}
+.seo-panel{background:#11141a;border:1px solid #272c35;border-radius:14px;padding:16px}
+.seo-panel h3{margin:0 0 13px}
+.seo-bars{display:grid;gap:8px}
+.seo-bar{display:grid;grid-template-columns:90px 1fr 55px;gap:8px;align-items:center;font-size:11px}
+.seo-track{height:9px;background:#242832;border-radius:99px;overflow:hidden}
+.seo-fill{height:100%;background:linear-gradient(90deg,#9f7e18,#f0cf68);border-radius:99px}
+.seo-chart{height:210px;display:flex;align-items:end;gap:5px;padding:12px 0}
+.seo-col{flex:1;min-width:14px;display:flex;flex-direction:column;justify-content:end;height:100%;gap:5px}
+.seo-col i{display:block;background:#d2ad32;border-radius:4px 4px 0 0;min-height:2px}
+.seo-col span{font-size:8px;color:#747b86;text-align:center;overflow:hidden;white-space:nowrap}
+@media(max-width:1100px){.app-shell{grid-template-columns:255px 1fr}.seo-layout{grid-template-columns:1fr}}
+@media(max-width:720px){.app-shell{display:block}.sidebar{position:sticky;top:0;max-height:45dvh}.nav{max-height:36dvh}.main{padding:16px}.topbar h1{font-size:25px}.seo-layout{grid-template-columns:1fr}.seo-range{margin-top:10px}}
