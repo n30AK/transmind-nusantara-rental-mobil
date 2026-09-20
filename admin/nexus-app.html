@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TRANSMIND NEXUS — Business Operating System</title>
-<link rel="stylesheet" href="./nexus-app.css?v=20260921-bos-shell-v1">
+<link rel="stylesheet" href="./nexus-app.css?v=20260921-bos-shell-v2">
 <script src="../config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -13,6 +13,8 @@
   <div class="brand"><strong>TRANSMIND NEXUS</strong><span>BUSINESS OPERATING SYSTEM</span></div>
   <nav id="nav" class="nav">
     <a class="nav-command" href="../nexus/crm/" title="CRM Command Center"><span>◈</span><b>CRM COMMAND CENTER</b><em>↗</em></a>
+    <div class="nav-access-state">● Akses NEXUS tidak tersedia</div>
+    <a class="nav-command" href="#" data-module="seo_live" title="SEO & Live Traffic Command Center"><span>●</span><b>SEO LIVE</b><em>↗</em></a>
 
     <button class="nav-section open" type="button"><span>🏠 MANAGEMENT</span><b>−</b></button>
     <div class="nav-items">
@@ -112,5 +114,5 @@
 
 <div id="confirmModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card"><h2 id="confirmTitle">Hapus record?</h2><p id="confirmText">Tindakan ini akan tercatat pada database.</p><div class="modal-actions"><button id="cancelDelete" class="btn ghost">Batal</button><button id="confirmDelete" class="btn danger">Delete</button></div></div></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script src="./nexus-app.js?v=20260921-master-v1"></script>
+<script src="./nexus-app.js?v=20260921-governance-menu-v1"></script>
 </body></html>
