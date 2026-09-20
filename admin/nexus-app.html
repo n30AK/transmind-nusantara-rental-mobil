@@ -31,6 +31,9 @@
       <a data-tx-view="completed"><i>■</i> Booking Selesai</a>
       <a data-tx-view="cancelled"><i>×</i> Pembatalan</a>
       <a data-tx-view="refunds"><i>↩</i> Refund</a>
+      <a data-tx-view="refund_all"><i>◉</i> Semua Refund</a><a data-tx-view="refund_pending"><i>!</i> Refund Pending</a><a data-tx-view="refund_approved"><i>✓</i> Refund Approved</a><a data-tx-view="refund_processing"><i>▶</i> Refund Processing</a><a data-tx-view="refund_completed"><i>■</i> Refund Completed</a><a data-tx-view="refund_rejected"><i>×</i> Refund Rejected</a><a data-tx-view="refund_history"><i>↶</i> Refund History</a>
+      <a data-tx-view="payment_all"><i>¤</i> Semua Payment</a><a data-tx-view="payment_new"><i>＋</i> Payment Baru</a><a data-tx-view="payment_pending"><i>!</i> Payment Pending</a><a data-tx-view="payment_verified"><i>✓</i> Payment Terverifikasi</a><a data-tx-view="payment_paid"><i>●</i> Payment Berhasil</a><a data-tx-view="payment_failed"><i>×</i> Payment Gagal</a><a data-tx-view="payment_partial"><i>◐</i> Payment Partial</a><a data-tx-view="payment_overpayment"><i>+</i> Overpayment</a><a data-tx-view="payment_refund"><i>↩</i> Payment Refund</a><a data-tx-view="payment_cancelled"><i>□</i> Payment Dibatalkan</a><a data-tx-view="payment_history"><i>↶</i> Payment History</a>
+      <a data-tx-view="cancellation_all"><i>⌫</i> Semua Pembatalan</a><a data-tx-view="cancellation_new"><i>＋</i> Pembatalan Baru</a><a data-tx-view="cancellation_pending"><i>!</i> Pembatalan Pending</a><a data-tx-view="cancellation_approved"><i>✓</i> Pembatalan Approved</a><a data-tx-view="cancellation_fee"><i>¤</i> Penilaian Biaya</a><a data-tx-view="cancellation_completed"><i>■</i> Pembatalan Selesai</a><a data-tx-view="cancellation_history"><i>↶</i> Riwayat Pembatalan</a>
     </div>
 
     <button class="nav-section open" type="button"><span>SALES & CRM</span><b>−</b></button>
@@ -68,5 +71,5 @@
 
 <div id="confirmModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card"><h2 id="confirmTitle">Hapus record?</h2><p id="confirmText">Tindakan ini akan tercatat pada database.</p><div class="modal-actions"><button id="cancelDelete" class="btn ghost">Batal</button><button id="confirmDelete" class="btn danger">Delete</button></div></div></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script src="./nexus-app.js?v=20260920-transaction-v1"></script>
+<script src="./nexus-app.js?v=20260920-transaction-domain-v2"></script>
 </body></html>
