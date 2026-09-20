@@ -64,7 +64,33 @@ document.querySelectorAll('#nav a[data-module]').forEach(a=>a.onclick=e=>{e.prev
 document.querySelectorAll('#nav a[data-tx-view]').forEach(a=>a.onclick=e=>{e.preventDefault();openTxView(a.dataset.txView)});
 }
 function markActive(selector,value){document.querySelectorAll(selector).forEach(a=>a.classList.toggle('active',a.getAttribute(selector.includes('tx-view')?'data-tx-view':'data-module')===value))}
-function home(){setHeader('Workspace','Pintu masuk pekerjaan dan seluruh modul aplikasi Nexus.');document.querySelector('[data-module="home"]')?.classList.add('active');$('content').innerHTML='<div class="summary"><div class="metric"><span>AUTHORITY</span><b>'+esc(role||'—')+'</b><span>Role aktif</span></div><div class="metric"><span>DATABASE</span><b>LIVE</b><span>Supabase production</span></div><div class="metric"><span>MODE</span><b>ERP / CRM</b><span>Application workflow</span></div><div class="metric"><span>TRANSAKSI</span><b>11</b><span>Submenu booking & refund</span></div></div><div class="notice">Modul Transaksi adalah pusat proses booking: input → verifikasi → konfirmasi → rental → selesai/pembatalan → transaksi → payment/refund. Semua angka dan record berasal dari database production.</div><div class="tx-flow">'+Object.entries(txViews).map(([k,v])=>'<button class="flow-card" data-flow="'+k+'"><b>'+v.title+'</b><span>'+v.desc+'</span></button>').join('')+'</div>';document.querySelectorAll('[data-flow]').forEach(x=>x.onclick=()=>openTxView(x.dataset.flow))}
+async function home(){
+  setHeader('Executive Dashboard','TRANSMIND NEXUS — Business Operating System. Ringkasan live dari database production.');
+  document.querySelectorAll('.nav-items a').forEach(x=>x.classList.remove('active'));
+  const q=async(table,select='id',filter=null)=>{let z=client.from(table).select(select,{count:'exact',head:filter?false:true});if(filter)z=z.eq(filter[0],filter[1]);return z};
+  const [bk,tr,cu,ve,crm,ga,op,pm,rf]=await Promise.all([
+    q('bookings'),q('transactions'),q('customers'),q('vehicles'),q('crm_tasks'),q('nexus_growth_actions'),q('nexus_operations_tasks'),q('payments'),q('refunds')
+  ]);
+  const count=r=>Number(r.count||0), money=r=>Number(r.gross_amount||0);
+  const [rev, recent, pending, actions]=await Promise.all([
+    client.from('transactions').select('gross_amount').in('transaction_status',['confirmed','paid','successful','completed']),
+    client.from('bookings').select('id,booking_code,customer_name,status,start_date,total_price,created_at').order('created_at',{ascending:false}).limit(8),
+    client.from('bookings').select('id,booking_code,customer_name,status,start_date').eq('status','Menunggu').order('created_at',{ascending:false}).limit(8),
+    client.from('nexus_growth_actions').select('id,title,status,priority,channel,due_at').neq('status','completed').order('created_at',{ascending:false}).limit(8)
+  ]);
+  const revenue=(rev.data||[]).reduce((n,x)=>n+Number(x.gross_amount||0),0);
+  const rup=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n||0);
+  const card=(label,value,note)=>'<div class="metric"><span>'+label+'</span><b>'+value+'</b><span>'+note+'</span></div>';
+  const rows=(recent.data||[]).map(x=>'<tr><td>'+esc(x.booking_code||x.id)+'</td><td>'+esc(x.customer_name||'—')+'</td><td>'+statusPill(x.status)+'</td><td>'+esc(x.start_date||'—')+'</td><td>'+rup(x.total_price)+'</td></tr>').join('');
+  const pRows=(pending.data||[]).map(x=>'<tr><td>'+esc(x.booking_code||x.id)+'</td><td>'+esc(x.customer_name||'—')+'</td><td>'+esc(x.start_date||'—')+'</td><td>'+statusPill(x.status)+'</td></tr>').join('')||'<tr><td colspan="4" class="empty">Tidak ada booking pending.</td></tr>';
+  const aRows=(actions.data||[]).map(x=>'<tr><td>'+esc(x.title||'—')+'</td><td>'+esc(x.channel||'—')+'</td><td>'+statusPill(x.priority||'normal')+'</td><td>'+esc(x.due_at?String(x.due_at).replace('T',' ').slice(0,16):'—')+'</td></tr>').join('')||'<tr><td colspan="4" class="empty">Tidak ada action terbuka.</td></tr>';
+  $('content').innerHTML='<div class="hero"><div><div class="eyebrow">TRANSMIND NEXUS / BUSINESS OPERATING SYSTEM</div><h2 style="margin:6px 0">Executive Dashboard</h2><p class="muted">Satu layar untuk melihat kondisi bisnis, transaksi, customer, armada, operasi dan growth. Seluruh angka berasal dari production database.</p></div><div class="module-actions"><button class="btn ghost" id="execRefresh">↻ Refresh</button><button class="btn ghost" id="execPrint">Print</button></div></div>'+
+  '<div class="summary">'+card('BOOKINGS',count(bk),'total production')+card('TRANSACTIONS',count(tr),'transaction ledger')+card('CUSTOMERS',count(cu),'customer master')+card('ARMADA',count(ve),'vehicle master')+card('REVENUE',rup(revenue),'successful/confirmed ledger')+card('CRM OPEN',count(crm),'CRM task records')+card('GROWTH ACTIONS',count(ga),'growth records')+card('OPERATIONS',count(op),'operations task records')+card('PAYMENTS',count(pm),'payment ledger')+card('REFUNDS',count(rf),'refund ledger')+'</div>'+
+  '<div class="seo-layout" style="margin-top:14px"><div class="seo-panel"><h3>Booking terbaru</h3><table class="table"><thead><tr><th>Booking</th><th>Customer</th><th>Status</th><th>Mulai</th><th>Nilai</th></tr></thead><tbody>'+(rows||'<tr><td colspan="5" class="empty">Belum ada data.</td></tr>')+'</tbody></table></div><div class="seo-panel"><h3>Booking Pending</h3><table class="table"><thead><tr><th>Booking</th><th>Customer</th><th>Mulai</th><th>Status</th></tr></thead><tbody>'+pRows+'</tbody></table></div></div>'+
+  '<div class="seo-panel" style="margin-top:14px"><h3>Open Growth Actions</h3><table class="table"><thead><tr><th>Action</th><th>Channel</th><th>Priority</th><th>Due</th></tr></thead><tbody>'+aRows+'</tbody></table></div>'+
+  '<div class="notice" style="margin-top:14px">NEXUS OPERATING PRINCIPLE: data nyata → intelligence → opportunity → action → conversion → attribution → learning. Dashboard ini hanya membaca data production; tidak membuat booking, lead, traffic, atau revenue sintetis.</div>';
+  $('execRefresh').onclick=()=>home();$('execPrint').onclick=()=>window.print();
+}
 async function loadLookups(){
 const [c,v,u,t,b]=await Promise.all([
 client.from('customers').select('id,full_name,phone').limit(1000),
