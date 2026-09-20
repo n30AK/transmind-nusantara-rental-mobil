@@ -61,6 +61,7 @@ function setHeader(title,desc){$('moduleTitle').textContent=title;$('moduleDesc'
 function bindNavigation(){
 document.querySelectorAll('.nav-section').forEach(b=>b.onclick=()=>{b.classList.toggle('open');b.querySelector('b').textContent=b.classList.contains('open')?'−':'+'});
 document.querySelectorAll('#nav a[data-module]').forEach(a=>a.onclick=e=>{e.preventDefault();openModule(a.dataset.module)});
+document.querySelectorAll('#nav a[data-management]').forEach(a=>a.onclick=e=>{e.preventDefault();renderManagementDashboard(a.dataset.management)});
 document.querySelectorAll('#nav a[data-tx-view]').forEach(a=>a.onclick=e=>{e.preventDefault();openTxView(a.dataset.txView)});
 }
 function markActive(selector,value){document.querySelectorAll(selector).forEach(a=>a.classList.toggle('active',a.getAttribute(selector.includes('tx-view')?'data-tx-view':'data-module')===value))}
@@ -91,6 +92,57 @@ async function home(){
   '<div class="notice" style="margin-top:14px">NEXUS OPERATING PRINCIPLE: data nyata → intelligence → opportunity → action → conversion → attribution → learning. Dashboard ini hanya membaca data production; tidak membuat booking, lead, traffic, atau revenue sintetis.</div>';
   $('execRefresh').onclick=()=>home();$('execPrint').onclick=()=>window.print();
 }
+async function renderManagementDashboard(kind){
+  const cfg={
+    operations:{title:'Operational Dashboard',desc:'Kondisi pekerjaan operasional, booking berjalan, pending dan task yang membutuhkan tindakan.'},
+    sales:{title:'Sales Dashboard',desc:'Pipeline penjualan, booking, CRM follow-up dan growth action dari data production.'},
+    finance:{title:'Finance Dashboard',desc:'Ringkasan transaksi, pembayaran, refund dan nilai finansial dari ledger production.'}
+  }[kind];
+  setHeader(cfg.title,cfg.desc);
+  const q=(table,select)=>client.from(table).select(select||'*',{count:'exact'});
+  const [bk,crm,op,ga,tr,pm,rf]=await Promise.all([
+    q('bookings','id,booking_code,customer_name,status,start_date,end_date,total_price,created_at'),
+    q('crm_tasks','id,title,status,priority,due_at,booking_id,customer_id'),
+    q('nexus_operations_tasks','id,title,status,priority,due_at,booking_id,customer_id'),
+    q('nexus_growth_actions','id,title,status,priority,channel,due_at,booking_id,customer_id'),
+    q('transactions','id,transaction_code,booking_id,customer_id,gross_amount,transaction_status,created_at,successful_at'),
+    q('payments','*'),
+    q('refunds','*')
+  ]);
+  const B=bk.data||[], C=crm.data||[], O=op.data||[], G=ga.data||[], T=tr.data||[], P=pm.data||[], R=rf.data||[];
+  const open=x=>!['completed','selesai','closed','done','cancelled','dibatalkan','rejected'].includes(String(x.status||'').toLowerCase());
+  const money=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n||0));
+  const card=(l,v,n)=>'<div class="metric"><span>'+l+'</span><b>'+v+'</b><span>'+n+'</span></div>';
+  const table=(title,heads,data,fields)=>{
+    const body=data.slice(0,10).map(r=>'<tr>'+fields.map(f=>'<td>'+esc(r[f]??'—')+'</td>').join('')+'</tr>').join('')||'<tr><td colspan="'+heads.length+'" class="empty">Tidak ada data.</td></tr>';
+    return '<div class="seo-panel"><h3>'+title+'</h3><div class="table-scroll"><table class="table"><thead><tr>'+heads.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+body+'</tbody></table></div></div>';
+  };
+  let html='';
+  if(kind==='operations'){
+    const running=B.filter(x=>x.status==='Berjalan'), pending=B.filter(x=>x.status==='Menunggu');
+    html='<div class="summary">'+card('BOOKING HARI INI',B.filter(x=>String(x.start_date||'')===todayISO()).length,'jadwal mulai hari ini')+card('BERJALAN',running.length,'booking aktif')+card('PENDING',pending.length,'menunggu proses')+card('OPEN OPERATIONS',O.filter(open).length,'task operasional')+card('OPEN CRM',C.filter(open).length,'follow-up terkait operasi')+'</div>'+
+      '<div class="seo-layout" style="margin-top:14px">'+table('Booking Operasional Berjalan',['Booking','Customer','Mulai','Selesai','Status'],running,['booking_code','customer_name','start_date','end_date','status'])+table('Operations Queue',['Task','Status','Priority','Due','Booking'],O.filter(open),['title','status','priority','due_at','booking_id'])+'</div>'+
+      '<div style="margin-top:14px">'+table('Booking Pending',['Booking','Customer','Mulai','Nilai'],pending,['booking_code','customer_name','start_date','total_price'])+'</div>';
+  } else if(kind==='sales'){
+    const booked=B.filter(x=>['Menunggu','Dikonfirmasi','Berjalan','Selesai'].includes(x.status));
+    const openCrm=C.filter(open), openGrowth=G.filter(open);
+    html='<div class="summary">'+card('BOOKING PIPELINE',booked.length,'status aktif')+card('CONFIRMED',B.filter(x=>x.status==='Dikonfirmasi').length,'booking confirmed')+card('OPEN CRM',openCrm.length,'follow-up')+card('GROWTH ACTIONS',openGrowth.length,'aksi belum selesai')+card('BOOKING VALUE',money(booked.reduce((n,x)=>n+Number(x.total_price||0),0)),'nilai booking aktif')+'</div>'+
+      '<div class="seo-layout" style="margin-top:14px">'+table('CRM Follow-up Queue',['Task','Status','Priority','Due','Booking'],openCrm,['title','status','priority','due_at','booking_id'])+table('Growth Action Queue',['Action','Channel','Priority','Due','Booking'],openGrowth,['title','channel','priority','due_at','booking_id'])+'</div>'+
+      '<div style="margin-top:14px">'+table('Sales Booking Pipeline',['Booking','Customer','Status','Mulai','Nilai'],booked,['booking_code','customer_name','status','start_date','total_price'])+'</div>';
+  } else {
+    const paid=P.filter(x=>['paid','successful','completed','verified','terverifikasi','berhasil'].includes(String(x.payment_status||x.status||'').toLowerCase()));
+    const txValue=T.reduce((n,x)=>n+Number(x.gross_amount||0),0);
+    const paidValue=paid.reduce((n,x)=>n+Number(x.amount||x.payment_amount||0),0);
+    const refundValue=R.reduce((n,x)=>n+Number(x.refund_amount||0),0);
+    html='<div class="summary">'+card('TRANSACTIONS',T.length,'ledger production')+card('TRANSACTION VALUE',money(txValue),'gross amount')+card('PAYMENTS',P.length,'payment ledger')+card('PAID VALUE',money(paidValue),'payment records')+card('REFUNDS',R.length,'refund ledger')+card('REFUND VALUE',money(refundValue),'refund amount')+'</div>'+
+      '<div class="seo-layout" style="margin-top:14px">'+table('Transaction Ledger',['Code','Booking','Gross','Status','Created'],T,['transaction_code','booking_id','gross_amount','transaction_status','created_at'])+table('Payment Ledger',['Reference','Amount','Method','Status','Paid At'],P,['payment_reference','amount','payment_method','payment_status','paid_at'])+'</div>'+
+      '<div style="margin-top:14px">'+table('Refund Ledger',['Reference','Transaction','Amount','Status','Processed'],R,['refund_reference','transaction_id','refund_amount','refund_status','processed_at'])+'</div>';
+  }
+  $('content').innerHTML='<div class="hero"><div><div class="eyebrow">TRANSMIND NEXUS / MANAGEMENT</div><h2 style="margin:6px 0">'+cfg.title+'</h2><p class="muted">'+cfg.desc+' Semua angka berasal dari production database.</p></div><div class="module-actions"><button class="btn ghost" id="mgmtRefresh">↻ Refresh</button><button class="btn ghost" id="mgmtPrint">Print</button></div></div>'+html+'<div class="notice" style="margin-top:14px">Dashboard Management adalah read-only command surface. Perubahan data dilakukan melalui aplikasi domain terkait dengan authority dan audit yang berlaku.</div>';
+  $('mgmtRefresh').onclick=()=>renderManagementDashboard(kind);
+  $('mgmtPrint').onclick=()=>window.print();
+}
+
 async function loadLookups(){
 const [c,v,u,t,b]=await Promise.all([
 client.from('customers').select('id,full_name,phone').limit(1000),
@@ -229,7 +281,8 @@ async function cancellationAction(id,status){if(!canWrite('booking_cancellations
 async function renderRefunds(){
 const r=await client.from('refunds').select('*').order('created_at',{ascending:false}).limit(1000);if(r.error){$('content').innerHTML='<div class="notice error">'+esc(r.error.message)+'</div>';return}rows=r.data||[];const writable=canWrite('refunds');$('content').innerHTML='<div class="module-head"><div><b>'+rows.length+' refund</b><div class="muted">Relasi Refund → Transaction → Booking → Customer / Armada.</div></div><div class="module-actions">'+(writable?'<button class="btn primary" id="insertBtn">＋ Refund Baru</button>':'')+'<button class="btn ghost" id="exportBtn">Export CSV</button><button class="btn ghost" id="printBtn">Print</button></div></div>'+txToolbar()+'<div class="table-card"><table class="table"><thead><tr><th>Refund Ref</th><th>Transaction</th><th>Booking</th><th>Amount</th><th>Reason</th><th>Status</th><th>Processed</th><th>Aksi</th></tr></thead><tbody id="tbody"></tbody></table></div>';const draw=()=>{const q=($('filter').value||'').toLowerCase();const vis=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q)||labelRelation('transactions',r.transaction_id).toLowerCase().includes(q));$('tbody').innerHTML=vis.map(r=>'<tr><td>'+esc(r.refund_reference)+'</td><td>'+esc(labelRelation('transactions',r.transaction_id))+'</td><td>'+esc(labelRelation('bookings',lookups.transactions[r.transaction_id]?.booking_id))+'</td><td>'+Number(r.refund_amount||0).toLocaleString('id-ID')+'</td><td>'+esc(r.refund_reason||'—')+'</td><td>'+statusPill(r.refund_status)+'</td><td>'+esc(r.processed_at||'—')+'</td><td><div class="row-actions"><button class="btn ghost" data-ref-view="'+r.id+'">View</button>'+(writable?'<button class="btn ghost" data-ref-edit="'+r.id+'">Update</button>':'')+(canDelete()?'<button class="btn danger" data-ref-del="'+r.id+'">Delete</button>':'')+'</div></td></tr>').join('')||'<tr><td colspan="8" class="empty">Tidak ada refund.</td></tr>';document.querySelectorAll('[data-ref-view],[data-ref-edit]').forEach(b=>b.onclick=()=>openGenericRecord('refunds',b.dataset.refView||b.dataset.refEdit));document.querySelectorAll('[data-ref-del]').forEach(b=>b.onclick=()=>requestDelete('refunds',b.dataset.refDel))};$('filter').oninput=draw;$('clearFilter').onclick=()=>{$('filter').value='';draw()};draw();if(writable)$('insertBtn').onclick=()=>openGenericRecord('refunds',null);$('exportBtn').onclick=()=>exportRows(rows,'refunds');$('printBtn').onclick=()=>window.print()
 }
-function exportRows(data,name){if(!data.length)return;const cols=Object.keys(data[0]),csv=[cols.join(','),...data.map(r=>cols.map(c=>'"'+String(r[c]??'').replaceAll('"','""')+'"').join(','))].join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=name+'-'+new Date().toISOString().slice(0,10)+'.csv';a.click()}
+function exportRows(data,name){if(!data.length)return;const cols=Object.keys(data[0]),csv=[cols.join(','),...data.map(r=>cols.map(c=>'"'+String(r[c]??'').replaceAll('"','""')+'"').join(','))].join('
+'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=name+'-'+new Date().toISOString().slice(0,10)+'.csv';a.click()}
 function fieldHTML(table,c,v){let type='text';if(c.endsWith('_at'))type='datetime-local';if(c==='refund_amount'||c==='amount'||c==='fee_amount'||c==='gross_amount')type='number';if(c==='refund_status')return '<select data-field="'+c+'">'+['pending','approved','processed','rejected','cancelled'].map(o=>'<option '+(o===v?'selected':'')+'>'+o+'</option>').join('')+'</select>';if(c==='payment_status')return '<select data-field="'+c+'">'+['pending','paid','failed','cancelled'].map(o=>'<option '+(o===v?'selected':'')+'>'+o+'</option>').join('')+'</select>';return '<input data-field="'+c+'" type="'+type+'" value="'+esc(v??'')+'">'}
 async function openGenericRecord(table,id){
 const r=await client.from(table).select('*').eq('id',id).maybeSingle();const row=r.data||null;const cols=fallback[table]||Object.keys(row||{});$('drawerTitle').textContent=(row?'Update ':'Insert ')+(table==='refunds'?'Refund':table);$('drawerSubtitle').textContent=row?'Record linked to transaction '+labelRelation('transactions',row.transaction_id):'Financial transaction record';$('recordNav').innerHTML='<button type="button" class="btn ghost" id="undoBtn">↶ Undo</button>';$('detailTabs').innerHTML='';$('formBody').innerHTML='<div class="field-grid">'+cols.filter(c=>!['id','created_at'].includes(c)).map(c=>'<div class="field '+(['refund_reason','notes'].includes(c)?'full':'')+'"><label>'+c.replaceAll('_',' ')+'</label>'+fieldHTML(table,c,row?.[c])+'</div>').join('')+'</div>';$('drawer').classList.remove('hidden');$('saveBtn').style.display=canWrite(table)?'block':'none';$('recordForm').onsubmit=async e=>{e.preventDefault();const payload={};for(const c of cols.filter(c=>!['id','created_at'].includes(c))){const el=document.querySelector('[data-field="'+c+'"]');if(!el)continue;let v=el.value||null;if(['refund_amount','amount','fee_amount','gross_amount'].includes(c)&&v!==null)v=Number(v);payload[c]=v}let before=row?JSON.parse(JSON.stringify(row)):null;let res=row?await client.from(table).update(payload).eq('id',row.id).select().single():await client.from(table).insert(payload).select().single();if(res.error){notify(res.error.message);return}undoStack.push({table,action:row?'update':'insert',id:res.data.id,before,after:res.data});notify(row?'Record diperbarui':'Record ditambahkan');$('drawer').classList.add('hidden');await renderRefunds()};$('undoBtn').onclick=undoLast
