@@ -2,39 +2,71 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Transmind Nexus — Business Application Suite</title>
-<link rel="stylesheet" href="./nexus-app.css?v=20260920-2315">
+<title>Transmind Nexus — ERP / CRM Application Suite</title>
+<link rel="stylesheet" href="./nexus-app.css?v=20260920-transaction-v1">
 <script src="../config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="app-shell">
 <aside class="sidebar">
-  <div class="brand"><strong>TRANSMIND NEXUS</strong><span>BUSINESS APPLICATION SUITE</span></div>
+  <div class="brand"><strong>TRANSMIND NEXUS</strong><span>ERP / CRM APPLICATION SUITE</span></div>
   <nav id="nav" class="nav">
-    <button class="nav-section open" type="button" data-section="workspace"><span>WORKSPACE</span><b>−</b></button>
-    <div class="nav-items" data-items="workspace"><a data-module="home" class="active"><i>⌂</i> Workspace</a></div>
-    <button class="nav-section open" type="button" data-section="master"><span>MASTER DATA</span><b>−</b></button>
-    <div class="nav-items" data-items="master"><a data-module="customers"><i>◎</i> Customers</a><a href="./fleet.html"><i>▣</i> Armada <em>↗</em></a></div>
-    <button class="nav-section open" type="button" data-section="sales"><span>SALES & BOOKING</span><b>−</b></button>
-    <div class="nav-items" data-items="sales"><a data-module="bookings"><i>▤</i> Bookings</a><a data-module="crm_tasks"><i>✓</i> CRM Tasks</a><a data-module="interactions"><i>◌</i> Interactions</a><a data-module="transactions"><i>¤</i> Transactions</a></div>
-    <button class="nav-section open" type="button" data-section="growth"><span>GROWTH & MARKETING</span><b>−</b></button>
-    <div class="nav-items" data-items="growth"><a data-module="growth_actions"><i>↗</i> Growth Actions</a><a data-module="opportunities"><i>◇</i> Opportunities</a><a data-module="campaign_queue"><i>▸</i> Campaign Queue</a><a data-module="website_campaigns"><i>◈</i> Website Campaigns</a></div>
-    <button class="nav-section open" type="button" data-section="operations"><span>OPERATIONS</span><b>−</b></button>
-    <div class="nav-items" data-items="operations"><a data-module="operations_tasks"><i>☑</i> Operations Tasks</a></div>
-    <button class="nav-section open" type="button" data-section="intelligence"><span>INTELLIGENCE</span><b>−</b></button>
-    <div class="nav-items" data-items="intelligence"><a data-module="signals"><i>⌁</i> Intelligence Signals</a><a data-module="analytics"><i>◫</i> Production Analytics</a></div>
+    <button class="nav-section open" type="button"><span>WORKSPACE</span><b>−</b></button>
+    <div class="nav-items"><a data-module="home" class="active"><i>⌂</i> Workspace</a></div>
+
+    <button class="nav-section open" type="button"><span>MASTER DATA</span><b>−</b></button>
+    <div class="nav-items"><a data-module="customers"><i>◎</i> Customers</a><a href="./fleet.html"><i>▣</i> Armada <em>↗</em></a></div>
+
+    <button class="nav-section open" type="button"><span>TRANSAKSI</span><b>−</b></button>
+    <div class="nav-items transaction-menu">
+      <a data-tx-view="all"><i>▤</i> Semua Booking</a>
+      <a data-tx-view="new"><i>＋</i> Booking Baru</a>
+      <a data-tx-view="today"><i>●</i> Booking Hari Ini</a>
+      <a data-tx-view="upcoming"><i>◷</i> Booking Mendatang</a>
+      <a data-tx-view="calendar"><i>▦</i> Kalender Rental</a>
+      <a data-tx-view="pending"><i>!</i> Booking Pending</a>
+      <a data-tx-view="confirmed"><i>✓</i> Booking Confirmed</a>
+      <a data-tx-view="running"><i>▶</i> Booking Berjalan</a>
+      <a data-tx-view="completed"><i>■</i> Booking Selesai</a>
+      <a data-tx-view="cancelled"><i>×</i> Pembatalan</a>
+      <a data-tx-view="refunds"><i>↩</i> Refund</a>
+    </div>
+
+    <button class="nav-section open" type="button"><span>SALES & CRM</span><b>−</b></button>
+    <div class="nav-items"><a data-module="crm_tasks"><i>✓</i> CRM Tasks</a><a data-module="interactions"><i>◌</i> Interactions</a><a data-module="transactions"><i>¤</i> Transactions Ledger</a></div>
+
+    <button class="nav-section open" type="button"><span>OPERATIONS</span><b>−</b></button>
+    <div class="nav-items"><a data-module="operations_tasks"><i>☑</i> Operations Tasks</a></div>
+
+    <button class="nav-section open" type="button"><span>GROWTH & MARKETING</span><b>−</b></button>
+    <div class="nav-items"><a data-module="growth_actions"><i>↗</i> Growth Actions</a><a data-module="opportunities"><i>◇</i> Opportunities</a><a data-module="campaign_queue"><i>▸</i> Campaign Queue</a><a data-module="website_campaigns"><i>◈</i> Website Campaigns</a></div>
+
+    <button class="nav-section open" type="button"><span>INTELLIGENCE</span><b>−</b></button>
+    <div class="nav-items"><a data-module="signals"><i>⌁</i> Intelligence Signals</a><a data-module="analytics"><i>◫</i> Production Analytics</a></div>
   </nav>
   <div class="side-foot"><span id="roleBadge">Checking authority…</span><button id="logoutBtn" class="link-btn">Keluar</button></div>
 </aside>
+
 <main class="main">
-  <header class="topbar"><div><div class="eyebrow">NEXUS / APPLICATION</div><h1 id="moduleTitle">Workspace</h1><p id="moduleDesc" class="muted">Pintu masuk pekerjaan dan seluruh modul aplikasi Nexus.</p></div><div class="top-actions"><span id="dbStatus" class="status">Connecting…</span><button id="refreshBtn" class="btn ghost">↻ Refresh</button></div></header>
+  <header class="topbar">
+    <div><div class="eyebrow">NEXUS / ERP / CRM / TRANSAKSI</div><h1 id="moduleTitle">Workspace</h1><p id="moduleDesc" class="muted">Pintu masuk pekerjaan dan seluruh modul aplikasi Nexus.</p></div>
+    <div class="top-actions"><span id="dbStatus" class="status">Connecting…</span><button id="refreshBtn" class="btn ghost">↻ Refresh</button></div>
+  </header>
   <section id="content"></section>
 </main>
 </div>
-<div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle"><div class="modal-card auth-card"><div class="eyebrow">TRANSMIND NEXUS / AUTHORITY</div><h2 id="authTitle">Sign in</h2><p class="muted">Masuk dengan akun Nexus yang memiliki role terdaftar.</p><form id="authForm"><label>Email<input id="authEmail" type="email" autocomplete="username" required></label><label>Password<input id="authPassword" type="password" autocomplete="current-password" required></label><div id="authError" class="error"></div><button class="btn primary" type="submit">Masuk ke Nexus</button></form></div></div>
-<div id="drawer" class="drawer-wrap hidden"><div class="backdrop" data-close></div><aside class="drawer"><div class="drawer-head"><div><div class="eyebrow">NEXUS / DATA ENTRY</div><h2 id="drawerTitle">Record</h2></div><button class="icon" data-close aria-label="Tutup">×</button></div><div id="recordNav" class="record-nav"></div><form id="recordForm"><div id="formBody"></div><div class="drawer-foot"><button type="button" class="btn ghost" data-close>Batal</button><button id="saveBtn" class="btn primary">Simpan</button></div></form></aside></div>
-<div id="confirmModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmTitle"><div class="modal-card"><h2 id="confirmTitle">Hapus record?</h2><p id="confirmText">Tindakan ini akan tercatat pada audit database.</p><div class="modal-actions"><button id="cancelDelete" class="btn ghost">Batal</button><button id="confirmDelete" class="btn danger">Delete</button></div></div></div>
+
+<div id="authModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card auth-card"><div class="eyebrow">TRANSMIND NEXUS / AUTHORITY</div><h2>Sign in</h2><p class="muted">Masuk dengan akun Nexus yang memiliki role terdaftar.</p><form id="authForm"><label>Email<input id="authEmail" type="email" autocomplete="username" required></label><label>Password<input id="authPassword" type="password" autocomplete="current-password" required></label><div id="authError" class="error"></div><button class="btn primary" type="submit">Masuk ke Nexus</button></form></div></div>
+
+<div id="drawer" class="drawer-wrap hidden"><div class="backdrop" data-close></div><aside class="drawer wide">
+  <div class="drawer-head"><div><div class="eyebrow">NEXUS / TRANSACTION RECORD</div><h2 id="drawerTitle">Booking</h2><div id="drawerSubtitle" class="muted"></div></div><button class="icon" data-close aria-label="Tutup">×</button></div>
+  <div id="recordNav" class="record-nav"></div>
+  <div id="detailTabs" class="detail-tabs"></div>
+  <form id="recordForm"><div id="formBody"></div><div class="drawer-foot"><button type="button" class="btn ghost" data-close>Batal</button><button id="saveBtn" class="btn primary">Simpan</button></div></form>
+</aside></div>
+
+<div id="confirmModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card"><h2 id="confirmTitle">Hapus record?</h2><p id="confirmText">Tindakan ini akan tercatat pada database.</p><div class="modal-actions"><button id="cancelDelete" class="btn ghost">Batal</button><button id="confirmDelete" class="btn danger">Delete</button></div></div></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script src="./nexus-app.js?v=20260920-2315"></script>
+<script src="./nexus-app.js?v=20260920-transaction-v1"></script>
 </body></html>
