@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Transmind Nexus — Fleet Management</title>
+<link rel="stylesheet" href="./fleet.css">
+<script src="../config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+  <div class="brand"><strong>TRANSMIND</strong><span>NEXUS OPERATIONS</span></div>
+  <nav>
+    <a href="./fleet.html" class="nav-item active"><span>▣</span> Armada</a>
+    <div class="submenu">
+      <a class="active" href="#fleet-data">Data Armada</a>
+      <a href="#fleet-units">Unit</a>
+      <a href="#fleet-pricing">Harga</a>
+      <a href="#fleet-availability">Ketersediaan</a>
+      <a href="#fleet-documents">Dokumen</a>
+      <a href="#fleet-history">Riwayat</a>
+    </div>
+    <a class="nav-item muted" href="../index.html">Website</a>
+  </nav>
+  <div class="side-foot">Admin Fleet Control<br><span>Real database • no synthetic data</span></div>
+</aside>
+<main class="main">
+<header class="topbar">
+  <div><div class="eyebrow">ARMADA / MASTER DATA</div><h1>Fleet Management</h1></div>
+  <div class="top-actions"><span id="sessionState" class="status">Checking session…</span><button id="logoutBtn" class="btn ghost hidden">Keluar</button></div>
+</header>
+<section id="loginPanel" class="login-panel hidden">
+  <div><div class="eyebrow">ADMIN ACCESS</div><h2>Masuk untuk mengelola armada</h2><p>Gunakan akun Supabase yang memiliki role admin pada <code>app_metadata.role</code>.</p></div>
+  <form id="loginForm"><label>Email<input id="loginEmail" type="email" autocomplete="username" required></label><label>Password<input id="loginPassword" type="password" autocomplete="current-password" required></label><button class="btn primary" type="submit">Masuk</button><div id="loginError" class="error"></div></form>
+</section>
+<section id="fleetApp" class="hidden">
+  <div class="toolbar">
+    <div class="search"><span>⌕</span><input id="search" placeholder="Cari nama, kategori, slug…"><button id="clearSearch" aria-label="Hapus pencarian" class="icon hidden">×</button></div>
+    <select id="statusFilter" aria-label="Filter status"><option value="all">Semua status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
+    <button id="undoBtn" class="btn ghost" disabled>↶ Undo</button>
+    <button id="newBtn" class="btn primary">＋ Tambah Armada</button>
+  </div>
+  <div class="summary"><div><b id="totalCount">0</b><span>Total</span></div><div><b id="activeCount">0</b><span>Aktif</span></div><div><b id="inactiveCount">0</b><span>Nonaktif</span></div><div><b id="unitCount">0</b><span>Total Unit</span></div></div>
+  <div class="table-card">
+    <table><thead><tr><th>Armada</th><th>Kategori</th><th>Kapasitas</th><th>Unit</th><th>Status</th><th>Urutan</th><th class="actions-col">Aksi</th></tr></thead><tbody id="fleetRows"><tr><td colspan="7" class="loading">Memuat data…</td></tr></tbody></table>
+  </div>
+</section>
+<div id="drawer" class="drawer-wrap hidden" aria-hidden="true">
+  <div class="backdrop" data-close></div><aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div class="drawer-head"><div><div class="eyebrow">MASTER ARMADA</div><h2 id="drawerTitle">Tambah Armada</h2></div><button class="icon" data-close aria-label="Tutup">×</button></div>
+    <form id="fleetForm" novalidate>
+      <input type="hidden" id="vehicleId">
+      <div class="photo-box"><div id="photoPreview" class="photo-preview">No image</div><div><label class="upload-btn">Pilih gambar<input id="imageFile" type="file" accept="image/*"></label><small>Upload ke bucket vehicle-images.</small></div></div>
+      <div class="grid2">
+        <label>Nama Armada*<input id="name" required maxlength="120"></label>
+        <label>Slug*<input id="slug" required maxlength="160"></label>
+        <label>Kategori<select id="category"><option value="">Pilih kategori</option><option>MPV</option><option>SUV</option><option>Sedan</option><option>City Car</option><option>Luxury</option><option>Bus</option><option>Other</option></select></label>
+        <label>Kapasitas<input id="capacity" maxlength="50" placeholder="7 penumpang"></label>
+        <label>Total Unit*<input id="totalUnits" type="number" min="0" step="1" value="5" required></label>
+        <label>Urutan Tampil<input id="sortOrder" type="number" step="1" value="0"></label>
+      </div>
+      <label class="switch-row"><span><b>Armada aktif</b><small>Jika nonaktif, tidak tampil di katalog publik.</small></span><input id="active" type="checkbox" checked><i></i></label>
+      <div id="formError" class="error"></div>
+      <div class="drawer-foot"><button type="button" class="btn ghost" data-close>Batal</button><button type="submit" class="btn primary" id="saveBtn">Simpan Armada</button></div>
+    </form>
+  </aside>
+</div>
+<div id="confirm" class="modal-wrap hidden" aria-hidden="true"><div class="backdrop" data-close></div><div class="modal"><div class="eyebrow">KONFIRMASI</div><h2>Hapus armada?</h2><p id="confirmText"></p><div class="modal-actions"><button class="btn ghost" data-close>Batal</button><button id="confirmDelete" class="btn danger">Hapus</button></div></div></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+</main>
+</div>
+<script src="./fleet.js"></script>
+</body></html>
