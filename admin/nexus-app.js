@@ -19,7 +19,7 @@ const modules={
 };
 const perms={owner:9,admin:9,manager:8,sales:6,operator:6,marketing:6,fleet:6,finance:6,analyst:4,viewer:2};
 const rank=()=>perms[role]||0;
-function canWrite(m){if(m==='transactions')return ['owner','admin','manager','finance'].includes(role);if(['signals','opportunities'].includes(m))return ['owner','admin','manager','analyst','marketing'].includes(role);if(['campaign_queue','website_campaigns'].includes(m))return ['owner','admin','manager','marketing'].includes(role);if(['growth_actions'].includes(m))return ['owner','admin','manager','marketing','sales','operator'].includes(role);return rank()>=6}
+function canWrite(m){if(m==='analytics')return false;if(m==='transactions')return ['owner','admin','manager','finance'].includes(role);if(['signals','opportunities'].includes(m))return ['owner','admin','manager','analyst','marketing'].includes(role);if(['campaign_queue','website_campaigns'].includes(m))return ['owner','admin','manager','marketing'].includes(role);if(['growth_actions'].includes(m))return ['owner','admin','manager','marketing','sales','operator'].includes(role);return rank()>=6}
 function canDelete(){return ['owner','admin','manager'].includes(role)}
 function notify(s){const e=$('toast');e.textContent=s;e.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.remove('show'),2600)}
 function setHeader(m){const x=modules[m];$('moduleTitle').textContent=x.title;$('moduleDesc').textContent=x.desc;document.querySelectorAll('#nav a[data-module]').forEach(a=>a.classList.toggle('active',a.dataset.module===m))}
