@@ -86,7 +86,7 @@
           intent_stage:'whatsapp_click'
         });
       }else if(href.indexOf('#booking')!==-1 || /booking/i.test(txt)){
-        track('cta_click',{
+        track('booking_cta_click',{
           label:txt.slice(0,100),
           href:clean(href,300),
           intent_stage:'booking_cta_click'
