@@ -1825,6 +1825,7 @@ async function submitBooking(
          * baru buka WhatsApp.
          */
 
+        clearBookingDraft();
         openSuccessWhatsApp(
             formData,
             bookingResult
@@ -1901,6 +1902,16 @@ async function submitBooking(
 
 
 /* =========================================================
+   BOOKING DRAFT / CONVERSION FRICTION CONTROL
+   ========================================================= */
+const BOOKING_DRAFT_KEY = 'transmind_booking_draft_v1';
+function bookingDraftFields(){return ['name','phone','vehicle','service','start','end','area','notes'];}
+function saveBookingDraft(){const d={};bookingDraftFields().forEach(id=>{const e=getElement(id);if(e)d[id]=e.value||''});try{localStorage.setItem(BOOKING_DRAFT_KEY,JSON.stringify(d))}catch(_){}}
+function restoreBookingDraft(){try{const r=localStorage.getItem(BOOKING_DRAFT_KEY);if(!r)return;const d=JSON.parse(r);bookingDraftFields().forEach(id=>{const e=getElement(id);if(e&&d[id]!=null&&!e.value)e.value=d[id]});updateVehicleInfo()}catch(_){}}
+function clearBookingDraft(){try{localStorage.removeItem(BOOKING_DRAFT_KEY)}catch(_){}}
+function setBookingDateMinimums(){const t=new Date().toISOString().slice(0,10),s=getElement('start'),e=getElement('end');if(s)s.min=t;if(e)e.min=t;if(s&&e)s.addEventListener('change',()=>{e.min=s.value||t;if(e.value&&s.value&&e.value<s.value)e.value=s.value;saveBookingDraft()})}
+
+/* =========================================================
    SETUP EVENTS
    ========================================================= */
 
@@ -1949,6 +1960,7 @@ function setupEvents() {
     }
 
 
+    bookingDraftFields().forEach(id=>{const el=getElement(id);if(el)el.addEventListener('input',saveBookingDraft);if(el)el.addEventListener('change',saveBookingDraft)});setBookingDateMinimums();restoreBookingDraft();
     console.log(
         'SETUP EVENTS: selesai.'
     );
