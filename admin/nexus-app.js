@@ -74,7 +74,7 @@ function installLegacyMenu(){
 }
 const NEXUS_AI_ARCHITECTURE=[["Agentic AI","Plan, execute, verify"],["AI Agents / Multi-Agent Systems","Specialized agents cooperate as one digital organization"],["Autonomous Systems","Observe, decide, act, verify"],["Self-Healing Computing","Detect, diagnose, repair, rollback"],["Cognitive Architecture","Memory, reasoning, planning, perception, action"],["Digital Twin","Digital model for simulation"],["Knowledge Graph","Complex entity relationships"],["Neuro-symbolic AI","AI reasoning plus formal rules"],["Edge AI","AI near device or data"],["Federated Learning","Cross-institution learning without centralizing raw data"],["World Models","Possible states and action consequences"],["Human-in-the-loop / Human-on-the-loop","Human retains authority"],["AI Governance / Policy Engine","Constrains what AI may do"]];
 function installNexusAI(){const nav=document.querySelector('#nav');if(!nav||nav.dataset.aiInstalled)return;nav.dataset.aiInstalled='1';const box=document.createElement('div');box.innerHTML='<button class="nav-section open" type="button"><span>NEXUS AI & AUTONOMY</span><b>-</b></button><div class="nav-items">'+NEXUS_AI_ARCHITECTURE.map(x=>'<a data-module="ai_architecture" data-app-label="'+x[0]+'"><i>*</i> '+x[0]+'</a>').join('')+'</div>';while(box.firstChild)nav.appendChild(box.firstChild);bindNavigation()}
-\nconst modules={
+const modules={
 home:{title:'Workspace',desc:'Pintu masuk pekerjaan dan seluruh modul aplikasi Nexus.',table:null},
 customers:{title:'Customers',desc:'Master customer, verifikasi, relasi booking dan riwayat.',table:'customers'},
 crm_tasks:{title:'CRM Tasks',desc:'Follow-up, pipeline, prioritas dan assignment pelanggan.',table:'crm_tasks'},
