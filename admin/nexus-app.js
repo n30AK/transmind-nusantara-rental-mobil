@@ -143,7 +143,13 @@ document.querySelectorAll('#nav a[data-tx-view]').forEach(a=>a.onclick=e=>{e.pre
 }
 function markActive(selector,value){document.querySelectorAll(selector).forEach(a=>a.classList.toggle('active',a.getAttribute(selector.includes('tx-view')?'data-tx-view':'data-module')===value))}
 
-async function renderAIArchitecture(){setHeader('AI Architecture & Agent Registry','NEXUS AI architecture and governance registry.');const el=$('content-ai_architecture');el.innerHTML='<div class="summary">'+NEXUS_AI_ARCHITECTURE.slice(0,4).map(x=>'<div class="metric"><span>'+esc(x[0])+'</span><b>DEFINED</b><span>'+esc(x[1])+'</span></div>').join('')+'</div><div class="table-card"><table class="table"><thead><tr><th>CAPABILITY</th><th>PERAN</th><th>CONTROL</th></tr></thead><tbody>'+NEXUS_AI_ARCHITECTURE.map(x=>'<tr><td><b>'+esc(x[0])+'</b></td><td>'+esc(x[1])+'</td><td><span class="pill">RBAC + POLICY + AUDIT</span></td></tr>').join('')+'</tbody></table></div><div class="notice" style="margin-top:12px">AI tidak mendapat otoritas tanpa batas. Agent harus dibatasi oleh role, policy, scope, audit, verification dan human approval untuk tindakan berisiko.</div>')}
+async function renderAIArchitecture(){
+  setHeader('AI Architecture & Agent Registry','NEXUS AI architecture and governance registry.');
+  const el=$('content-ai_architecture');
+  const metrics=NEXUS_AI_ARCHITECTURE.slice(0,4).map(x=>'<div class="metric"><span>'+esc(x[0])+'</span><b>DEFINED</b><span>'+esc(x[1])+'</span></div>').join('');
+  const rows=NEXUS_AI_ARCHITECTURE.map(x=>'<tr><td><b>'+esc(x[0])+'</b></td><td>'+esc(x[1])+'</td><td><span class="pill">RBAC + POLICY + AUDIT</span></td></tr>').join('');
+  el.innerHTML='<div class="summary">'+metrics+'</div><div class="table-card"><table class="table"><thead><tr><th>CAPABILITY</th><th>PERAN</th><th>CONTROL</th></tr></thead><tbody>'+rows+'</tbody></table></div><div class="notice" style="margin-top:12px">AI tidak mendapat otoritas tanpa batas. Agent harus dibatasi oleh role, policy, scope, audit, verification dan human approval untuk tindakan berisiko.</div>';
+}
 async function home(){
   setHeader('Executive Dashboard','TRANSMIND NEXUS — Business Operating System. Ringkasan live dari database production.');
   document.querySelectorAll('.nav-items a').forEach(x=>x.classList.remove('active'));
