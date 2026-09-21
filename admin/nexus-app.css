@@ -74,3 +74,5 @@ body{background:radial-gradient(900px 500px at 85% -10%,#332b12 0%,transparent 5
 .seo-col span{font-size:8px;color:#747b86;text-align:center;overflow:hidden;white-space:nowrap}
 @media(max-width:1100px){.app-shell{grid-template-columns:255px 1fr}.seo-layout{grid-template-columns:1fr}}
 @media(max-width:720px){.app-shell{display:block}.sidebar{position:sticky;top:0;max-height:45dvh}.nav{max-height:36dvh}.main{padding:16px}.topbar h1{font-size:25px}.seo-layout{grid-template-columns:1fr}.seo-range{margin-top:10px}}
+
+.nav-access-state.online{color:#9fc7a2}.nav-access-state.online::first-letter{color:#6fbf73}
