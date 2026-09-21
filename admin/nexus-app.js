@@ -57,7 +57,7 @@ function installLegacyMenu(){
   ];
 
   const section=(title,items)=>'<button class="nav-section open" type="button"><span>'+title+'</span><b>−</b></button><div class="nav-items">'+items.map(x=>x).join('')+'</div>';
-  const appItems=(items)=>items.map(x=>'<a data-module="app_workspace" data-app-label="'+x.replace(/"/g,'&quot;')+'"><i>+</i> '+x+'</a>');
+  const appItems=(items)=>items.map(x=>'<a href="#" data-module="app_workspace" data-app-label="'+x.replace(/"/g,'&quot;')+'"><i>+</i> '+x+'</a>');
   const txItems=tx.map(x=>'<a data-tx-view="'+x[0]+'"><i>▤</i> '+x[1]+'</a>');
 
   let html='';
@@ -76,7 +76,7 @@ function installLegacyMenu(){
   bindNavigation();
 }
 const NEXUS_AI_ARCHITECTURE=[["Agentic AI","Plan, execute, verify"],["AI Agents / Multi-Agent Systems","Specialized agents cooperate as one digital organization"],["Autonomous Systems","Observe, decide, act, verify"],["Self-Healing Computing","Detect, diagnose, repair, rollback"],["Cognitive Architecture","Memory, reasoning, planning, perception, action"],["Digital Twin","Digital model for simulation"],["Knowledge Graph","Complex entity relationships"],["Neuro-symbolic AI","AI reasoning plus formal rules"],["Edge AI","AI near device or data"],["Federated Learning","Cross-institution learning without centralizing raw data"],["World Models","Possible states and action consequences"],["Human-in-the-loop / Human-on-the-loop","Human retains authority"],["AI Governance / Policy Engine","Constrains what AI may do"]];
-function installNexusAI(){const nav=document.querySelector('#nav');if(!nav||nav.dataset.aiInstalled)return;nav.dataset.aiInstalled='1';const box=document.createElement('div');box.innerHTML='<button class="nav-section open" type="button"><span>NEXUS AI & AUTONOMY</span><b>-</b></button><div class="nav-items">'+NEXUS_AI_ARCHITECTURE.map(x=>'<a data-module="ai_architecture" data-app-label="'+x[0]+'"><i>*</i> '+x[0]+'</a>').join('')+'</div>';while(box.firstChild)nav.appendChild(box.firstChild);bindNavigation()}
+function installNexusAI(){const nav=document.querySelector('#nav');if(!nav||nav.dataset.aiInstalled)return;nav.dataset.aiInstalled='1';const box=document.createElement('div');box.innerHTML='<button class="nav-section open" type="button"><span>NEXUS AI & AUTONOMY</span><b>-</b></button><div class="nav-items">'+NEXUS_AI_ARCHITECTURE.map(x=>'<a href="#" data-module="ai_architecture" data-app-label="'+x[0]+'"><i>*</i> '+x[0]+'</a>').join('')+'</div>';while(box.firstChild)nav.appendChild(box.firstChild);bindNavigation()}
 const modules={
 home:{title:'Workspace',desc:'Pintu masuk pekerjaan dan seluruh modul aplikasi Nexus.',table:null},
 customers:{title:'Customers',desc:'Master customer, verifikasi, relasi booking dan riwayat.',table:'customers'},
@@ -409,7 +409,7 @@ function fieldHTML(table,c,v){let type='text';if(c.endsWith('_at'))type='datetim
 async function openGenericRecord(table,id){
 const r=await client.from(table).select('*').eq('id',id).maybeSingle();const row=r.data||null;const cols=fallback[table]||Object.keys(row||{});$('drawerTitle').textContent=(row?'Update ':'Insert ')+(table==='refunds'?'Refund':table);$('drawerSubtitle').textContent=row?'Record linked to transaction '+labelRelation('transactions',row.transaction_id):'Financial transaction record';$('recordNav').innerHTML='<button type="button" class="btn ghost" id="undoBtn">↶ Undo</button>';$('detailTabs').innerHTML='';$('formBody').innerHTML='<div class="field-grid">'+cols.filter(c=>!['id','created_at'].includes(c)).map(c=>'<div class="field '+(['refund_reason','notes'].includes(c)?'full':'')+'"><label>'+c.replaceAll('_',' ')+'</label>'+fieldHTML(table,c,row?.[c])+'</div>').join('')+'</div>';$('drawer').classList.remove('hidden');$('saveBtn').style.display=canWrite(table)?'block':'none';$('recordForm').onsubmit=async e=>{e.preventDefault();const payload={};for(const c of cols.filter(c=>!['id','created_at'].includes(c))){const el=document.querySelector('[data-field="'+c+'"]');if(!el)continue;let v=el.value||null;if(['refund_amount','amount','fee_amount','gross_amount'].includes(c)&&v!==null)v=Number(v);payload[c]=v}let before=row?JSON.parse(JSON.stringify(row)):null;let res=row?await client.from(table).update(payload).eq('id',row.id).select().single():await client.from(table).insert(payload).select().single();if(res.error){notify(res.error.message);return}undoStack.push({table,action:row?'update':'insert',id:res.data.id,before,after:res.data});notify(row?'Record diperbarui':'Record ditambahkan');$('drawer').classList.add('hidden');await renderRefunds()};$('undoBtn').onclick=undoLast
 }
-async function renderSeoLive(days=7){
+async async function renderSeoLive(days=7){
   const res=await client.rpc('nexus_seo_live_metrics',{p_days:days});
   if(res.error){$('content').innerHTML='<div class="notice error">'+esc(res.error.message)+'</div>';return}
   const x=res.data||{},daily=Array.isArray(x.daily)?x.daily:[],sources=Array.isArray(x.sources)?x.sources:[],landing=Array.isArray(x.landing_pages)?x.landing_pages:[];
