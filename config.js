@@ -17,7 +17,7 @@ var original=window.supabase.createClient.bind(window.supabase);
 window.supabase.createClient=function(){var client=original.apply(window.supabase,arguments),rpc=client.rpc.bind(client);client.rpc=function(fn,args,options){if(fn!=='create_booking'||!args)return rpc(fn,args,options);var t=stored.first_touch||stored.last_touch||{};var enriched=Object.assign({},args,{p_attribution_source:clean(t.source,100)||'unknown',p_attribution_medium:clean(t.medium,100),p_attribution_campaign:clean(t.campaign,150),p_attribution_content:clean(t.content,150),p_attribution_term:clean(t.term,100),p_landing_page:clean((stored.first_touch&&stored.first_touch.landing_page)||t.landing_page,1000),p_referrer_url:clean((stored.first_touch&&stored.first_touch.referrer_url)||t.referrer_url,1000),p_visitor_session_id:clean(window.TRANSMIND_VISITOR_SESSION_ID,200)});var result=rpc('create_booking_with_attribution',enriched,options);if(result&&typeof result.then==='function'){return result.then(function(res){trackSuccess(client,res,t);return res;});}return result};return client}
 }
 window.addEventListener('DOMContentLoaded',function(){
-if(!document.querySelector('link[data-transmind-responsive]')){var css=document.createElement('link');css.rel='stylesheet';css.href='./css/responsive.css?v=3';css.dataset.transmindResponsive='1';document.head.appendChild(css)}
-['website-live.js?v=8','live-repair.js?v=1','conversion-bridge.js?v=1','driver-card-live.js?v=1','seo-schema.js?v=2','seo-analytics.js?v=4'].forEach(function(src){var s=document.createElement('script');s.src='./'+src;s.defer=true;document.body.appendChild(s)})
+if(!document.querySelector('link[data-transmind-responsive]')){var css=document.createElement('link');css.rel='stylesheet';css.href='../css/responsive.css?v=4';css.dataset.transmindResponsive='1';document.head.appendChild(css)}
+
 });
 })();
