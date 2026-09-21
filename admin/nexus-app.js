@@ -133,9 +133,58 @@ function canDelete(){return ['owner','admin','manager'].includes(role)}
 function notify(s){const e=$('toast');e.textContent=s;e.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.remove('show'),2800)}
 function todayISO(){return new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Jakarta'})}
 function setHeader(title,desc){$('moduleTitle').textContent=title;$('moduleDesc').textContent=desc;document.querySelectorAll('#nav a').forEach(a=>a.classList.remove('active'))}
-function aiContext(){const label=document.querySelector('#nav a.active')?.dataset.appLabel||modules[current]?.title||current;return{module:label,table:(APP_CATALOG[label]||[])[0]||modules[current]?.table||null,rows:rows.slice(0,80),role};}
-function aiFallback(q){const ctx=aiContext(),x=q.toLowerCase();if(/berapa|jumlah|total|count/.test(x))return "Workspace "+ctx.module+" memiliki "+ctx.rows.length+" record yang sedang dimuat. Saya tidak mengarang angka di luar data production yang dapat saya baca.";if(/cari|search|temukan|find/.test(x)){const term=x.replace(/cari|search|temukan|find/g,'').trim();const hits=ctx.rows.filter(r=>JSON.stringify(r).toLowerCase().includes(term)).slice(0,5);return hits.length?"Ditemukan "+hits.length+" record yang cocok pada data yang sedang tersedia. Gunakan Filter/Search untuk membuka recordnya.":"Tidak ditemukan record yang cocok pada data yang sedang tersedia."}if(/hapus|delete|approve|setujui|bayar|payment|kirim whatsapp|send/.test(x))return "Aksi tersebut termasuk tindakan berisiko. Companion hanya memberi analisis/persiapan; eksekusi tetap melalui workflow aplikasi oleh manusia yang memiliki authority.";return "Saya membaca workspace "+ctx.module+" dengan role "+(ctx.role||'unknown')+". Saya dapat membantu membaca, merangkum, mencari record, menjelaskan data, mendeteksi hal yang perlu diperiksa, dan mengarahkan workflow. Endpoint AI generatif belum dikonfigurasi di environment ini, jadi saya tidak akan mengarang jawaban."}
-async function askAI(q){try{const r=await fetch('/api/nexus-ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,context:aiContext()})});if(r.ok){const d=await r.json();if(d&&d.answer)return d.answer}}catch(_){}return aiFallback(q)}
+function aiLabel(){return document.querySelector('#nav a.active')?.dataset.appLabel||modules[current]?.title||current}
+async function aiContext(){
+  const label=aiLabel(), base={module:label,table:(APP_CATALOG[label]||[])[0]||modules[current]?.table||null,rows:rows.slice(0,80),role,data:{}};
+  const read=async(table,select='*',limit=12,order='created_at')=>{
+    try{
+      let q=client.from(table).select(select);
+      if(order)q=q.order(order,{ascending:false});
+      if(limit)q=q.limit(limit);
+      const r=await q;
+      return r.error?{error:r.error.message,rows:[]}: {rows:r.data||[]};
+    }catch(e){return{error:String(e),rows:[]}}
+  };
+  const count=async(table)=>{
+    try{const r=await client.from(table).select('id',{count:'exact',head:true});return Number(r.count||0)}catch(_){return null}
+  };
+  const tables=['bookings','transactions','payments','refunds','customers','crm_tasks','customer_interactions','nexus_operations_tasks','nexus_growth_actions','nexus_growth_opportunities','nexus_campaign_queue','website_campaigns','nexus_intelligence_signals','website_analytics_events','vehicles','vehicle_units','partners'];
+  const counts=await Promise.all(tables.map(async t=>[t,await count(t)]));
+  base.data.counts=Object.fromEntries(counts);
+  const selected=[['bookings','id,booking_code,customer_name,status,start_date,end_date,total_price,created_at,customer_id,vehicle_id,unit_id,attribution_source,attribution_campaign'],['transactions','id,transaction_code,booking_id,customer_id,gross_amount,transaction_status,source,created_at'],['payments','id,transaction_id,payment_reference,amount,payment_status,paid_at,created_at'],['refunds','id,transaction_id,refund_reference,refund_amount,refund_status,created_at'],['customers','id,full_name,phone,verification_status,risk_level,created_at'],['crm_tasks','id,title,status,priority,due_at,booking_id,customer_id,pipeline_stage,next_followup_at'],['nexus_growth_actions','id,title,status,priority,channel,due_at,booking_id,customer_id'],['nexus_growth_opportunities','id,opportunity_key,channel,intent_level,source_type,query_or_theme,landing_path,status,created_at'],['nexus_intelligence_signals','id,signal_code,signal_type,severity,title,summary,score,status,detected_at'],['website_analytics_events','id,event_type,visitor_session_id,occurred_at,path,source,medium,campaign,booking_id,booking_code']];
+  const pairs=await Promise.all(selected.map(async ([t,sel])=>[t,await read(t,sel,12)]));
+  base.data.samples=Object.fromEntries(pairs);
+  return base;
+}
+function aiFallback(q,ctx){
+  const x=q.toLowerCase(), d=ctx?.data||{}, counts=d.counts||{}, samples=d.samples||{};
+  if(/hapus|delete|approve|setujui|bayar|refund|cancel|kirim whatsapp|send/.test(x))return "Aksi tersebut termasuk tindakan berisiko. Companion dapat menganalisis dan menyiapkan langkah, tetapi eksekusi tetap melalui workflow aplikasi sesuai authority dan audit.";
+  if(/berapa|jumlah|total|count/.test(x)){
+    const hit=Object.entries(counts).filter(([k])=>x.includes(k.replaceAll('_',' '))||x.includes(k));
+    if(hit.length)return hit.map(([k,v])=>k+" = "+(v??"tidak tersedia")).join(" · ");
+    return "Data Nexus yang saya baca: "+Object.entries(counts).map(([k,v])=>k+"="+(v??"—")).join(", ");
+  }
+  if(/booking/.test(x)){
+    const b=samples.bookings?.rows||[];
+    return "Saya terhubung ke tabel bookings production. Saat ini konteks Nexus memuat "+(counts.bookings??"—")+" booking. Sampel terbaru: "+(b.slice(0,5).map(r=>(r.booking_code||r.id)+" / "+(r.customer_name||"—")+" / "+(r.status||"—")).join("; ")||"belum ada.");
+  }
+  if(/traffic|visitor|pengunjung|seo|organic|whatsapp|conversion/.test(x)){
+    const e=samples.website_analytics_events?.rows||[];
+    const by={};e.forEach(r=>{by[r.event_type]=(by[r.event_type]||0)+1});
+    return "Saya membaca telemetry website_analytics_events production. Total event yang terjangkau dalam konteks ini: "+(counts.website_analytics_events??"—")+". Sampel event terbaru: "+(Object.entries(by).map(([k,v])=>k+"="+v).join(", ")||"belum ada sampel.");
+  }
+  if(/customer|pelanggan/.test(x))return "Saya terhubung ke customer master production: "+(counts.customers??"—")+" record. Sampel terbaru: "+((samples.customers?.rows||[]).slice(0,5).map(r=>(r.full_name||r.id)+" / "+(r.verification_status||"—")).join("; ")||"belum ada.");
+  if(/crm|follow.?up|lead|prospect/.test(x))return "CRM production terbaca: "+(counts.crm_tasks??"—")+" task. Sampel: "+((samples.crm_tasks?.rows||[]).slice(0,5).map(r=>(r.title||r.id)+" / "+(r.status||"—")+" / "+(r.priority||"—")).join("; ")||"belum ada.");
+  return "Saya terhubung langsung ke data production Nexus untuk workspace "+ctx.module+" (role "+(ctx.role||"unknown")+"). Saya dapat membaca ringkasan lintas bookings, transactions, payments, refunds, customers, CRM, growth, intelligence dan telemetry. Untuk pertanyaan spesifik, sebutkan data yang ingin diperiksa.";
+}
+async function askAI(q){
+  const ctx=await aiContext();
+  try{
+    const r=await fetch('/api/nexus-ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,context:ctx})});
+    if(r.ok){const d=await r.json();if(d&&d.answer)return d.answer}
+  }catch(_){}
+  return aiFallback(q,ctx);
+}
 function initAICompanion(){const panel=$('aiCompanion');if(!panel)return;const min=$('aiMin'),msgs=$('aiMessages'),form=$('aiForm'),input=$('aiInput'),scope=$('aiScope');min.onclick=()=>{panel.classList.toggle('min');min.textContent=panel.classList.contains('min')?'+':'−'};form.onsubmit=async e=>{e.preventDefault();const q=input.value.trim();if(!q)return;input.value='';msgs.insertAdjacentHTML('beforeend','<div class="ai-msg user">'+esc(q)+'</div>');scope.textContent='Scope: '+(aiContext().module||'workspace')+' · role '+(role||'unknown')+' · production data';const m=document.createElement('div');m.className='ai-msg assistant';m.textContent='Menganalisis workspace…';msgs.appendChild(m);msgs.scrollTop=msgs.scrollHeight;m.textContent=await askAI(q);msgs.scrollTop=msgs.scrollHeight}}
 function bindNavigation(){
 document.querySelectorAll('.nav-section').forEach(b=>b.onclick=()=>{b.classList.toggle('open');b.querySelector('b').textContent=b.classList.contains('open')?'−':'+'});
