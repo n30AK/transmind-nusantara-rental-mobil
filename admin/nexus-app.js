@@ -5,7 +5,28 @@ const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g
 let role=null,current='home',rows=[],recordIndex=-1,pendingDelete=null,undoStack=[],txView='all',lookups={customers:{},vehicles:{},units:{},transactions:{},bookings:{}},related={};
 let domainState={kind:null,row:null};
 
-const modules={
+
+const LEGACY_MENU=[
+["ARMADA",["Dashboard Armada","Data Kendaraan","Unit Kendaraan","Ketersediaan","Assignment","Kalender Armada","Maintenance","Service","STNK / Pajak","Dokumen Kendaraan","Kilometer","Biaya Kendaraan","Utilisasi Armada"]],
+["CUSTOMER / CRM",["Customer Dashboard","Customer Master","Customer 360","Riwayat Booking","Interaksi","Follow Up","Lead","Prospect","Customer Aktif","Repeat Customer","Customer At Risk","Customer Inactive","Customer Value"]],
+["SALES & MARKETING",["Lead Management","Sales Pipeline","Campaign","Promo","Coupon","Source / Channel","WhatsApp Leads","Conversion","Customer Acquisition","Marketing Performance"]],
+["PARTNER",["Partner Dashboard","Partner Master","Armada Partner","Booking Partner","Partner Revenue","Commission","Settlement","Partner Performance","Partner Reliability"]],
+["KEUANGAN",["Finance Dashboard","Pendapatan","Invoice","Pembayaran","Piutang","Pengeluaran","Cash Flow","Profit & Loss","Cost Center","Commission","Settlement","Rekonsiliasi","Financial Closing"]],
+["LAPORAN",["Report Center","Laporan Penjualan","Laporan Booking","Laporan Armada","Laporan Customer","Laporan Partner","Laporan Pendapatan","Laporan Pengeluaran","Laporan Profit","Laporan Piutang","Laporan Cash Flow","Laporan Komisi","Laporan Pajak","Export Excel / PDF"]],
+["FORECASTING",["Forecast Dashboard","Forecast Booking","Forecast Revenue","Forecast Demand","Forecast Armada","Forecast Customer","Forecast Cash Flow","Target vs Actual","Scenario Planning","Early Warning"]],
+["BUSINESS INTELLIGENCE",["Executive BI","Sales Funnel","Conversion Rate","Booking Trend","Revenue Trend","Average Rental Value","Utilization Armada","Revenue / Unit","Revenue / Customer","Customer Acquisition Cost","Repeat Rate","Retention","Cancellation Rate","Profitability","Channel Performance"]],
+["OPERASIONAL",["Operations Dashboard","Task","Workflow","Handover","Pickup","Return","Driver","Incident","Complaint","Quality Control"]],
+["PROCUREMENT & INVENTORY",["Vendor","Purchase Request","Purchase Order","Spare Part","Inventory","Stock Movement","Supplier Performance"]],
+["HR & ORGANIZATION",["Employee","Driver","Attendance","Leave","Payroll","Performance","Organization"]],
+["DOKUMEN",["Customer Documents","Vehicle Documents","Contract","Invoice","Receipt","Document Verification"]],
+["AI INTELLIGENCE",["AI Business Advisor","Revenue Advisor","Fleet Advisor","Customer Advisor","Sales Advisor","Financial Advisor","Anomaly Detection","Recommended Actions"]],
+["ADMIN",["User","Role & Permission","Organization","Branch","System Setting","Pricing Setting","Notification Setting","Integration","API","Audit Log"]]
+];
+function installLegacyMenu(){const nav=document.querySelector('#nav');if(!nav||nav.dataset.legacyInstalled)return;nav.dataset.legacyInstalled='1';const map={ARMADA:'operations_tasks','CUSTOMER / CRM':'customers','SALES & MARKETING':'growth_actions','PARTNER':'transactions','KEUANGAN':'transactions','LAPORAN':'analytics','FORECASTING':'analytics','BUSINESS INTELLIGENCE':'analytics','OPERASIONAL':'operations_tasks','PROCUREMENT & INVENTORY':'operations_tasks','HR & ORGANIZATION':'customers','DOKUMEN':'customers','AI INTELLIGENCE':'signals','ADMIN':'governance'};const wrap=document.createElement('div');wrap.innerHTML=LEGACY_MENU.map(g=>'<button class="nav-section open" type="button"><span>'+g[0]+'</span><b>-</b></button><div class="nav-items">'+g[1].map(x=>'<a data-module="'+(map[g[0]]||'home')+'" data-app-label="'+x.replace(/"/g,'&quot;')+'"><i>+</i> '+x+'</a>').join('')+'</div>').join('');while(wrap.firstChild)nav.appendChild(wrap.firstChild);bindNavigation()}
+\n
+const NEXUS_AI_ARCHITECTURE=[["Agentic AI","Plan, execute, verify"],["AI Agents / Multi-Agent Systems","Specialized agents cooperate as one digital organization"],["Autonomous Systems","Observe, decide, act, verify"],["Self-Healing Computing","Detect, diagnose, repair, rollback"],["Cognitive Architecture","Memory, reasoning, planning, perception, action"],["Digital Twin","Digital model for simulation"],["Knowledge Graph","Complex entity relationships"],["Neuro-symbolic AI","AI reasoning plus formal rules"],["Edge AI","AI near device or data"],["Federated Learning","Cross-institution learning without centralizing raw data"],["World Models","Possible states and action consequences"],["Human-in-the-loop / Human-on-the-loop","Human retains authority"],["AI Governance / Policy Engine","Constrains what AI may do"]];
+function installNexusAI(){const nav=document.querySelector('#nav');if(!nav||nav.dataset.aiInstalled)return;nav.dataset.aiInstalled='1';const box=document.createElement('div');box.innerHTML='<button class="nav-section open" type="button"><span>NEXUS AI & AUTONOMY</span><b>-</b></button><div class="nav-items">'+NEXUS_AI_ARCHITECTURE.map(x=>'<a data-module="ai_architecture" data-app-label="'+x[0]+'"><i>*</i> '+x[0]+'</a>').join('')+'</div>';while(box.firstChild)nav.appendChild(box.firstChild);bindNavigation()}
+\nconst modules={
 home:{title:'Workspace',desc:'Pintu masuk pekerjaan dan seluruh modul aplikasi Nexus.',table:null},
 customers:{title:'Customers',desc:'Master customer, verifikasi, relasi booking dan riwayat.',table:'customers'},
 crm_tasks:{title:'CRM Tasks',desc:'Follow-up, pipeline, prioritas dan assignment pelanggan.',table:'crm_tasks'},
@@ -20,6 +41,7 @@ signals:{title:'Intelligence Signals',desc:'Sinyal intelligence untuk keputusan 
 governance:{title:'ERP Governance',desc:'Authority, role matrix, ownership, approval control dan governance evidence.',table:null},
 production:{title:'Production Readiness',desc:'Health, security, telemetry, automation dan production-readiness evidence.',table:null},
 analytics:{title:'Production Analytics',desc:'Telemetry produksi read-only.',table:'website_analytics_events'},
+ai_architecture:{title:'AI Architecture & Agent Registry',desc:'Agentic AI, multi-agent systems, autonomous systems, self-healing, cognitive architecture, digital twin, knowledge graph, neuro-symbolic AI, edge AI, federated learning, world models, human oversight and AI governance.',table:null},
 seo_live:{title:'SEO & Live Traffic Command Center',desc:'Traffic website, source, organic demand, WhatsApp, booking, session-linked conversion dan forecast funnel dalam satu layar.',table:null}
 };
 const txViews={
@@ -69,6 +91,8 @@ document.querySelectorAll('#nav a[data-master]').forEach(a=>a.onclick=e=>{e.prev
 document.querySelectorAll('#nav a[data-tx-view]').forEach(a=>a.onclick=e=>{e.preventDefault();openTxView(a.dataset.txView)});
 }
 function markActive(selector,value){document.querySelectorAll(selector).forEach(a=>a.classList.toggle('active',a.getAttribute(selector.includes('tx-view')?'data-tx-view':'data-module')===value))}
+
+async function renderAIArchitecture(){setHeader('AI Architecture & Agent Registry','NEXUS AI architecture and governance registry.');const el=$('content-ai_architecture');el.innerHTML='<div class="summary">'+NEXUS_AI_ARCHITECTURE.slice(0,4).map(x=>'<div class="metric"><span>'+esc(x[0])+'</span><b>DEFINED</b><span>'+esc(x[1])+'</span></div>').join('')+'</div><div class="table-card"><table class="table"><thead><tr><th>CAPABILITY</th><th>PERAN</th><th>CONTROL</th></tr></thead><tbody>'+NEXUS_AI_ARCHITECTURE.map(x=>'<tr><td><b>'+esc(x[0])+'</b></td><td>'+esc(x[1])+'</td><td><span class="pill">RBAC + POLICY + AUDIT</span></td></tr>').join('')+'</tbody></table></div><div class="notice" style="margin-top:12px">AI tidak mendapat otoritas tanpa batas. Agent harus dibatasi oleh role, policy, scope, audit, verification dan human approval untuk tindakan berisiko.</div>')}
 async function home(){
   setHeader('Executive Dashboard','TRANSMIND NEXUS — Business Operating System. Ringkasan live dari database production.');
   document.querySelectorAll('.nav-items a').forEach(x=>x.classList.remove('active'));
@@ -405,7 +429,7 @@ function bindDomainTabs(){
   });
 }
 async function init(){
-bindNavigation();bindDomainTabs();$('cancelDelete').onclick=()=>{$('confirmModal').classList.add('hidden');pendingDelete=null};$('confirmDelete').onclick=executeDelete;document.querySelectorAll('[data-close]').forEach(x=>x.onclick=()=>x.closest('.drawer-wrap')?.classList.add('hidden'));$('refreshBtn').onclick=()=>current==='home'?home():(current==='transactions'||current==='customers'||current==='crm_tasks'||current==='interactions'||current==='operations_tasks'||current==='growth_actions'||current==='opportunities'||current==='campaign_queue'||current==='website_campaigns'||current==='signals'||current==='analytics'?openModule(current):openTxView(txView));$('logoutBtn').onclick=async()=>{await client.auth.signOut();location.reload()};if(!(await openAuth()))return;const s=await client.auth.getSession(),uid=s.data.session.user.id,p=await client.from('user_profiles').select('role,full_name').eq('id',uid).maybeSingle();role=p.data?.role||s.data.session.user.app_metadata?.role||'viewer';$('roleBadge').textContent=(p.data?.full_name||s.data.session.user.email||'User')+' · '+role;$('dbStatus').textContent='Production DB · authenticated';openModule('seo_live')
+bindNavigation();installLegacyMenu();installNexusAI();bindDomainTabs();$('cancelDelete').onclick=()=>{$('confirmModal').classList.add('hidden');pendingDelete=null};$('confirmDelete').onclick=executeDelete;document.querySelectorAll('[data-close]').forEach(x=>x.onclick=()=>x.closest('.drawer-wrap')?.classList.add('hidden'));$('refreshBtn').onclick=()=>current==='home'?home():(current==='transactions'||current==='customers'||current==='crm_tasks'||current==='interactions'||current==='operations_tasks'||current==='growth_actions'||current==='opportunities'||current==='campaign_queue'||current==='website_campaigns'||current==='signals'||current==='analytics'?openModule(current):openTxView(txView));$('logoutBtn').onclick=async()=>{await client.auth.signOut();location.reload()};if(!(await openAuth()))return;const s=await client.auth.getSession(),uid=s.data.session.user.id,p=await client.from('user_profiles').select('role,full_name').eq('id',uid).maybeSingle();role=p.data?.role||s.data.session.user.app_metadata?.role||'viewer';$('roleBadge').textContent=(p.data?.full_name||s.data.session.user.email||'User')+' · '+role;$('dbStatus').textContent='Production DB · authenticated';openModule('seo_live')
 }
 init()
 })();
