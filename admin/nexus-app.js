@@ -43,13 +43,33 @@ function installLegacyMenu(){
   const nav=document.querySelector('#nav');
   if(!nav||nav.dataset.legacyInstalled)return;
   nav.dataset.legacyInstalled='1';
-  const groups=[
-    ['MANAGEMENT',['Executive Dashboard','Operational Dashboard','Sales Dashboard','Finance Dashboard']],
-    ['TRANSAKSI',['Semua Booking','Booking Baru','Booking Hari Ini','Booking Mendatang','Kalender Rental','Booking Pending','Booking Confirmed','Booking Berjalan','Booking Selesai','Pembatalan','Refund']],
-    ...LEGACY_MENU
+
+  const management=[
+    ['home','Executive Dashboard'],
+    ['management','Operational Dashboard'],
+    ['management','Sales Dashboard'],
+    ['management','Finance Dashboard']
   ];
-  const icon='▸';
-  nav.innerHTML='<div class="legacy-menu-note">Pilih menu utama untuk membuka halaman submenu.</div>'+groups.map((g,i)=>'<a class="legacy-page-menu" href="#" data-legacy-group="'+esc(g[0])+'"><span class="legacy-menu-icon">'+icon+'</span><span>'+esc(g[0])+'</span><em>›</em></a>').join('');
+  const tx=[
+    ['all','Semua Booking'],['new','Booking Baru'],['today','Booking Hari Ini'],['upcoming','Booking Mendatang'],
+    ['calendar','Kalender Rental'],['pending','Booking Pending'],['confirmed','Booking Confirmed'],
+    ['running','Booking Berjalan'],['completed','Booking Selesai'],['cancelled','Pembatalan'],['refund','Refund']
+  ];
+
+  const section=(title,items)=>'<button class="nav-section open" type="button"><span>'+title+'</span><b>−</b></button><div class="nav-items">'+items.map(x=>x).join('')+'</div>';
+  const appItems=(items)=>items.map(x=>'<a data-module="app_workspace" data-app-label="'+x.replace(/"/g,'&quot;')+'"><i>+</i> '+x+'</a>');
+  const txItems=tx.map(x=>'<a data-tx-view="'+x[0]+'"><i>▤</i> '+x[1]+'</a>');
+
+  let html='';
+  html+=section('🏠 MANAGEMENT',[
+    '<a data-module="home"><i>⌂</i> Executive Dashboard</a>',
+    '<a data-management="operations"><i>⚙</i> Operational Dashboard</a>',
+    '<a data-management="sales"><i>▣</i> Sales Dashboard</a>',
+    '<a data-management="finance"><i>¤</i> Finance Dashboard</a>'
+  ]);
+  html+=section('📥 TRANSAKSI',txItems);
+  html+=LEGACY_MENU.map(g=>section(g[0],appItems(g[1]))).join('');
+  nav.innerHTML=html;
   bindNavigation();
 }
 const NEXUS_AI_ARCHITECTURE=[["Agentic AI","Plan, execute, verify"],["AI Agents / Multi-Agent Systems","Specialized agents cooperate as one digital organization"],["Autonomous Systems","Observe, decide, act, verify"],["Self-Healing Computing","Detect, diagnose, repair, rollback"],["Cognitive Architecture","Memory, reasoning, planning, perception, action"],["Digital Twin","Digital model for simulation"],["Knowledge Graph","Complex entity relationships"],["Neuro-symbolic AI","AI reasoning plus formal rules"],["Edge AI","AI near device or data"],["Federated Learning","Cross-institution learning without centralizing raw data"],["World Models","Possible states and action consequences"],["Human-in-the-loop / Human-on-the-loop","Human retains authority"],["AI Governance / Policy Engine","Constrains what AI may do"]];
@@ -120,35 +140,6 @@ document.querySelectorAll('#nav a[data-module]').forEach(a=>a.onclick=e=>{e.prev
 document.querySelectorAll('#nav a[data-management]').forEach(a=>a.onclick=e=>{e.preventDefault();renderManagementDashboard(a.dataset.management)});
 document.querySelectorAll('#nav a[data-master]').forEach(a=>a.onclick=e=>{e.preventDefault();renderMasterData()});
 document.querySelectorAll('#nav a[data-tx-view]').forEach(a=>a.onclick=e=>{e.preventDefault();openTxView(a.dataset.txView)});
-document.querySelectorAll('#nav a[data-legacy-group]').forEach(a=>a.onclick=e=>{e.preventDefault();renderLegacySubmenu(a.dataset.legacyGroup)});
-}
-function renderLegacySubmenu(group){
-  const groups=[
-    ['MANAGEMENT',['Executive Dashboard','Operational Dashboard','Sales Dashboard','Finance Dashboard']],
-    ['TRANSAKSI',['Semua Booking','Booking Baru','Booking Hari Ini','Booking Mendatang','Kalender Rental','Booking Pending','Booking Confirmed','Booking Berjalan','Booking Selesai','Pembatalan','Refund']],
-    ...LEGACY_MENU
-  ];
-  const found=groups.find(g=>g[0]===group);
-  if(!found)return;
-  setHeader(group,'NEXUS / '+group+' · pilih aplikasi yang ingin dibuka.');
-  document.querySelectorAll('#nav a[data-legacy-group]').forEach(a=>a.classList.toggle('active',a.dataset.legacyGroup===group));
-  const items=found[1];
-  $('content').innerHTML='<div class="page-menu-head"><div><div class="eyebrow">TRANSMIND NEXUS / MENU</div><h2>'+esc(group)+'</h2><p class="muted">Halaman submenu aplikasi. Klik salah satu modul untuk membuka workspace dan data production.</p></div><button class="btn ghost" id="submenuHome">⌂ Home</button></div><div class="submenu-grid">'+items.map((label,i)=>'<button type="button" class="submenu-card" data-submenu-label="'+esc(label)+'"><span class="submenu-index">'+String(i+1).padStart(2,'0')+'</span><span><b>'+esc(label)+'</b><small>Open application workspace</small></span><em>→</em></button>').join('')+'</div><div class="notice">Menu utama → halaman submenu → aplikasi/workspace. Tidak ada data sintetis; perubahan mengikuti authority dan RLS.</div>';
-  $('submenuHome').onclick=()=>openModule('home');
-  document.querySelectorAll('[data-submenu-label]').forEach(b=>b.onclick=()=>openLegacyItem(group,b.dataset.submenuLabel));
-}
-function openLegacyItem(group,label){
-  if(group==='MANAGEMENT'){
-    const map={'Executive Dashboard':'home','Operational Dashboard':'operations','Sales Dashboard':'sales','Finance Dashboard':'finance'};
-    if(map[label]==='home')return openModule('home');
-    return renderManagementDashboard(map[label]);
-  }
-  if(group==='TRANSAKSI'){
-    const map={'Semua Booking':'all','Booking Baru':'new','Booking Hari Ini':'today','Booking Mendatang':'upcoming','Kalender Rental':'calendar','Booking Pending':'pending','Booking Confirmed':'confirmed','Booking Berjalan':'running','Booking Selesai':'completed','Pembatalan':'cancelled','Refund':'refund_all'};
-    return openTxView(map[label]||'all');
-  }
-  if(label==='Dashboard Armada')return openModule('app_workspace',label);
-  return openModule('app_workspace',label);
 }
 function markActive(selector,value){document.querySelectorAll(selector).forEach(a=>a.classList.toggle('active',a.getAttribute(selector.includes('tx-view')?'data-tx-view':'data-module')===value))}
 
