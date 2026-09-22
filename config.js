@@ -32,7 +32,7 @@ if(!document.querySelector('link[data-transmind-responsive]')){var css=document.
   function load(){
     if(document.querySelector('script[data-transmind-customer-care]')) return;
     var s=document.createElement('script');
-    s.src='ai-companion-customer-care.js';
+    s.src='ai-companion-customer-care.js?v=20260922-1';
     s.async=true;
     s.dataset.transmindCustomerCare='1';
     document.body.appendChild(s);
