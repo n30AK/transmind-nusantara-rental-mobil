@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 const C=window.NEXUS_CONFIG||{}; if(!C.supabaseUrl||!C.supabaseAnonKey)return;
-const db=supabase.createClient(C.supabaseUrl,C.supabaseAnonKey);
+const db=window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey);
 const esc=s=>String(s??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
 const root=()=>document.querySelector('.page.active .nx-driver');
 async function rpc(name,args){const r=await db.rpc(name,args);if(r.error){alert(r.error.message);throw r.error}return r.data}
