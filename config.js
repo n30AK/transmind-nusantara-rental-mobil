@@ -1,6 +1,13 @@
 window.TRANSMIND_SUPABASE_URL='https://ynigwuutmqpnfnkhlaip.supabase.co';
 window.TRANSMIND_SUPABASE_ANON_KEY='sb_publishable_MycpkacWOWLwO2gXclp2Cw_ApWaeeAw';
 window.TRANSMIND_AI_ENDPOINT='https://ynigwuutmqpnfnkhlaip.supabase.co/functions/v1/transmind-ai';
+window.getTransmindSupabaseClient=function(){
+  if(window.__TRANSMIND_SUPABASE_CLIENT)return window.__TRANSMIND_SUPABASE_CLIENT;
+  if(!window.supabase||typeof window.supabase.createClient!=='function')return null;
+  if(!window.TRANSMIND_SUPABASE_URL||!window.TRANSMIND_SUPABASE_ANON_KEY)return null;
+  window.__TRANSMIND_SUPABASE_CLIENT=window.supabase.createClient(window.TRANSMIND_SUPABASE_URL,window.TRANSMIND_SUPABASE_ANON_KEY);
+  return window.__TRANSMIND_SUPABASE_CLIENT;
+};
 (function(){
 'use strict';
 var STORAGE_KEY='transmind_attribution_v1',SESSION_KEY='transmind_visitor_session_v1',host=location.host;
