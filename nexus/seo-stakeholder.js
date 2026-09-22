@@ -9,7 +9,7 @@
     page.appendChild(panel);
     panel.querySelector('#seoRefreshLive').onclick=load;panel.querySelector('#seoPrintReport').onclick=()=>window.print();load();
   }
-  async function load(){
+  async function load(){const session=(await window.NXSB.auth.getSession()).data.session;if(!session)return;
     const{data:rows}=await window.NXSB.from('growth_seo_metrics').select('metric_date,metric_key,metric_value,metadata').order('metric_date',{ascending:false}).limit(500);
     const data=rows||[];
     const latest=data[0]?.metric_date||'—';
