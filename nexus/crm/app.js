@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const cfg = window.NEXUS_CONFIG || {};
-  const sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+  const sb = window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const fmtDate = v => v ? new Date(v).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}) : '—';
