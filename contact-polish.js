@@ -14,7 +14,6 @@
   'use strict';
 
   const NUMBERS=[
-    {display:'081292677888',wa:'6281292677888'},
     {display:'08816654141',wa:'628816654141'}
   ];
 
