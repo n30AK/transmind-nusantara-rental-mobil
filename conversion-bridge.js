@@ -23,10 +23,8 @@
       if(!window.supabase || !window.TRANSMIND_SUPABASE_URL ||
          !window.TRANSMIND_SUPABASE_ANON_KEY || !sid()) return Promise.resolve(false);
 
-      var sb=window.supabase.createClient(
-        window.TRANSMIND_SUPABASE_URL,
-        window.TRANSMIND_SUPABASE_ANON_KEY
-      );
+      var sb=window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():null;
+      if(!sb) return Promise.resolve(false);
 
       var a=window.TRANSMIND_ATTRIBUTION ||
         window.TRANSMIND_GROWTH_ATTRIBUTION || {};
