@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const URL='https://ynigwuutmqpnfnkhlaip.supabase.co',KEY=['sb_publishable_','MycpkacWOWLwO2gXclp2Cw_ApWaeeAw'].join(''),db=supabase.createClient(URL,KEY);
+const C=window.NEXUS_CONFIG||{},db=window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():supabase.createClient(C.supabaseUrl,C.supabaseAnonKey);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const label=s=>String(s).replace(/_/g,' ').replace(/\b\w/g,m=>m.toUpperCase());
 const REL={vehicle_id:['vehicles','id','name'],customer_id:['customers','id','full_name'],partner_id:['partners','id','display_name'],agent_id:['agents','id','full_name'],unit_id:['vehicle_units','id','unit_code'],vehicle_unit_id:['vehicle_units','id','unit_code'],booking_id:['bookings','id','booking_code'],transaction_id:['transactions','id','transaction_code'],driver_id:['drivers','id','full_name'],org_unit_id:['nexus_org_units','id','name']};
