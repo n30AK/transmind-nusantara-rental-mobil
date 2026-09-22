@@ -59,7 +59,7 @@
     addStyles();
     if(!window.supabase || !window.TRANSMIND_SUPABASE_URL || !window.TRANSMIND_SUPABASE_ANON_KEY) return;
 
-    const sb=window.supabase.createClient(window.TRANSMIND_SUPABASE_URL,window.TRANSMIND_SUPABASE_ANON_KEY);
+    const sb=window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():null;
     sb.from('website_campaigns')
       .select('campaign_type,title,subtitle,body,cta_label,cta_url,image_url,priority,active,starts_at,ends_at')
       .eq('active',true)
