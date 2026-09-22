@@ -78,6 +78,29 @@ function page(id){
   '<section id="page-'+esc(id)+'" class="page"><div class="hero"><div><div class="eyebrow">'+esc(r.group_name)+'</div><div class="title">'+esc(r.module_label)+'</div><div class="desc">'+esc(r.description||'Application workspace dengan form, navigasi data dan relasi.')+'</div></div>'+
   '<div class="hero-actions"><span id="mode-'+esc(id)+'" class="status">'+(writable(r)?'● APPLICATION FORM':'● READ ONLY')+'</span></div></div><div id="ws-'+esc(id)+'"></div></section>');
 }
+function printAllowed(r){
+ const g=String(r?.group_name||'').toLowerCase();
+ const id=String(r?.module_id||'').toLowerCase();
+ return ['transaksi','armada','customer / crm','sales & marketing','partner','keuangan','laporan','procurement & inventory','hr & organization','dokumen'].includes(g)
+   || /(^|-)report|invoice|receipt|contract|document|booking|payment|expense|revenue|commission|settlement|tax|payroll|customer|vehicle|driver|partner|purchase|inventory|stock|attendance|leave|performance/.test(id);
+}
+function printCss(){
+ return '<style>@page{size:A4;margin:14mm}*{box-sizing:border-box}body{font:12px Arial,sans-serif;color:#111;margin:0}.head{border-bottom:2px solid #222;padding-bottom:10px;margin-bottom:14px}.brand{font-size:18px;font-weight:800;letter-spacing:1px}.meta{font-size:10px;color:#555;margin-top:4px}.title{font-size:16px;font-weight:700;margin:0 0 4px}.scope{font-size:10px;color:#555;margin-bottom:12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:6px;vertical-align:top;text-align:left}th{background:#eee;font-size:9px;text-transform:uppercase}.sign{margin-top:35px;display:flex;justify-content:flex-end}.sign>div{width:220px;text-align:center}.no-print{display:none!important}</style>';
+}
+function printWorkspace(id,row=null){
+ const r=reg.get(id);if(!r||!printAllowed(r))return;
+ const fs=(r.field_meta||[]).filter(f=>!['id','created_at','updated_at'].includes(f.name));
+ const rows=row?[row]:(state[id]?.rows||[]);
+ const title=r.module_label||id;
+ const stamp=new Date().toLocaleString('id-ID');
+ const body=row
+  ? '<table><thead><tr><th>Field</th><th>Data</th></tr></thead><tbody>'+fs.map(f=>'<tr><th>'+esc(nice(f.name))+'</th><td>'+esc(row[f.name]??'')+'</td></tr>').join('')+'</tbody></table>'
+  : '<table><thead><tr>'+fs.slice(0,8).map(f=>'<th>'+esc(nice(f.name))+'</th>').join('')+'</tr></thead><tbody>'+rows.map(x=>'<tr>'+fs.slice(0,8).map(f=>'<td>'+esc(x[f.name]??'')+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+ const w=window.open('','_blank','width=1100,height=800');
+ if(!w){setMessage(id,'Popup cetak diblokir browser. Izinkan popup untuk NEXUS.','warn');return}
+ w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+esc(title)+'</title>'+printCss()+'</head><body><div class="head"><div class="brand">TRANSMIND NEXUS</div><div class="meta">BUSINESS OPERATING SYSTEM · Dokumen Cetak</div></div><div class="title">'+esc(title)+'</div><div class="scope">'+esc(r.group_name)+' · '+esc(r.table_name)+' · Dicetak '+esc(stamp)+(row?' · Record terpilih':' · Daftar data')+'</div>'+body+'<div class="sign"><div>Dicetak oleh<br><br><br>________________________</div></div></body></html>');
+ w.document.close();w.focus();setTimeout(()=>w.print(),250);
+}
 function setMessage(id,msg,kind=''){
  const e=document.getElementById('m-'+id);if(!e)return;e.textContent=msg||'';e.className='msg '+(kind||'');
 }
@@ -118,7 +141,7 @@ function bindForm(id,row){
  document.getElementById('c-'+id).onclick=()=>renderForm(id,null);
  document.getElementById('b-'+id).onclick=()=>document.getElementById('list-'+id)?.scrollIntoView({behavior:'smooth',block:'start'});
  document.getElementById('f-'+id).onsubmit=e=>{e.preventDefault();save(id,row)};
- document.getElementById('d-'+id)?.addEventListener('click',()=>del(id,row));
+ document.getElementById('d-'+id)?.addEventListener('click',()=>del(id,row));document.getElementById('p-'+id)?.addEventListener('click',()=>printWorkspace(id,row));
  if(locked)form.querySelectorAll('input,select,textarea').forEach(x=>x.disabled=true);
 }
 async function renderForm(id,row){
@@ -129,7 +152,7 @@ async function renderForm(id,row){
  '<form id="f-'+id+'"><div class="form-grid">'+fs.map(f=>inputHtml(f,row,r,locked)).join('')+'</div><div id="m-'+id+'" class="msg"></div><div class="toolbar">'+
  (locked?'':'<button class="primary" type="submit">'+(row?'Update':'Insert')+'</button>')+
  '<button class="secondary" type="button" id="c-'+id+'">Cancel / New</button><button class="secondary" type="button" id="b-'+id+'">Back to Data</button>'+
- (row&&!locked?'<button class="secondary" type="button" id="d-'+id+'">Delete</button>':'')+
+ (row&&!locked?'<button class="secondary" type="button" id="d-'+id+'">Delete</button>':'')+(printAllowed(r)?'<button class="secondary" type="button" id="p-'+id+'">🖨 Cetak</button>':'')+
  '</div></form></div>';
  bindForm(id,row);
 }
@@ -153,12 +176,12 @@ async function list(id,selectedPk=null){
  let rows=q.data||[];
  if(r.filter_column)rows=rows.filter(x=>String(x[r.filter_column])===String(r.filter_value));
  state[id]={rows};
- h.innerHTML='<div class="workspace-nav"><button class="secondary" id="back-'+id+'">← Back</button><button class="secondary" id="new-'+id+'">＋ Insert / New</button><button class="secondary" id="refresh-'+id+'">↻ Refresh</button><button class="secondary" id="searchbtn-'+id+'">⌕ Search</button></div><div id="form-'+id+'"></div><div id="list-'+id+'" class="card" style="margin-top:13px"><div class="toolbar"><b>Data '+esc(r.module_label)+'</b><input id="s-'+id+'" placeholder="Search..."></div><div id="t-'+id+'" class="table"></div></div>';
+ h.innerHTML='<div class="workspace-nav"><button class="secondary" id="back-'+id+'">← Back</button><button class="secondary" id="new-'+id+'">＋ Insert / New</button><button class="secondary" id="refresh-'+id+'">↻ Refresh</button><button class="secondary" id="searchbtn-'+id+'">⌕ Search</button>'+(printAllowed(r)?'<button class="secondary" id="print-'+id+'">🖨 Cetak</button>':'')+'</div><div id="form-'+id+'"></div><div id="list-'+id+'" class="card" style="margin-top:13px"><div class="toolbar"><b>Data '+esc(r.module_label)+'</b><input id="s-'+id+'" placeholder="Search..."></div><div id="t-'+id+'" class="table"></div></div>';
  renderTable(id,rows);
  document.getElementById('new-'+id).onclick=()=>{if(writable(r)){renderForm(id,null);document.getElementById('form-'+id)?.scrollIntoView({behavior:'smooth',block:'start'})}};
  document.getElementById('refresh-'+id).onclick=()=>list(id,selectedPk);
  document.getElementById('back-'+id).onclick=()=>window.history.back();
- document.getElementById('searchbtn-'+id).onclick=()=>document.getElementById('s-'+id)?.focus();
+ document.getElementById('searchbtn-'+id).onclick=()=>document.getElementById('s-'+id)?.focus();document.getElementById('print-'+id)?.addEventListener('click',()=>printWorkspace(id));
  document.getElementById('s-'+id).oninput=e=>{const s=e.target.value.toLowerCase();renderTable(id,rows.filter(x=>Object.values(x).some(v=>String(v??'').toLowerCase().includes(s))))};
  const row=selectedPk?rows.find(x=>String(x[r.pk_column])===String(selectedPk)):null;
  await renderForm(id,row||null);
