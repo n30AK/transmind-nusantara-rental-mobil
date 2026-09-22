@@ -10,8 +10,7 @@
     panel.querySelector('#seoRefreshLive').onclick=load;panel.querySelector('#seoPrintReport').onclick=()=>window.print();load();
   }
   async function load(){
-    const org=(await window.NXSB.rpc('current_organization_id')).data;if(!org)return;
-    const{data:rows}=await window.NXSB.from('growth_seo_metrics').select('metric_date,metric_key,metric_value,metadata').eq('organization_id',org).order('metric_date',{ascending:false}).limit(500);
+    const{data:rows}=await window.NXSB.from('growth_seo_metrics').select('metric_date,metric_key,metric_value,metadata').order('metric_date',{ascending:false}).limit(500);
     const data=rows||[];
     const latest=data[0]?.metric_date||'—';
     const get=k=>{const r=data.find(x=>x.metric_key===k);return r?Number(r.metric_value):null};
