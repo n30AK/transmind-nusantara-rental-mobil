@@ -1988,11 +1988,7 @@ async function init() {
 
     try {
 
-        sb =
-            window.supabase.createClient(
-                window.TRANSMIND_SUPABASE_URL,
-                window.TRANSMIND_SUPABASE_ANON_KEY
-            );
+        sb = window.getTransmindSupabaseClient();
 
 
         console.log(
