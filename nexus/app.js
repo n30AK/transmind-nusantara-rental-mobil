@@ -70,7 +70,7 @@
 
   async function boot(){
     if(!cfg.supabaseUrl||!cfg.supabaseAnonKey||cfg.supabaseAnonKey.includes('YOUR_')){showApp(false);message('NEXUS_CONFIG belum dikonfigurasi.','err');return;}
-    sb=supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
+    sb=window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
     $('login-form')?.addEventListener('submit',signIn); $('logout')?.addEventListener('click',signOut);
     document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$(b.dataset.view)?.classList.add('active');});
     const {data}=await sb.auth.getSession();
