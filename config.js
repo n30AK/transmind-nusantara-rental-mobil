@@ -21,3 +21,22 @@ if(!document.querySelector('link[data-transmind-responsive]')){var css=document.
 
 });
 })();
+
+
+/* =========================================================
+   AI COMPANION CUSTOMER CARE BRIDGE
+   Loaded after configuration so the live website can capture
+   WhatsApp handoff intent without exposing credentials.
+   ========================================================= */
+(function(){
+  function load(){
+    if(document.querySelector('script[data-transmind-customer-care]')) return;
+    var s=document.createElement('script');
+    s.src='ai-companion-customer-care.js';
+    s.async=true;
+    s.dataset.transmindCustomerCare='1';
+    document.body.appendChild(s);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',load);
+  else load();
+})();
