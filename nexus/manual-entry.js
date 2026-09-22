@@ -1,6 +1,6 @@
 (()=>{
 const C=window.NEXUS_CONFIG||{};if(!C.supabaseUrl||!C.supabaseAnonKey||!window.supabase)return;const sb=window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():(window.transmindSupabase||(window.transmindSupabase=supabase.createClient(C.supabaseUrl,C.supabaseAnonKey)));
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({&:'&amp;',<:'&lt;',>:'&gt;',":'&quot;',"'":'&#39;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const defs={
 
  customer:{label:'Customer',table:'customers',perm:'customer.manage',archive:['verification_status','Belum Diverifikasi'],fields:[['full_name','Nama Lengkap','text',1],['phone','WhatsApp / Telepon','text',1],['nik','NIK','text',0],['address','Alamat','textarea',0],['current_address','Alamat Saat Ini','textarea',0],['emergency_name','Kontak Darurat','text',0],['emergency_phone','Telepon Darurat','text',0],['emergency_relation','Hubungan','text',0],['notes','Catatan','textarea',0]]},
