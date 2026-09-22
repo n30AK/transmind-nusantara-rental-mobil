@@ -148,13 +148,12 @@ async function list(id,selectedPk=null){
  let rows=q.data||[];
  if(r.filter_column)rows=rows.filter(x=>String(x[r.filter_column])===String(r.filter_value));
  state[id]={rows};
- h.innerHTML='<div id="form-'+id+'"></div><div id="list-'+id+'" class="card" style="margin-top:13px"><div class="toolbar">'+
- '<input id="s-'+id+'" placeholder="Cari '+esc(r.module_label)+'...">'+
- (writable(r)?'<button class="primary" id="n-'+id+'">＋ Data Baru</button>':'')+
- '<button class="secondary" id="r-'+id+'">↻ Refresh</button></div><div id="t-'+id+'" class="table"></div></div>';
+ h.innerHTML='<div class="workspace-nav"><button class="secondary" id="back-'+id+'">← Back</button><button class="secondary" id="new-'+id+'">＋ Insert / New</button><button class="secondary" id="refresh-'+id+'">↻ Refresh</button><button class="secondary" id="searchbtn-'+id+'">⌕ Search</button></div><div id="form-'+id+'"></div><div id="list-'+id+'" class="card" style="margin-top:13px"><div class="toolbar"><b>Data '+esc(r.module_label)+'</b><input id="s-'+id+'" placeholder="Search..."></div><div id="t-'+id+'" class="table"></div></div>';
  renderTable(id,rows);
- document.getElementById('n-'+id)?.addEventListener('click',()=>{renderForm(id,null);document.getElementById('form-'+id)?.scrollIntoView({behavior:'smooth',block:'start'})});
- document.getElementById('r-'+id).onclick=()=>list(id,selectedPk);
+ document.getElementById('new-'+id).onclick=()=>{if(writable(r)){renderForm(id,null);document.getElementById('form-'+id)?.scrollIntoView({behavior:'smooth',block:'start'})}};
+ document.getElementById('refresh-'+id).onclick=()=>list(id,selectedPk);
+ document.getElementById('back-'+id).onclick=()=>window.history.back();
+ document.getElementById('searchbtn-'+id).onclick=()=>document.getElementById('s-'+id)?.focus();
  document.getElementById('s-'+id).oninput=e=>{const s=e.target.value.toLowerCase();renderTable(id,rows.filter(x=>Object.values(x).some(v=>String(v??'').toLowerCase().includes(s))))};
  const row=selectedPk?rows.find(x=>String(x[r.pk_column])===String(selectedPk)):null;
  await renderForm(id,row||null);
