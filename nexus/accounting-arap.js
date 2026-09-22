@@ -1,7 +1,8 @@
 (()=>{
 const C=window.NEXUS_CONFIG||{};if(!C.supabaseUrl||!C.supabaseAnonKey||!window.supabase)return;const sb=window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-async function can(p){const{data}=await sb.rpc('has_permission',{p_permission_code:p});return data===true}
+const permCache={};
+async function can(p){if(permCache[p]!==undefined)return permCache[p];try{const{data:{session}}=await sb.auth.getSession();if(!session){permCache[p]=false;return false}const{data,error}=await sb.rpc('has_permission',{p_permission_code:p});permCache[p]=!error&&data===true}catch{permCache[p]=false}return permCache[p]}
 function activate(id,label){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id)?.classList.add('active');document.querySelectorAll('.submenu button').forEach(x=>x.classList.remove('active'));const c=document.getElementById('breadcrumb');if(c)c.textContent='NEXUS / '+label}
 function nav(){const n=document.getElementById('nav');if(!n||document.getElementById('nxnav-arap'))return;let s=[...n.querySelectorAll('.nav-section')].find(x=>x.querySelector('.nav-main')?.textContent?.includes('Keuangan'));if(!s)return;const b=document.createElement('button');b.id='nxnav-arap';b.textContent='AR / AP';b.onclick=()=>{activate('nx-arap','AR / AP');render()};s.querySelector('.submenu').appendChild(b)}
 function p(){let x=document.getElementById('nx-arap');if(!x){x=document.createElement('section');x.className='page';x.id='nx-arap';document.getElementById('pages')?.appendChild(x)}return x}
