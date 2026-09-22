@@ -67,8 +67,13 @@ function inputHtml(f,row,r,locked){
    '<input data-f="'+esc(f.name)+'" type="'+t+'" value="'+esc(value)+'"'+(required?' required':'')+dis+'>')+'</div>';
 }
 function page(id){
- if(document.getElementById('page-'+id))return;
- const r=reg.get(id);
+ const r=reg.get(id);if(!r)return;
+ const existing=document.getElementById('page-'+id);
+ if(existing){
+  const content=existing.querySelector('#content-'+id);
+  if(content){content.innerHTML='<div id="ws-'+esc(id)+'"></div>';return}
+  if(existing.querySelector('#ws-'+id))return;
+ }
  document.getElementById('pages').insertAdjacentHTML('beforeend',
   '<section id="page-'+esc(id)+'" class="page"><div class="hero"><div><div class="eyebrow">'+esc(r.group_name)+'</div><div class="title">'+esc(r.module_label)+'</div><div class="desc">'+esc(r.description||'Application workspace dengan form, navigasi data dan relasi.')+'</div></div>'+
   '<div class="hero-actions"><span id="mode-'+esc(id)+'" class="status">'+(writable(r)?'● APPLICATION FORM':'● READ ONLY')+'</span></div></div><div id="ws-'+esc(id)+'"></div></section>');
