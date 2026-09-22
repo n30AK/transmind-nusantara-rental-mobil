@@ -1,6 +1,6 @@
 (()=>{
 const C=window.NEXUS_CONFIG||{}; if(!C.supabaseUrl||!C.supabaseAnonKey||!window.supabase)return;
-const sb=supabase.createClient(C.supabaseUrl,C.supabaseAnonKey);
+const sb=window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():supabase.createClient(C.supabaseUrl,C.supabaseAnonKey);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const forms={
  customer:{label:'Customer Baru',table:'customers',fields:[['full_name','Nama Lengkap','text',1],['phone','WhatsApp / Telepon','text',1],['email','Email','email',0],['company_name','Perusahaan','text',0],['customer_type','Tipe Customer','text',1],['source_channel','Source / Channel','text',0],['notes','Catatan','textarea',0]]},
