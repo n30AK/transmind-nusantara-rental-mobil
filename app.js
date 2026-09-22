@@ -22,6 +22,7 @@ console.log('==========================================');
 const WA_NUMBER = '628816654141';
 
 const VEHICLE_IMAGE_BUCKET = 'vehicle-images';
+const VEHICLE_IMAGE_VERSION = '20260922-3';
 
 const MAX_DISPLAY_VEHICLES = 26;
 
@@ -146,7 +147,8 @@ function getVehicleImageUrl(vehicle) {
     return supabaseUrl +
         '/storage/v1/object/public/' +
         encodeURIComponent(VEHICLE_IMAGE_BUCKET) +
-        '/' + cleanPath;
+        '/' + cleanPath +
+        '?v=' + VEHICLE_IMAGE_VERSION;
 }
 
 
@@ -321,7 +323,7 @@ function showCars(vehicles) {
 
             image.loading = 'lazy';
             image.decoding = 'async';
-            image.referrerPolicy = 'no-referrer';
+            image.referrerPolicy = 'strict-origin-when-cross-origin';
 
 
             if (imageUrl) {
