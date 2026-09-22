@@ -19,7 +19,7 @@ console.log('==========================================');
    CONFIG
    ========================================================= */
 
-const WA_NUMBER = '6281292677888';
+const WA_NUMBER = '628816654141';
 
 const VEHICLE_IMAGE_BUCKET = 'vehicle-images';
 
