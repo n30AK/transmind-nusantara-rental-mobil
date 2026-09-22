@@ -1,5 +1,5 @@
 (()=>{
-const CFG=window.NEXUS_CONFIG||{};if(!CFG.supabaseUrl||!CFG.supabaseAnonKey)return;const sb=supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey);
+const CFG=window.NEXUS_CONFIG||{};if(!CFG.supabaseUrl||!CFG.supabaseAnonKey)return;const sb=window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const label=s=>String(s).replace(/_/g,' ').replace(/\b\w/g,m=>m.toUpperCase());
 const configs={
