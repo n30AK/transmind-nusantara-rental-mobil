@@ -1,5 +1,5 @@
 (()=>{
-const C=window.NEXUS_CONFIG||{};if(!C.supabaseUrl||!C.supabaseAnonKey||!window.supabase)return;const sb=window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey);
+const C=window.NEXUS_CONFIG||{};if(!C.supabaseUrl||!C.supabaseAnonKey||!window.supabase)return;const sb=window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function can(p){const{data}=await sb.rpc('has_permission',{p_permission_code:p});return data===true}
 function activate(id,label){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id)?.classList.add('active');document.querySelectorAll('.submenu button').forEach(x=>x.classList.remove('active'));const c=document.getElementById('breadcrumb');if(c)c.textContent='NEXUS / '+label}
