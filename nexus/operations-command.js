@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 const C=window.NEXUS_CONFIG||{}; if(!C.supabaseUrl||!C.supabaseAnonKey)return;
-const db=supabase.createClient(C.supabaseUrl,C.supabaseAnonKey);
+const db=window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():supabase.createClient(C.supabaseUrl,C.supabaseAnonKey);
 const esc=s=>String(s??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
 const rup=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n||0));
 const dt=v=>v?new Date(v).toLocaleString('id-ID',{dateStyle:'short',timeStyle:'short'}):'—';
