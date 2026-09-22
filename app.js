@@ -130,18 +130,18 @@ function getVehicleImageUrl(vehicle) {
 
     if (!imagePath) return '';
 
-    if (/^https?:\\/\\//i.test(imagePath)) return imagePath;
+    if (/^https?:\/\//i.test(imagePath)) return imagePath;
 
     // Production source of truth: Supabase Storage bucket vehicle-images.
     // Build the public URL directly so image rendering does not depend on
     // Supabase JS client timing or object-path encoding quirks.
     const cleanPath = imagePath
-        .replace(/^\\/+/, '')
+        .replace(/^\/+/, '')
         .split('/')
         .map(function(part) { return encodeURIComponent(part); })
         .join('/');
 
-    const supabaseUrl = String(window.TRANSMIND_SUPABASE_URL || '').replace(/\\/+$/, '');
+    const supabaseUrl = String(window.TRANSMIND_SUPABASE_URL || '').replace(/\/+$/, '');
     if (!supabaseUrl) return '';
 
     return supabaseUrl +
