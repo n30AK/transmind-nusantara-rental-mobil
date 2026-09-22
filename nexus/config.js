@@ -39,3 +39,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const s = document.createElement('script'); s.src = src; s.defer = true; document.head.appendChild(s);
   });
 });
+
+// Single shared Supabase client for all NEXUS modules.
+window.getTransmindSupabaseClient = function(){
+  if (window.transmindSupabase) return window.transmindSupabase;
+  if (!window.NEXUS_CONFIG?.supabaseUrl || !window.NEXUS_CONFIG?.supabaseAnonKey || !window.supabase) return null;
+  return (window.transmindSupabase = window.supabase.createClient(window.NEXUS_CONFIG.supabaseUrl, window.NEXUS_CONFIG.supabaseAnonKey));
+};
