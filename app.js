@@ -2,7 +2,7 @@
    TRANSMIND NUSANTARA RENTAL MOBIL
    APP.JS — GO LIVE FINAL
    MODE:
-   DATABASE + IMAGE_PATH + MAX 26 ARMADA
+   DATABASE + IMAGE_PATH + ACTIVE ARMADA
    BOOKING + WHATSAPP + EMAIL OTOMATIS
    ========================================================= */
 
@@ -24,7 +24,7 @@ const WA_NUMBER = '628816654141';
 const VEHICLE_IMAGE_BUCKET = 'vehicle-images';
 const VEHICLE_IMAGE_VERSION = '20260922-3';
 
-const MAX_DISPLAY_VEHICLES = 26;
+const MAX_DISPLAY_VEHICLES = 24;
 
 let sb = null;
 
@@ -566,6 +566,7 @@ async function loadVehicles() {
                 .select(
                     'id, name, slug, category, capacity, active, image_path'
                 )
+                .eq('active', true)
                 .order(
                     'name',
                     {
@@ -639,7 +640,7 @@ async function loadVehicles() {
 
 
         /*
-         * Tampilkan maksimal 26 armada.
+         * Tampilkan maksimal 24 armada aktif.
          */
 
         const vehiclesToDisplay =
