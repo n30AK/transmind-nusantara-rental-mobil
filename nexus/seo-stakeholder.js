@@ -19,4 +19,5 @@
     const sourceRows=sources.map(r=>'<div class="list-row"><span>'+esc(r.source||'direct')+'</span><b>'+fmt(r.visitors||0)+'</b></div>').join('')||'<div class="empty">Belum ada source data.</div>';
     const landingRows=landing.map(r=>'<div class="list-row"><span>'+esc(r.path||'—')+'</span><b>'+fmt(r.visitors||0)+'</b></div>').join('')||'<div class="empty">Belum ada landing page data.</div>';
     document.getElementById('seoStakeholderBody').innerHTML='<div class="card"><h3>Traffic 30 Hari</h3><div class="list">'+dailyRows+'</div></div><div class="card"><h3>Sources & Landing Pages</h3><div class="list">'+sourceRows+'</div><div style="margin-top:12px">'+landingRows+'</div></div>';
-  };
+  }
+})();
