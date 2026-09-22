@@ -125,53 +125,28 @@ function getVehicleImageUrl(vehicle) {
     }
 
 
-    const imagePath =
-        vehicle.image_path;
+    const imagePath = String(vehicle.image_path || '').trim();
 
+    if (!imagePath) return '';
 
-    if (!imagePath) {
-        return '';
-    }
+    if (/^https?:\\/\\//i.test(imagePath)) return imagePath;
 
+    // Production source of truth: Supabase Storage bucket vehicle-images.
+    // Build the public URL directly so image rendering does not depend on
+    // Supabase JS client timing or object-path encoding quirks.
+    const cleanPath = imagePath
+        .replace(/^\\/+/, '')
+        .split('/')
+        .map(function(part) { return encodeURIComponent(part); })
+        .join('/');
 
-    if (
-        imagePath.startsWith('http://') ||
-        imagePath.startsWith('https://')
-    ) {
+    const supabaseUrl = String(window.TRANSMIND_SUPABASE_URL || '').replace(/\\/+$/, '');
+    if (!supabaseUrl) return '';
 
-        return imagePath;
-    }
-
-
-    if (!sb) {
-        return '';
-    }
-
-
-    try {
-
-        const result =
-            sb.storage
-                .from(VEHICLE_IMAGE_BUCKET)
-                .getPublicUrl(
-                    imagePath
-                );
-
-
-        return (
-            result?.data?.publicUrl ||
-            ''
-        );
-
-    } catch (error) {
-
-        console.error(
-            'GAGAL MEMBUAT URL GAMBAR:',
-            error
-        );
-
-        return '';
-    }
+    return supabaseUrl +
+        '/storage/v1/object/public/' +
+        encodeURIComponent(VEHICLE_IMAGE_BUCKET) +
+        '/' + cleanPath;
 }
 
 
@@ -344,8 +319,9 @@ function showCars(vehicles) {
                 'Armada Transmind';
 
 
-            image.loading =
-                'lazy';
+            image.loading = 'lazy';
+            image.decoding = 'async';
+            image.referrerPolicy = 'no-referrer';
 
 
             if (imageUrl) {
