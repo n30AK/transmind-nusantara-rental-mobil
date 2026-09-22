@@ -7,9 +7,7 @@
   const RESET_URL = 'https://transmindnusantararentalmobil.co.id/nexus/reset-password.html';
   const COOLDOWN_MS = 90000;
   const STORAGE_KEY = 'transmind_nexus_recovery_cooldown_v1';
-  const client = (window.supabase && cfg.supabaseUrl && cfg.supabaseAnonKey)
-    ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey)
-    : null;
+  const client = window.getTransmindSupabaseClient ? window.getTransmindSupabaseClient() : ((window.supabase && cfg.supabaseUrl && cfg.supabaseAnonKey) ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey) : null);
   let timer = null;
 
   function msg(text, cls){
