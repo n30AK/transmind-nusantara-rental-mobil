@@ -10,15 +10,13 @@
     panel.querySelector('#seoRefreshLive').onclick=load;panel.querySelector('#seoPrintReport').onclick=()=>window.print();load();
   }
   async function load(){const session=(await window.NXSB.auth.getSession()).data.session;if(!session)return;
-    const{data:rows}=await window.NXSB.from('growth_seo_metrics').select('metric_date,metric_key,metric_value,metadata').order('metric_date',{ascending:false}).limit(500);
-    const data=rows||[];
-    const latest=data[0]?.metric_date||'—';
-    const get=k=>{const r=data.find(x=>x.metric_key===k);return r?Number(r.metric_value):null};
-    const kpi=[['Organic clicks',get('clicks'),'Search Console'],['Impressions',get('impressions'),'Search Console'],['CTR',get('ctr')===null?null:(get('ctr')<=1?get('ctr')*100:get('ctr')),'percent'],['Avg. position',get('position'),'Search Console'],['SEO rows stored',data.length,'database'],['Latest data',latest,'date']];
-    document.getElementById('seoStakeholderKpis').innerHTML=kpi.map(x=>`<div class="card"><div class="k-label">${esc(x[0])}</div><div class="k-value">${x[1]===null?'—':x[0]==='CTR'?x[1].toFixed(2)+'%':typeof x[1]==='number'?fmt(x[1]):esc(x[1])}</div><div class="k-note">${esc(x[2])}</div></div>`).join('');
-    const daily={};data.forEach(r=>{daily[r.metric_date]??={};daily[r.metric_date][r.metric_key]=Number(r.metric_value)});const dates=Object.keys(daily).sort().slice(-14);
-    const chart=dates.length?`<div class="card"><h3>SEO trend — 14 titik terakhir</h3>${dates.map(d=>{const v=daily[d].clicks??0;const max=Math.max(1,...dates.map(x=>daily[x].clicks??0));return `<div class="list-row"><span>${esc(d)}</span><span style="flex:1;margin:0 12px;height:8px;background:#22262e;border-radius:8px;overflow:hidden"><span style="display:block;height:100%;width:${Math.round(v/max*100)}%;background:var(--gold)"></span></span><b>${fmt(v)}</b></div>`}).join('')}</div>`:`<div class="card"><h3>Status Data</h3><div class="notice"><b>BASELINE — belum ada Search Console metrics.</b><br>Hubungkan Google Search Console untuk mengisi clicks, impressions, CTR, average position, queries, pages, country dan device. Setelah data masuk, panel ini otomatis berubah menjadi hasil aktual.</div></div>`;
-    const actions=`<div class="card"><h3>Stakeholder Interpretation</h3><div class="list"><div class="list-row"><span>SEO foundation</span><b class="ok">READY</b></div><div class="list-row"><span>Attribution → booking → revenue</span><b class="ok">READY</b></div><div class="list-row"><span>Search Console data</span><b class="warn">${data.length?'CONNECTED DATA':'NOT IMPORTED'}</b></div><div class="list-row"><span>Decision quality</span><b>${data.length?'MEASURED':'BASELINE'}</b></div></div><div class="notice" style="margin-top:12px">Target manajemen: <b>SEO → Demand → Booking → Revenue</b>. Ranking dan traffic diperlakukan sebagai leading indicators, bukan tujuan akhir.</div></div>`;
-    document.getElementById('seoStakeholderBody').innerHTML=chart+actions;
-  }
-})();
+    const {data,error}=await window.NXSB.rpc('nexus_seo_live_metrics',{p_days:30});
+    if(error){const body=document.getElementById('seoStakeholderBody');if(body)body.innerHTML='<div class="notice bad">'+esc(error.message)+'</div>';return;}
+    const x=data||{},daily=Array.isArray(x.daily)?x.daily:[],sources=Array.isArray(x.sources)?x.sources:[],landing=Array.isArray(x.landing_pages)?x.landing_pages:[];
+    const kpi=[['Unique visitors',x.unique_visitors??0,'actual sessions'],['Page views',x.page_views??0,'actual page views'],['Organic visitors',x.organic_visitors??0,'actual organic source'],['Organic share',Number(x.organic_share_pct||0).toFixed(2)+'%','of unique visitors'],['WhatsApp clicks',x.whatsapp_clicks??0,'actual lead signal'],['Bookings',x.bookings??0,'actual bookings']];
+    document.getElementById('seoStakeholderKpis').innerHTML=kpi.map(x=>`<div class="card"><div class="k-label">${esc(x[0])}</div><div class="k-value">${typeof x[1]==='number'?fmt(x[1]):esc(x[1])}</div><div class="k-note">${esc(x[2])}</div></div>`).join('');
+    const dailyRows=daily.map(r=>'<div class="list-row"><span>'+esc(r.day_label||r.day)+'</span><b>'+fmt(r.visitors||0)+'</b></div>').join('')||'<div class="empty">Belum ada data harian.</div>';
+    const sourceRows=sources.map(r=>'<div class="list-row"><span>'+esc(r.source||'direct')+'</span><b>'+fmt(r.visitors||0)+'</b></div>').join('')||'<div class="empty">Belum ada source data.</div>';
+    const landingRows=landing.map(r=>'<div class="list-row"><span>'+esc(r.path||'—')+'</span><b>'+fmt(r.visitors||0)+'</b></div>').join('')||'<div class="empty">Belum ada landing page data.</div>';
+    document.getElementById('seoStakeholderBody').innerHTML='<div class="card"><h3>Traffic 30 Hari</h3><div class="list">'+dailyRows+'</div></div><div class="card"><h3>Sources & Landing Pages</h3><div class="list">'+sourceRows+'</div><div style="margin-top:12px">'+landingRows+'</div></div>';
+  };
