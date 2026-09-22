@@ -1329,6 +1329,71 @@
 ></script>
 
 
+
+<!-- =========================================================
+     TRANSMIND AI COMPANION
+     Customer concierge + demand intelligence layer.
+     AI endpoint can be connected through:
+     window.TRANSMIND_AI_ENDPOINT = '/api/transmind-ai'
+     ========================================================= -->
+<style id="transmind-ai-companion-style">
+#transmind-ai-launcher{position:fixed;right:22px;bottom:22px;z-index:99990;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:#d7b56d;color:#111;padding:13px 18px;font-weight:800;box-shadow:0 12px 40px rgba(0,0,0,.35);cursor:pointer}
+#transmind-ai-panel{position:fixed;right:22px;bottom:82px;width:min(390px,calc(100vw - 28px));height:min(620px,calc(100vh - 110px));z-index:99991;display:none;flex-direction:column;overflow:hidden;border:1px solid rgba(215,181,109,.35);border-radius:20px;background:#090909;color:#f4f4f4;box-shadow:0 25px 80px rgba(0,0,0,.55);font-family:inherit}
+#transmind-ai-panel.open{display:flex}
+.tm-ai-head{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;gap:12px}
+.tm-ai-head strong{display:block}.tm-ai-head small{opacity:.68}
+.tm-ai-close{background:transparent;border:0;color:#fff;font-size:22px;cursor:pointer}
+#tm-ai-messages{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.tm-ai-msg{max-width:88%;padding:11px 13px;border-radius:15px;line-height:1.45;font-size:14px;white-space:pre-wrap}
+.tm-ai-bot{align-self:flex-start;background:#151515;border:1px solid rgba(255,255,255,.08)}
+.tm-ai-user{align-self:flex-end;background:#d7b56d;color:#111}
+#tm-ai-suggestions{display:flex;gap:7px;overflow:auto;padding:0 12px 10px}
+.tm-ai-suggestion{white-space:nowrap;border:1px solid rgba(215,181,109,.45);background:transparent;color:#e8cf9b;border-radius:999px;padding:7px 10px;cursor:pointer}
+.tm-ai-form{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.1)}
+#tm-ai-input{flex:1;min-width:0;border:1px solid rgba(255,255,255,.14);background:#111;color:#fff;border-radius:12px;padding:11px 12px;outline:none}
+#tm-ai-send{border:0;border-radius:12px;background:#d7b56d;color:#111;font-weight:800;padding:0 14px;cursor:pointer}
+@media(max-width:650px){#transmind-ai-launcher{right:14px;bottom:14px}#transmind-ai-panel{right:10px;bottom:70px;width:calc(100vw - 20px);height:calc(100vh - 90px)}}
+</style>
+<button id="transmind-ai-launcher" type="button" aria-controls="transmind-ai-panel" aria-expanded="false">✦ AI Companion</button>
+<section id="transmind-ai-panel" aria-label="Transmind AI Companion">
+  <div class="tm-ai-head">
+    <div><strong>Transmind AI Companion</strong><small>Travel concierge & rental assistant</small></div>
+    <button class="tm-ai-close" id="tm-ai-close" type="button" aria-label="Tutup">×</button>
+  </div>
+  <div id="tm-ai-messages" aria-live="polite"></div>
+  <div id="tm-ai-suggestions">
+    <button class="tm-ai-suggestion" type="button">Wisata dekat Jakarta</button>
+    <button class="tm-ai-suggestion" type="button">Perjalanan nyaman 2 hari</button>
+    <button class="tm-ai-suggestion" type="button">Mobil + driver</button>
+    <button class="tm-ai-suggestion" type="button">Rekomendasi untuk keluarga</button>
+  </div>
+  <form class="tm-ai-form" id="tm-ai-form">
+    <input id="tm-ai-input" autocomplete="off" placeholder="Tanya perjalanan, wisata, rental mobil..." />
+    <button id="tm-ai-send" type="submit">Kirim</button>
+  </form>
+</section>
+<script>
+(function(){
+'use strict';
+const ENDPOINT=window.TRANSMIND_AI_ENDPOINT||document.documentElement.dataset.transmindAiEndpoint||'';
+const SESSION_KEY='transmind_ai_session_v1';
+const DEMAND_KEY='transmind_ai_demand_v1';
+let session='';
+try{session=localStorage.getItem(SESSION_KEY)||''}catch(_){}
+if(!session){session=(crypto&&crypto.randomUUID)?crypto.randomUUID():'tm-ai-'+Date.now()+'-'+Math.random().toString(36).slice(2);try{localStorage.setItem(SESSION_KEY,session)}catch(_){}}
+const panel=document.getElementById('transmind-ai-panel'),launcher=document.getElementById('transmind-ai-launcher'),close=document.getElementById('tm-ai-close'),messages=document.getElementById('tm-ai-messages'),form=document.getElementById('tm-ai-form'),input=document.getElementById('tm-ai-input');
+function add(role,text){const el=document.createElement('div');el.className='tm-ai-msg '+(role==='user'?'tm-ai-user':'tm-ai-bot');el.textContent=text;messages.appendChild(el);messages.scrollTop=messages.scrollHeight}
+function open(){panel.classList.add('open');launcher.setAttribute('aria-expanded','true');if(!messages.children.length)add('bot','Halo! Saya AI Companion Transmind. Saya bisa membantu memilih mobil, merencanakan perjalanan, memberi ide wisata, dan memahami kebutuhan perjalanan Anda. Apa yang sedang Anda rencanakan?');input.focus()}
+function closePanel(){panel.classList.remove('open');launcher.setAttribute('aria-expanded','false')}
+function demandTags(q){const s=q.toLowerCase(),tags=[];if(/wisata|libur|jalan|destinasi|pantai|gunung|kuliner/.test(s))tags.push('wisata');if(/driver|supir|sopir/.test(s))tags.push('driver');if(/lepas kunci/.test(s))tags.push('lepas_kunci');if(/keluarga|anak|family/.test(s))tags.push('keluarga');if(/corporate|kantor|bisnis|dinas/.test(s))tags.push('corporate');if(/wedding|nikah|pernikahan/.test(s))tags.push('wedding');if(/jakarta|bekasi|bogor|depok|tangerang|jabodetabek/.test(s))tags.push('jabodetabek');if(/harga|biaya|tarif|sewa/.test(s))tags.push('harga');return tags}
+function saveDemand(q,answer){const row={session_id:session,question:q,tags:demandTags(q),answer_source:ENDPOINT?'ai':'local_fallback',path:location.pathname,referrer:document.referrer||'',timestamp:new Date().toISOString()};try{const arr=JSON.parse(localStorage.getItem(DEMAND_KEY)||'[]');arr.push(row);localStorage.setItem(DEMAND_KEY,JSON.stringify(arr.slice(-100)));}catch(_){}window.dispatchEvent(new CustomEvent('transmind:ai-demand',{detail:row}));}
+function localAnswer(q){const s=q.toLowerCase();if(/wisata/.test(s))return'Saya bisa membantu menyusun rute wisata. Sebutkan kota asal, jumlah orang, durasi, dan gaya perjalanan (santai, keluarga, kuliner, alam, atau campuran). Untuk perjalanan yang nyaman, layanan dengan driver bisa dipertimbangkan.';if(/harga|biaya|tarif|sewa/.test(s))return'Untuk memberi rekomendasi yang tepat, sebutkan jenis mobil, tanggal mulai–selesai, area perjalanan, dan apakah lepas kunci atau dengan driver.';if(/driver|supir|sopir/.test(s))return'Untuk perjalanan santai atau wisata, saya dapat membantu menyusun kebutuhan kendaraan + driver. Beri tahu kota, tanggal, jumlah penumpang, dan tujuan.';if(/keluarga|anak/.test(s))return'Untuk keluarga, saya akan mempertimbangkan kapasitas penumpang, ruang bagasi, durasi perjalanan, dan kebutuhan berhenti agar perjalanan lebih nyaman.';return'Saya siap membantu soal rental mobil, wisata, rute, kenyamanan perjalanan, dan kebutuhan perjalanan bisnis. Ceritakan tujuan, tanggal, jumlah penumpang, serta area perjalanan Anda.'}
+async function ask(q){if(!q)return;add('user',q);input.value='';const thinking='Saya sedang menganalisis kebutuhan perjalanan Anda…';add('bot',thinking);let answer='';try{if(ENDPOINT){const res=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,session_id:session,path:location.pathname,referrer:document.referrer,context:{business:'Transmind Nusantara Rental Mobil',services:['lepas kunci','dengan driver','corporate','wedding','pariwisata'],areas:['Jakarta','Bekasi','Bogor','Depok','Tangerang']}})});if(!res.ok)throw new Error('AI endpoint '+res.status);const data=await res.json();answer=data.answer||data.text||data.message||''} }catch(_){answer=''}if(!answer)answer=localAnswer(q);messages.lastElementChild.remove();add('bot',answer);saveDemand(q,answer)}
+launcher.addEventListener('click',open);close.addEventListener('click',closePanel);form.addEventListener('submit',e=>{e.preventDefault();ask(input.value.trim())});document.querySelectorAll('.tm-ai-suggestion').forEach(b=>b.addEventListener('click',()=>ask(b.textContent.trim())));
+window.TRANSMIND_AI={ask,session};
+})();
+</script>
+
 </body>
 
 </html>
