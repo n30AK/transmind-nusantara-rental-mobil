@@ -1,4 +1,4 @@
-name: TransMind UI Next — Staging Preview
+name: TransMind UI Next — Public Staging Preview
 
 on:
   workflow_dispatch:
@@ -24,20 +24,20 @@ jobs:
     steps:
       - name: Checkout staging
         uses: actions/checkout@v4
-
-      - name: Prepare static preview
+      - name: Prepare complete static site
         run: |
           mkdir -p _site
-          cp ui-next/core-preview.html _site/index.html
-
+          rsync -a --delete \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude '_site/' \
+            ./ _site/
       - name: Configure Pages
         uses: actions/configure-pages@v5
-
-      - name: Upload preview artifact
+      - name: Upload complete site artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: _site
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
