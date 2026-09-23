@@ -3,7 +3,6 @@ name: Deploy TransMind Nexus to GitHub Pages
 on:
   push:
     branches: ["main"]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -30,6 +29,7 @@ jobs:
           path: .
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
