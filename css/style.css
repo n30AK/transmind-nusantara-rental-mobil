@@ -1562,3 +1562,55 @@ footer small {
     }
 
 }
+
+
+
+/* =========================================================
+   TRANSMIND — APEX-INSPIRED LIQUID GLASS VISUAL LAYER
+   VISUAL ONLY. Existing DOM, fleet images/data, booking,
+   Supabase, Nexus, analytics and AI behavior remain intact.
+   ========================================================= */
+:root{
+ --tm-bg:#070a0f;--tm-surface:#0d121a;--tm-surface2:#121a24;
+ --tm-line:rgba(255,255,255,.10);--tm-text:#f4f8fc;--tm-muted:#8ea0b5;
+ --tm-cyan:#39c6ff;--tm-blue:#1677ff;
+}
+html{background:var(--tm-bg)}
+body{background:radial-gradient(circle at 82% 8%,rgba(22,119,255,.15),transparent 30rem),radial-gradient(circle at 8% 40%,rgba(57,198,255,.07),transparent 25rem),var(--tm-bg);color:var(--tm-text)}
+header{background:rgba(7,10,15,.70);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(22px) saturate(135%);-webkit-backdrop-filter:blur(22px) saturate(135%)}
+.nav{min-height:82px}.brand img{filter:drop-shadow(0 0 18px rgba(57,198,255,.18))}
+nav a{color:#9eafc2}nav a:hover{color:#fff}nav a::after{background:var(--tm-cyan)}
+.hero{min-height:760px;background:#070a0f}
+.hero-video{filter:saturate(.72) contrast(1.06);opacity:.72}
+.hero-overlay{background:linear-gradient(90deg,rgba(7,10,15,.96),rgba(7,10,15,.72) 45%,rgba(7,10,15,.36)),linear-gradient(180deg,rgba(7,10,15,.22),rgba(7,10,15,.76))}
+.hero-in{min-height:760px;padding-top:92px;gap:44px}.hero-content{max-width:720px}
+.hero-content label,.head label,.services-section>.wrap>label,.contact-section label{color:#75d7ff;letter-spacing:2.6px}
+.hero-content h1{font-size:clamp(48px,6.6vw,84px);line-height:.98;letter-spacing:-3.8px}
+.hero-content h1 em{color:var(--tm-cyan);text-shadow:0 0 36px rgba(57,198,255,.14)}
+.hero-content p{color:#a7b6c8}
+.hero-logo{width:min(300px,28vw);filter:drop-shadow(0 22px 65px rgba(0,0,0,.72))}
+.btn{min-height:48px;border-radius:12px;border:1px solid rgba(255,255,255,.10)}
+.btn.gold{color:#041019;border-color:rgba(57,198,255,.60);background:linear-gradient(135deg,#1677ff,#39c6ff);box-shadow:0 10px 30px rgba(22,119,255,.20)}
+.btn.outline{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.16);backdrop-filter:blur(14px)}
+.btn.outline:hover{border-color:rgba(57,198,255,.55);color:#75d7ff}
+.section{padding:92px 0}.booking-section{background:linear-gradient(180deg,#080d13,#070a0f)}
+.fleet-section{background:#070a0f}.services-section{background:#0a0f16}.contact-section{background:#070a0f}
+.head{max-width:780px;margin-bottom:34px}.head h2,.services-section h2,.contact-section h2{font-size:clamp(32px,4vw,52px);letter-spacing:-2px}.head p{color:#8193a7}
+.booking{gap:12px;padding:14px;background:rgba(13,18,26,.72);border:1px solid var(--tm-line);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.42);backdrop-filter:blur(24px) saturate(125%);-webkit-backdrop-filter:blur(24px) saturate(125%)}
+.booking input,.booking select{height:50px;background:rgba(5,10,16,.76);border:1px solid rgba(255,255,255,.08);border-radius:13px}
+.booking input:focus,.booking select:focus{border-color:rgba(57,198,255,.58);box-shadow:0 0 0 3px rgba(57,198,255,.08)}
+.vehicle-info{color:#7890a6}
+.section-video{border-radius:22px;border-color:rgba(255,255,255,.09);background:#090f16;box-shadow:0 22px 70px rgba(0,0,0,.28);overflow:hidden}
+#cars{gap:16px}
+#cars .car-card,.car,.services article,.address,.payment-box{background:linear-gradient(155deg,rgba(18,26,36,.94),rgba(8,13,19,.96));border-color:rgba(255,255,255,.08);border-radius:18px;box-shadow:0 12px 45px rgba(0,0,0,.20)}
+#cars .car-card:hover,.car:hover,.services article:hover{border-color:rgba(57,198,255,.42);box-shadow:0 24px 70px rgba(0,0,0,.34)}
+#cars .car-image{background:radial-gradient(circle at 50% 70%,rgba(57,198,255,.10),transparent 48%),#0a1017}
+.services article{min-height:230px}.services article>b{color:var(--tm-cyan)}.services article p{color:#899caf}
+.address>b,.payment-box>b{color:var(--tm-cyan)}
+footer{background:#05080c;border-top-color:rgba(255,255,255,.07)}
+#transmind-ai-launcher{background:linear-gradient(135deg,#1677ff,#39c6ff)!important;color:#041019!important;border-color:rgba(57,198,255,.55)!important;box-shadow:0 12px 38px rgba(22,119,255,.25)!important}
+#transmind-ai-panel{background:rgba(7,10,15,.90)!important;border-color:rgba(57,198,255,.28)!important;border-radius:22px!important;backdrop-filter:blur(24px) saturate(125%);-webkit-backdrop-filter:blur(24px) saturate(125%)}
+.tm-ai-user{background:linear-gradient(135deg,#1677ff,#39c6ff)!important;color:#041019!important}.tm-ai-bot{background:rgba(18,26,36,.92)!important}.tm-ai-suggestion{border-color:rgba(57,198,255,.34)!important;color:#75d7ff!important}
+#tm-ai-input{background:#0b1118!important;border-color:rgba(255,255,255,.10)!important}#tm-ai-send{background:linear-gradient(135deg,#1677ff,#39c6ff)!important;color:#041019!important}
+@media(max-width:700px){.hero{min-height:700px}.hero-in{min-height:700px}.hero-content h1{font-size:48px;letter-spacing:-2.4px}.hero-logo{width:180px}.booking{padding:10px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}

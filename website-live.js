@@ -38,7 +38,7 @@
       +(c.subtitle?'<p><strong>'+esc(c.subtitle)+'</strong></p>':'')
       +(c.body?'<p>'+esc(c.body)+'</p>':'')
       +'</div>'
-      +(c.cta_url?'<a class="tm-cta" href="'+esc(c.cta_url)+'">'+esc(c.cta_label||'BOOKING SEKARANG')+'</a>':'')
+      +(c.cta_url?'<a class="tm-cta" href="'+esc(c.cta_url)+'">'+esc(c.cta_label||'PESAN SEKARANG')+'</a>':'')
       +'<button class="tm-close" type="button" aria-label="Tutup kampanye">×</button>';
 
     el.querySelector('.tm-close').addEventListener('click',()=>el.remove());

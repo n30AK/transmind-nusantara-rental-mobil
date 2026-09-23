@@ -1,0 +1,49 @@
+name: TransMind Staging QA
+
+on:
+  push:
+    branches: ["staging/transmind-ui-next-20260923"]
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "index.html"
+      - "*.js"
+      - "assets/**"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout staging
+        uses: actions/checkout@v4
+
+      - name: Validate core page
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f index.html
+          grep -q 'id="bookingForm"' index.html
+          grep -q 'id="bookingSubmit"' index.html
+          grep -q 'id="fleetStatus"' index.html
+          grep -q 'id="cars"' index.html
+          grep -q 'id="pembayaran"' index.html
+          grep -q 'ASISTEN AI' index.html
+          grep -q 'STAGING' index.html
+
+      - name: Validate production guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -q 'workflow_dispatch' .github/workflows/deploy.yml
+          grep -q 'branches: ["main"]' .github/workflows/deploy.yml
+          grep -q "github.ref == 'refs/heads/main'" .github/workflows/deploy.yml
+
+      - name: Validate no accidental production domain override
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'transmindnusantararentalmobil.co.id' index.html || true
