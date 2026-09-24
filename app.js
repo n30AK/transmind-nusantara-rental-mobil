@@ -1559,6 +1559,10 @@ async function submitBooking(
 
     try {
 
+        window.dispatchEvent(new CustomEvent('transmind:booking-start', { detail: {
+            name: formData.name || '', service: formData.service || '', area: formData.area || ''
+        }}));
+
         console.log(
             'MEMANGGIL RPC create_booking...'
         );
@@ -1730,6 +1734,14 @@ async function submitBooking(
          * Only fires after create_booking returns a successful booking.
          * This is the source of truth for Nexus conversion reporting.
          */
+        window.dispatchEvent(new CustomEvent('transmind:booking-success', { detail: {
+            booking_id: bookingResult.id || bookingResult.booking_id || null,
+            booking_code: bookingCode,
+            vehicle_id: formData.vehicleId || null,
+            service: formData.service || '',
+            area: formData.area || ''
+        }}));
+
         if (typeof window.TRANSMIND_TRACK_CONVERSION === 'function') {
             await window.TRANSMIND_TRACK_CONVERSION('booking_success', {
                 booking_id: bookingResult.id || bookingResult.booking_id || null,
