@@ -65,7 +65,7 @@ async function submitLead(e){
  const generated=custom||['Saya ingin booking','Saya ingin tanya harga','Saya ingin konsultasi','Saya sedang merencanakan perjalanan'][['booking','pricing','rental_consultation','travel_planning'].indexOf(intent)]||'Saya ingin konsultasi rental.';
  const memory=[];if(date)memory.push({type:'trip_date',value:date,consent:true});if(area)memory.push({type:'trip_area',value:area,consent:true});if(service)memory.push({type:'service_preference',value:service,consent:true});
  try{
-  const r=await callAI(generated,{name,phone,vehicle_id:null,service,duration_days:days,quote:intent!=='rental_consultation',lead:{name,phone,memory}});
+  const r=await callAI(generated,{name,phone,vehicle_id:null,service,duration_days:days,quote:intent!=='rental_consultation',lead:{name,phone,consent:true,consent_status:'granted',memory}});
   document.getElementById('acs-form-msg').textContent=r.lead?.captured?'Lead tersimpan. AI sudah menyiapkan follow-up dan jalur WhatsApp.':'Data diterima, tetapi lead belum dapat dibuat otomatis. Periksa kembali nomor WhatsApp.';
   if(r.answer)addMsg(r.answer,'ai'); await renderData();
  }catch(err){msg.textContent='Gagal: '+err.message}
