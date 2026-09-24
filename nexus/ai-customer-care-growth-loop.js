@@ -37,7 +37,7 @@ async function queue(d,mode){
  if(sig.error)throw sig.error;if(com.error)throw com.error;
  const by=new Map();
  (sig.data||[]).forEach(x=>{const consent=String(x.metadata?.consent_status||x.metadata?.consent||'').toLowerCase();if(consent!=='granted'&&consent!=='true')return;const p=phone(x.phone||x.customer_phone||x.metadata?.phone||'');if(!p)return;const r=by.get(p)||{phone:p,name:x.name||x.metadata?.lead_name||'Calon pelanggan',last:x.created_at};r.last=new Date(r.last)>new Date(x.created_at)?r.last:x.created_at;by.set(p,r)});
- (com.data||[]).forEach(x=>{const consent=String(x.metadata?.consent_status||x.metadata?.consent_checked||'').toLowerCase();if(consent!=='granted'&&consent!=='true')return;const p=phone(x.recipient||x.metadata?.phone||'');if(!p)return;const r=by.get(p)||{phone:p,name:x.metadata?.lead_name||'Pelanggan',last:x.created_at};r.last=new Date(r.last)>new Date(x.created_at)?r.last:x.created_at;by.set(p,r)});
+ (com.data||[]).forEach(x=>{const consent=String(x.metadata?.consent_status||x.metadata?.consent_checked||'').toLowerCase();if(x.event_type!=='AI_LEAD_FOLLOWUP'&&consent!=='granted'&&consent!=='true')return;const p=phone(x.recipient||x.metadata?.phone||'');if(!p)return;const r=by.get(p)||{phone:p,name:x.metadata?.lead_name||'Pelanggan',last:x.created_at};r.last=new Date(r.last)>new Date(x.created_at)?r.last:x.created_at;by.set(p,r)});
  let made=0,skipped=0;
  for(const r of [...by.values()].slice(0,25)){
   const days=(Date.now()-new Date(r.last||0).getTime())/86400000;
