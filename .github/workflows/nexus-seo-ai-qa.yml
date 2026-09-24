@@ -38,7 +38,7 @@ jobs:
           grep -q 'TRANSMIND_AI_ENDPOINT' config.js
           grep -q 'vehicle_prices' supabase/functions/transmind-ai/index.ts
           grep -q 'crm_tasks' supabase/functions/transmind-ai/index.ts
-          grep -q 'nexus_communications' supabase/functions/transmind-ai/index.ts
+          grep -q 'nexus_communications' supabase/functions/transmind-ai/index.ts\n          test -f nexus/ai-customer-service-console.js
       - name: Validate Deno syntax
         uses: denoland/setup-deno@v1
         with:
