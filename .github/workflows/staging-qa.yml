@@ -3,14 +3,6 @@ name: TransMind Staging QA
 on:
   push:
     branches: ["staging/transmind-ui-next-20260923"]
-  pull_request:
-    branches: ["main"]
-    paths:
-      - "index.html"
-      - "*.js"
-      - "assets/**"
-      - ".github/workflows/**"
-
 permissions:
   contents: read
 
