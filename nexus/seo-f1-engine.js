@@ -44,8 +44,8 @@ async function render(days=7){
   if(live.error)throw live.error;if(funnel.error)throw funnel.error;
   const [prevRows]=await Promise.all([events(db,Math.max(days*2,14))]);
   const a=agg(rows),all=agg(prevRows),x=live.data||{},f=funnel.data||{};
-  const visitors=Number(x.unique_visitors||0),wa=Number(x.whatsapp_clicks||0),bookings=Number(f.bookings||0),linked=Number(f.linked_bookings||0),cta=Number(a.types.booking_cta_click||0),organic=Number(x.organic_visitors||0);
-  const prevEvents=Math.max(all.events-a.events,0),growth=prevEvents?((a.events-prevEvents)/prevEvents*100):0;
+  const visitors=Number(x.unique_visitors||0),wa=Number(x.whatsapp_clicks||0),rpcBookings=Number(f.bookings||0),eventBookingRows=rows.filter(r=>/^(booking_success|booking_created)$/.test(String(r.event_type||''))),eventBookingKeys=new Set(eventBookingRows.map(r=>String(r.booking_id||r.booking_code||r.metadata?.booking_id||r.metadata?.booking_code||r.visitor_session_id+'|'+String(r.occurred_at||'').slice(0,16)))),eventBookings=eventBookingKeys.size,bookings=Math.max(rpcBookings,eventBookings),linked=Number(f.linked_bookings||0),cta=Number(a.types.booking_cta_click||0),organic=Number(x.organic_visitors||0);
+  const prevEvents=Math.max(all.events-a.events,0),growth=prevEvents?((a.events-prevEvents)/prevEvents*100):0,bookingSource=eventBookings>0?'first-party booking events':'booking funnel RPC';
   const pages=top(a.pages),sources=top(a.sources),geo={};pages.forEach(([p,n])=>{const g=pathGeo(p);geo[g]=(geo[g]||0)+n;});
   const intents={};pages.forEach(([p,n])=>{const i=intentFor(p);intents[i]=(intents[i]||0)+n;});
   const geoRows=top(geo,6),intentRows=top(intents,6);
@@ -55,7 +55,7 @@ async function render(days=7){
   intentRows.forEach(([i,n])=>{if(n>=2)opportunities.push({title:'Intent '+i,why:n+' event',action:'Content cluster + conversion path'});});
   if(organic===0)opportunities.push({title:'Search Console connector',why:'Organic belum tersedia pada data Nexus',action:'Hubungkan Search Console'});
   if(bookings===0&&visitors>0)opportunities.push({title:'Booking rescue',why:visitors+' visitor tanpa booking terukur',action:'CTA + WhatsApp follow-up'});
-  const unique=[...new Map(opportunities.map(o=>[o.title,o])).values()].slice(0,10);
+  if(bookings===0&&cta>0)opportunities.push({title:'Booking conversion rescue',why:cta+' CTA tetapi belum ada booking terukur',action:'Periksa form → RPC → success event → admin follow-up'}); const unique=[...new Map(opportunities.map(o=>[o.title,o])).values()].slice(0,10);
   const expansionRows=pages.slice(0,4).flatMap(([p])=>expansion(p,pathGeo(p),intentFor(p))).slice(0,12);
   const channels=[['Google Search Console','DISCOVERY','Menunggu OAuth'],['Google Business Profile','LOCAL','Menunggu API/OAuth'],['Bing Webmaster','DISCOVERY','Menunggu API/OAuth'],['Email','NURTURE','Provider/domain belum terhubung'],['SMS','OUTBOUND','Hanya untuk opt-in/compliant provider'],['Social Mesh','DISTRIBUTION','OAuth per platform belum terhubung']];
   el.innerHTML=css+
