@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          node --check nexus/seo-f1-engine.js
+          for f in nexus/*.js; do node --check "$f"; done
 
       - name: Validate local SEO pages
         shell: bash
