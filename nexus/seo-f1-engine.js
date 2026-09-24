@@ -52,6 +52,7 @@ function install(){
   if(window.__TM_SEO_F1_INSTALLED)return;window.__TM_SEO_F1_INSTALLED=true;window.TRANSMIND_SEO_F1={render};
   const nav=document.getElementById('nav');
   if(nav&&!nav.dataset.seoF1Bound){nav.dataset.seoF1Bound='1';nav.addEventListener('click',function(e){const b=e.target.closest('[data-page="seo-live"]');if(b)setTimeout(()=>render(7),40);},true);}
+  document.addEventListener('click',function(e){const b=e.target.closest('[data-seo]');if(b){const days=Number(b.dataset.seo||7);setTimeout(()=>render(days),50);}},true);
   window.addEventListener('tm-seo-refresh',e=>render(Number(e.detail?.days||7)));
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
