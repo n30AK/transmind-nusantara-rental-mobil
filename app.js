@@ -1754,8 +1754,19 @@ async function submitBooking(
                 total_days: bookingResult.total_days || bookingResult.totalDays || null,
                 total_price: bookingResult.total_price || bookingResult.totalPrice || null,
                 source: 'website_booking_rpc'
-            }););\n        }\n\n        }
+            });
 
+            await window.TRANSMIND_TRACK_CONVERSION('booking_created', {
+                booking_id: bookingResult.id || bookingResult.booking_id || null,
+                booking_code: bookingCode,
+                vehicle_id: formData.vehicleId || null,
+                service: formData.service || '',
+                area: formData.area || '',
+                total_days: bookingResult.total_days || bookingResult.totalDays || null,
+                total_price: bookingResult.total_price || bookingResult.totalPrice || null,
+                source: 'website_booking_rpc'
+            });
+        }
 
         const vehicleName =
             bookingResult.vehicle_name ||
