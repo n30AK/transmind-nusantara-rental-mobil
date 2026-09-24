@@ -76,8 +76,8 @@ $('nav')?.addEventListener('click',e=>{const b=e.target.closest('[data-page]');i
 async function boot(){buildNav();buildPages();if(!cfg.supabaseUrl||!cfg.supabaseAnonKey){$('loginMsg').textContent='NEXUS_CONFIG belum dikonfigurasi.';return}sb=window.getTransmindSupabaseClient?window.getTransmindSupabaseClient():(window.transmindSupabase||(window.transmindSupabase=supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey)));const s=await sb.auth.getSession();session=s.data.session;if(!session)return;$('login').classList.add('hidden');$('app').classList.remove('hidden');try{await access();showPage('dashboard')}catch(e){$('conn').textContent='● '+e.message;$('conn').className='status bad'}}boot();
 </script>
 <script src="./integrated-crud.js?v=20260922-7"></script>
-<script src="./seo-f1-engine.js?v=20260924-3"></script>
+<script src="./seo-f1-engine.js?v=20260925-2"></script>
 <script src="./seo-f4-engine.js?v=20260924-1"></script>
 <script src="./seo-f5-engine.js?v=20260924-1"></script>
-<script src="./customer-care-autopilot.js?v=20260925-1"></script>\n<script src="./ai-customer-care-growth-loop.js?v=20260925-1"></script>\n<script src="./ai-customer-service-console.js?v=20260925-1"></script>
+<script src="./customer-care-autopilot.js?v=20260925-2"></script>\n<script src="./ai-customer-care-growth-loop.js?v=20260925-2"></script>\n<script src="./ai-customer-service-console.js?v=20260925-2"></script>
 </body></html>
