@@ -39,6 +39,7 @@ jobs:
           grep -q 'vehicle_prices' supabase/functions/transmind-ai/index.ts
           grep -q 'crm_tasks' supabase/functions/transmind-ai/index.ts
           grep -q 'nexus_communications' supabase/functions/transmind-ai/index.ts
+          test -f nexus/ai-customer-service-console.js
       - name: Validate Deno syntax
         uses: denoland/setup-deno@v1
         with:
@@ -49,6 +50,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check nexus/seo-f1-engine.js
+          node --check nexus/ai-customer-service-console.js
 
       - name: Validate local SEO pages
         shell: bash
