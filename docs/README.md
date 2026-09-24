@@ -29,3 +29,34 @@ Dokumentasi resmi proyek TransMind Nusantara Rental Mobil. Struktur ini memisahk
 - `16-TASKS` — controlled work queue
 - `17-RELEASES` — release records
 - `18-ARCHIVE` — superseded documentation
+
+
+## Struktur kerja profesional
+
+Dokumentasi dikelompokkan berdasarkan lifecycle proyek agar mudah diaudit dan diteruskan oleh tim lain:
+
+- **00-MANAGEMENT** — governance, roles, charter, approval gate
+- **01-PRODUCT** — vision, scope, requirements, backlog
+- **02-BUSINESS** — customer journey dan aturan bisnis
+- **03-ARCHITECTURE** — arsitektur sistem dan boundary integrasi
+- **04-FRONTEND** — UI/UX, Liquid Glass, responsive dan component contract
+- **05-BACKEND** — runtime, API dan service logic
+- **06-DATABASE** — Supabase, schema, RLS dan migration
+- **07-INTEGRATION** — WhatsApp, analytics dan external services
+- **08-SEO-GROWTH** — SEO, demand generation dan attribution
+- **09-AI** — Asisten AI dan travel intelligence
+- **10-TESTING** — QA, smoke, regression dan release acceptance
+- **11-DEPLOYMENT** — staging/production release control
+- **12-OPERATIONS** — runbook dan incident procedure
+- **13-SECURITY** — security/access/secret procedures
+- **14-CHANGELOG** — perubahan kronologis
+- **15-DECISIONS** — ADR/Project Decision Records
+- **16-TASKS** — work queue terkontrol
+- **17-RELEASES** — release evidence
+- **18-ARCHIVE** — dokumentasi superseded
+
+### Aturan penamaan dokumen
+Gunakan nama yang jelas, stabil, dan dapat dicari. Dokumen keputusan memakai `ADR-NNNN`; task memakai `TASK-...`; release baseline memakai tanggal ISO `YYYY-MM-DD`.
+
+### Status repository
+Production tetap berada di `main`. Struktur dokumentasi ini dibangun di branch `docs/transmind-project-structure-20260924` dan belum mengubah production.
