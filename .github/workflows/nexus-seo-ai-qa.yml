@@ -1,0 +1,54 @@
+name: TransMind Nexus SEO + AI QA
+on:
+  push:
+    branches: ["nexus/aggressive-seo-ai-cs-20260924"]
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "index.html"
+      - "demand/**"
+      - "rental-mobil-*.html"
+      - "supabase/functions/transmind-ai/**"
+      - "docs/08-SEO-GROWTH/**"
+      - "docs/09-AI/**"
+permissions:
+  contents: read
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate SEO essentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'rel="canonical"' index.html
+          grep -q 'name="robots" content="index,follow' index.html
+          grep -q 'application/ld+json' index.html
+          test -f sitemap.xml
+          test -f robots.txt
+          grep -q 'Sitemap:' robots.txt
+      - name: Validate AI and booking contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'bookingForm' index.html
+          grep -q 'transmind-ai-launcher' index.html
+          grep -q 'TRANSMIND_AI_ENDPOINT' config.js
+          grep -q 'vehicle_prices' supabase/functions/transmind-ai/index.ts
+          grep -q 'crm_tasks' supabase/functions/transmind-ai/index.ts
+          grep -q 'nexus_communications' supabase/functions/transmind-ai/index.ts
+      - name: Validate Deno syntax
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v2.x
+      - run: deno check supabase/functions/transmind-ai/index.ts
+      - name: Validate local SEO pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in rental-mobil-jakarta.html rental-mobil-bekasi.html rental-mobil-bogor.html rental-mobil-depok.html rental-mobil-tangerang.html demand/index.html; do
+            test -f "$f"
+            grep -q 'canonical' "$f"
+            grep -q 'Transmind' "$f"
+          done
