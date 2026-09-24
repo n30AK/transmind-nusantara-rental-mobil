@@ -137,6 +137,7 @@ a{color:inherit}.tm-shell{max-width:var(--tm-max);margin:auto;padding:0 28px}.tm
 <div class="tm-location-card"><label for="pickupLocation"><span>📍 Lokasi Anda</span><span class="tm-route-origin">Berangkat dari kantor Transmind</span></label><input id="pickupLocation" name="pickupLocation" type="text" autocomplete="street-address" placeholder="Pilih titik jemput Anda"><div class="tm-location-actions"><button class="tm-location-btn tm-location-primary" type="button" data-location-action="pickup-current">Gunakan lokasi saya</button><button class="tm-location-btn" type="button" data-location-action="pickup-map">Pilih di peta</button></div><div id="pickupLocationMeta" class="tm-location-meta">Kendaraan berangkat dari basis Transmind menuju titik jemput Anda.</div></div>
 <div class="tm-location-card"><label for="dropoffLocation"><span>◎ Tujuan</span><span class="tm-route-origin">Tujuan perjalanan</span></label><input id="dropoffLocation" name="dropoffLocation" type="text" autocomplete="street-address" placeholder="Mau ke mana?"><div class="tm-location-actions"><button class="tm-location-btn" type="button" data-location-action="dropoff-map">Pilih di peta</button></div><div id="dropoffLocationMeta" class="tm-location-meta">Masukkan nama tempat atau alamat tujuan.</div></div>
 </div>
+<div class="tm-care-consent"><label><input id="customerCareConsent" name="customerCareConsent" type="checkbox"> Saya bersedia dihubungi Transmind untuk membantu melanjutkan pemesanan ini jika saya belum menyelesaikannya.</label><small>Opsional. Anda dapat memilih tidak dihubungi.</small></div>
 <button class="tm-btn tm-btn-primary full" type="submit" id="bookingSubmit">KIRIM PEMESANAN</button>
 <a class="booking-secondary-cta" href="https://wa.me/628816654141" target="_blank" rel="noopener noreferrer" data-nexus-channel="whatsapp">Chat WhatsApp Transmind</a>
 <p id="result" class="result" aria-live="polite"></p>
@@ -303,5 +304,6 @@ d?.addEventListener('input',()=>{const e=document.getElementById('dropoffLocatio
 window.addEventListener('load',sync);
 })();
 </script>
+<script src="booking-lead-capture.js?v=20260925-1"></script>
 </body>
 </html>
