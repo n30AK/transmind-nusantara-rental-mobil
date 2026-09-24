@@ -17,6 +17,7 @@ function shell(el){
   <div class="acs-card"><div class="acs-note">Target booking / hari</div><div class="acs-value acs-warn">50</div><div class="acs-note">sasaran operasional</div></div>
   <div class="acs-card"><div class="acs-note">CTA 24 jam</div><div class="acs-value" id="acs-cta">—</div><div class="acs-note">minat masuk funnel</div></div>
   <div class="acs-card"><div class="acs-note">WhatsApp 24 jam</div><div class="acs-value" id="acs-wa">—</div><div class="acs-note">handoff percakapan</div></div>
+  <div class="acs-card"><div class="acs-note">Booking Start 24 jam</div><div class="acs-value" id="acs-start">—</div><div class="acs-note">form booking benar-benar dimulai</div></div>
   <div class="acs-card"><div class="acs-note">Booking 24 jam</div><div class="acs-value acs-danger" id="acs-book">—</div><div class="acs-note">yang benar-benar tercatat</div></div>
  </div>
  <div class="acs-grid" style="margin-top:12px">
@@ -81,12 +82,12 @@ async function renderData(){
  ]);
  const all=[ev,tasks,sigs,comms];const bad=all.find(x=>x.error);if(bad)throw bad.error;
  const rows=ev.data||[],count=t=>rows.filter(x=>x.event_type===t).length;
- document.getElementById('acs-cta').textContent=count('booking_cta_click');document.getElementById('acs-wa').textContent=count('whatsapp_click');
+ document.getElementById('acs-cta').textContent=count('booking_cta_click');document.getElementById('acs-wa').textContent=count('whatsapp_click');document.getElementById('acs-start').textContent=count('booking_start');
  const booking=count('booking_success')+count('booking_created');document.getElementById('acs-book').textContent=booking;
  const phones=new Set((sigs.data||[]).map(x=>String(x.phone||x.customer_phone||x.metadata?.phone||'').replace(/\D/g,'')).filter(x=>x.length>=9));
  document.getElementById('acs-leads').textContent=phones.size;document.getElementById('acs-tasks').textContent=(tasks.data||[]).length;
  const rescue=(tasks.data||[]).filter(x=>/rescue|lead|customer care/i.test(String(x.title||'')+' '+String(x.metadata?.mode||''))).length;document.getElementById('acs-rescue').textContent=rescue;
- const health=(count('booking_cta_click')>0&&booking===0)?'TRACKING GAP': 'HEALTHY';document.getElementById('acs-health').textContent=health;document.getElementById('acs-health').className='acs-value '+(health==='HEALTHY'?'acs-ok':'acs-warn');
+ const health=(count('booking_start')>0&&booking===0)?'CHECKOUT LEAK':((count('booking_cta_click')>0&&count('booking_start')===0)?'FORM START GAP':'HEALTHY');document.getElementById('acs-health').textContent=health;document.getElementById('acs-health').className='acs-value '+(health==='HEALTHY'?'acs-ok':'acs-warn');
  const by=new Map();
  (sigs.data||[]).forEach(x=>{const p=String(x.phone||x.customer_phone||x.metadata?.phone||'').replace(/\D/g,'');if(!p)return;const r=by.get(p)||{phone:p,name:x.name||x.metadata?.lead_name||'Calon pelanggan',intent:x.intent||'consultation',at:x.created_at};r.intent=x.intent||r.intent;r.at=new Date(r.at)>new Date(x.created_at)?r.at:x.created_at;by.set(p,r)});
  (tasks.data||[]).forEach(x=>{const p=String(x.metadata?.phone||'').replace(/\D/g,'');if(!p)return;const r=by.get(p)||{phone:p,name:x.metadata?.lead_name||'Calon pelanggan',intent:'booking',at:x.created_at};r.name=r.name||x.metadata?.lead_name;r.task=x.title;r.next=x.next_followup_at;r.quote=x.quote_value;by.set(p,r)});
