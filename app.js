@@ -952,7 +952,29 @@ function getFormData() {
             getElement(
                 'notes'
             )?.value
-            ?.trim() || ''
+            ?.trim() || '',
+
+        pickupLocation:
+            getElement(
+                'pickupLocation'
+            )?.value
+            ?.trim() || '',
+
+        dropoffLocation:
+            getElement(
+                'dropoffLocation'
+            )?.value
+            ?.trim() || '',
+
+        pickupLatitude:
+            getElement(
+                'pickupLocation'
+            )?.dataset?.lat || '',
+
+        pickupLongitude:
+            getElement(
+                'pickupLocation'
+            )?.dataset?.lng || ''
 
     };
 }
@@ -1569,7 +1591,20 @@ async function submitBooking(
                         formData.area,
 
                     p_notes:
-                        formData.notes
+                        [
+                            formData.notes,
+                            formData.pickupLocation
+                                ? 'Lokasi penjemputan: ' + formData.pickupLocation
+                                : '',
+                            formData.dropoffLocation
+                                ? 'Lokasi tujuan/penurunan: ' + formData.dropoffLocation
+                                : '',
+                            formData.pickupLatitude && formData.pickupLongitude
+                                ? 'Koordinat GPS penjemputan: ' +
+                                  formData.pickupLatitude + ', ' +
+                                  formData.pickupLongitude
+                                : ''
+                        ].filter(Boolean).join(' | ')
 
                 }
             );
