@@ -11,6 +11,7 @@ on:
       - "supabase/functions/transmind-ai/**"
       - "docs/08-SEO-GROWTH/**"
       - "docs/09-AI/**"
+      - "nexus/**"
 permissions:
   contents: read
 jobs:
@@ -43,6 +44,12 @@ jobs:
         with:
           deno-version: v2.x
       - run: deno check supabase/functions/transmind-ai/index.ts
+      - name: Validate browser JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check nexus/seo-f1-engine.js
+
       - name: Validate local SEO pages
         shell: bash
         run: |
