@@ -1753,7 +1753,7 @@ async function submitBooking(
                 total_price: bookingResult.total_price || bookingResult.totalPrice || null,
                 source: 'website_booking_rpc'
             });
-        }
+        // Compatibility conversion event: older Nexus funnel RPCs also count booking_created.\n        // This is emitted only after create_booking returns a successful transaction.\n        if (typeof window.TRANSMIND_TRACK_CONVERSION === 'function') {\n            await window.TRANSMIND_TRACK_CONVERSION('booking_created', {\n                booking_id: bookingResult.id || bookingResult.booking_id || null,\n                booking_code: bookingCode,\n                vehicle_id: formData.vehicleId || null,\n                service: formData.service || '',\n                area: formData.area || '',\n                total_days: bookingResult.total_days || bookingResult.totalDays || null,\n                total_price: bookingResult.total_price || bookingResult.totalPrice || null,\n                source: 'website_booking_rpc'\n            });\n        }\n\n        }
 
 
         const vehicleName =
