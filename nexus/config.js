@@ -33,14 +33,14 @@ window.addEventListener('DOMContentLoaded', () => {
     ['./erp-master-data.js?v=1'],
     ['./production-readiness.js?v=1'],
     ['./navigation-bridge.js?v=1'],
-    ['./manual-entry.js?v=4']
+    ['./manual-entry.js?v=4'],
+    ['./ai-customer-care.js?v=20260924-1']
   ];
   scripts.forEach(([src]) => {
     const s = document.createElement('script'); s.src = src; s.defer = true; document.head.appendChild(s);
   });
 });
 
-// Single shared Supabase client for all NEXUS modules.
 window.getTransmindSupabaseClient = function(){
   if (window.transmindSupabase) return window.transmindSupabase;
   if (!window.NEXUS_CONFIG?.supabaseUrl || !window.NEXUS_CONFIG?.supabaseAnonKey || !window.supabase) return null;
