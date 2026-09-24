@@ -7,7 +7,7 @@
 (function(){
 'use strict';
 const $=s=>document.querySelector(s);
-const db=()=>window.NXSB||window.getTransmindSupabaseClient?.();
+const db=()=>window.NXSB||window.getTransmindSupabaseClient?.()||window.transmindSupabase||null;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const since=d=>new Date(Date.now()-d*86400000).toISOString();
 const phone=v=>String(v||'').replace(/[^0-9]/g,'');
@@ -36,8 +36,8 @@ async function queue(d,mode){
  ]);
  if(sig.error)throw sig.error;if(com.error)throw com.error;
  const by=new Map();
- (sig.data||[]).forEach(x=>{const p=phone(x.phone||x.customer_phone||x.metadata?.phone||'');if(!p)return;const r=by.get(p)||{phone:p,name:x.name||x.metadata?.lead_name||'Calon pelanggan',last:x.created_at};r.last=new Date(r.last)>new Date(x.created_at)?r.last:x.created_at;by.set(p,r)});
- (com.data||[]).forEach(x=>{const p=phone(x.recipient||x.metadata?.phone||'');if(!p)return;const r=by.get(p)||{phone:p,name:x.metadata?.lead_name||'Pelanggan',last:x.created_at};r.last=new Date(r.last)>new Date(x.created_at)?r.last:x.created_at;by.set(p,r)});
+ (sig.data||[]).forEach(x=>{const consent=String(x.metadata?.consent_status||x.metadata?.consent||'').toLowerCase();if(consent!=='granted'&&consent!=='true')return;const p=phone(x.phone||x.customer_phone||x.metadata?.phone||'');if(!p)return;const r=by.get(p)||{phone:p,name:x.name||x.metadata?.lead_name||'Calon pelanggan',last:x.created_at};r.last=new Date(r.last)>new Date(x.created_at)?r.last:x.created_at;by.set(p,r)});
+ (com.data||[]).forEach(x=>{const consent=String(x.metadata?.consent_status||x.metadata?.consent_checked||'').toLowerCase();if(consent!=='granted'&&consent!=='true')return;const p=phone(x.recipient||x.metadata?.phone||'');if(!p)return;const r=by.get(p)||{phone:p,name:x.metadata?.lead_name||'Pelanggan',last:x.created_at};r.last=new Date(r.last)>new Date(x.created_at)?r.last:x.created_at;by.set(p,r)});
  let made=0,skipped=0;
  for(const r of [...by.values()].slice(0,25)){
   const days=(Date.now()-new Date(r.last||0).getTime())/86400000;
@@ -62,5 +62,5 @@ function render(el,m){
 async function boot(){const body=document.getElementById('seoBody'),d=db();if(!body||!d||document.getElementById('tm-care-growth'))return;try{render(body,await metrics(d))}catch(e){body.insertAdjacentHTML('beforeend','<div class="notice bad" style="margin-top:12px">AI Customer Service belum dapat membaca data: '+esc(e.message)+'</div>')}}
 window.TRANSMIND_AI_CUSTOMER_CARE_GROWTH={boot};
 document.addEventListener('tm-seo-refresh',()=>setTimeout(boot,120));
-setTimeout(boot,1200);
+setTimeout(boot,1200); setInterval(()=>{const b=document.getElementById('seoBody');if(b&&!document.hidden&&!document.getElementById('tm-care-growth'))boot()},15*60*1000);
 })();
