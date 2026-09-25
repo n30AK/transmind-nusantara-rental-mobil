@@ -74,17 +74,20 @@ async function submitLead(e){
 async function renderData(){
  const d=db();if(!d)return;
  const since=new Date(Date.now()-86400000).toISOString();
- const [ev,tasks,sigs,comms,due]=await Promise.all([
+ const [ev,tasks,sigs,comms,due,bookingView]=await Promise.all([
   d.from('website_analytics_events').select('event_type,visitor_session_id,metadata,occurred_at').gte('occurred_at',since).limit(3000),
   d.from('crm_tasks').select('id,title,status,priority,next_followup_at,quote_value,metadata,created_at').in('status',['open','OPEN','IN_PROGRESS']).order('next_followup_at',{ascending:true}).limit(100),
   d.from('ai_companion_demand_signals').select('id,intent,tags,phone,customer_phone,metadata,created_at').gte('created_at',new Date(Date.now()-30*86400000).toISOString()).order('created_at',{ascending:false}).limit(100),
   d.from('nexus_communications').select('id,recipient,event_type,status,message_body,metadata,created_at').gte('created_at',new Date(Date.now()-30*86400000).toISOString()).order('created_at',{ascending:false}).limit(100),
-  d.from('crm_tasks').select('id,title,status,priority,next_followup_at,quote_value,notes,metadata').eq('task_type','AI_CUSTOMER_CARE_FOLLOWUP').in('status',['open','OPEN','IN_PROGRESS']).lte('next_followup_at',new Date().toISOString()).order('next_followup_at',{ascending:true}).limit(30)
+  d.from('crm_tasks').select('id,title,status,priority,next_followup_at,quote_value,notes,metadata').eq('task_type','AI_CUSTOMER_CARE_FOLLOWUP').in('status',['open','OPEN','IN_PROGRESS']).lte('next_followup_at',new Date().toISOString()).order('next_followup_at',{ascending:true}).limit(30),
+  d.from('nexus_console_booking_360').select('booking_code,status,created_at').gte('created_at',since).order('created_at',{ascending:false}).limit(200)
  ]);
- const all=[ev,tasks,sigs,comms,due];const bad=all.find(x=>x.error);if(bad)throw bad.error;
+ const all=[ev,tasks,sigs,comms,due,bookingView];const bad=all.find(x=>x.error);if(bad)throw bad.error;
  const rows=ev.data||[],count=t=>rows.filter(x=>x.event_type===t).length;
  document.getElementById('acs-cta').textContent=count('booking_cta_click');document.getElementById('acs-wa').textContent=count('whatsapp_click');document.getElementById('acs-start').textContent=count('booking_start');
- const bookingRows=rows.filter(x=>/^(booking_success|booking_created)$/.test(String(x.event_type||'')));const bookingKeys=new Set(bookingRows.map(x=>String(x.metadata?.booking_id||x.metadata?.booking_code||x.visitor_session_id+'|'+String(x.occurred_at||'').slice(0,16))));const booking=bookingKeys.size;document.getElementById('acs-book').textContent=booking;
+ const bookingRows=rows.filter(x=>/^(booking_success|booking_created)$/.test(String(x.event_type||'')));const bookingKeys=new Set(bookingRows.map(x=>String(x.metadata?.booking_id||x.metadata?.booking_code||x.visitor_session_id+'|'+String(x.occurred_at||'').slice(0,16))));
+ const persistedBookings=(bookingView.data||[]).filter(x=>!['Dibatalkan','CANCELLED','REFUND','CANCELLED'].includes(String(x.status||'').toUpperCase()));
+ const booking=Math.max(bookingKeys.size,persistedBookings.length);document.getElementById('acs-book').textContent=booking;
  const phones=new Set((sigs.data||[]).map(x=>String(x.phone||x.customer_phone||x.metadata?.phone||'').replace(/\D/g,'')).filter(x=>x.length>=9));
  document.getElementById('acs-leads').textContent=phones.size;document.getElementById('acs-tasks').textContent=(tasks.data||[]).length;
  const rescue=(tasks.data||[]).filter(x=>/rescue|lead|customer care/i.test(String(x.title||'')+' '+String(x.metadata?.mode||''))).length;document.getElementById('acs-rescue').textContent=rescue;
