@@ -40,7 +40,7 @@ async function render(){
   safe(client.rpc('nexus_seo_live_metrics',{p_days:1}),{}),
   safe(client.rpc('nexus_seo_funnel_metrics',{p_days:1}),{}),
   safe(client.from('nexus_business_daily').select('*').eq('report_date',today).limit(1),[]),
-  safe(client.from('nexus_console_booking_360').select('booking_code,status,start_date,end_date,customer_master_name,customer_name,customer_phone').order('start_date',{ascending:false}).limit(500),[]),
+  safe(client.from('bookings').select('id,booking_code,status,created_at,total_price,customer_id').gte('created_at',new Date(Date.now()-86400000).toISOString()).order('created_at',{ascending:false}).limit(1000),[]),
   safe(client.from('customer_care_leads').select('*').eq('status','open').order('next_followup_at',{ascending:true}).limit(100),[]),
   safe(client.from('customer_care_followup_queue').select('*').eq('status','queued').order('scheduled_at',{ascending:true}).limit(100),[]),
   safe(client.from('crm_tasks').select('*').eq('status','open').order('next_followup_at',{ascending:true}).limit(100),[])
@@ -52,7 +52,9 @@ async function render(){
  const openLeads=Array.isArray(leads)?leads:[];
  const pending=Array.isArray(queue)?queue:[];
  const openTasks=Array.isArray(tasks)?tasks:[];
- const actualBookings=num(D.bookings ?? F.bookings ?? L.bookings);
+ const validBooking=x=>!['dibatalkan','cancelled','canceled','refund','refunded'].includes(String(x.status||'').trim().toLowerCase());
+ const authoritativeBookings=B.filter(validBooking);
+ const actualBookings=authoritativeBookings.length||num(D.bookings ?? F.bookings ?? L.bookings);
  const confirmed=num(D.confirmed ?? F.confirmed);
  const completed=num(D.completed ?? F.completed);
  const cta=num(F.booking_cta_clicks ?? F.booking_cta ?? L.booking_cta_clicks);
@@ -61,8 +63,7 @@ async function render(){
  const target=50,gap=Math.max(0,target-actualBookings),conversion=cta?actualBookings/cta*100:0;
  const hot=openLeads.filter(x=>x.human_required).length;
  const due=pending.filter(x=>new Date(x.scheduled_at||0)<=new Date()).length;
- const bookingRows=B.filter(x=>String(x.start_date||'').slice(0,10)===today && !['CANCELLED','REFUND'].includes(String(x.status||'').toUpperCase()));
- const realBookingFallback=actualBookings||bookingRows.length;
+ const realBookingFallback=actualBookings;
 
  const queueRows=openLeads.slice(0,12).map(x=>{
    const msg='Halo '+(x.name||'kak')+', saya dari TransMind. Saya ingin membantu melanjutkan kebutuhan rental yang kemarin dibahas. Kalau masih dibutuhkan, saya siap bantu cek kembali detailnya.';
