@@ -30,13 +30,13 @@ async function metrics(d){
  return {visitor:sessions,whatsapp:count('whatsapp_click'),cta:count('booking_cta_click'),starts:count('booking_start'),bookings:new Set(rows.filter(x=>/^(booking_success|booking_created)$/.test(x.event_type)).map(x=>x.metadata?.booking_id||x.metadata?.booking_code||x.visitor_session_id+'|'+x.occurred_at.slice(0,16))).size};
 }
 async function queue(d,mode){
- const [sig,com]=await Promise.all([
-  d.from('ai_companion_demand_signals').select('*').gte('created_at',since(30)).order('created_at',{ascending:false}).limit(300),
-  d.from('nexus_communications').select('*').gte('created_at',since(30)).order('created_at',{ascending:false}).limit(500)
+ const [leads,com]=await Promise.all([
+  d.from('customer_care_leads').select('id,name,phone,consent_status,status,stage,intent,last_activity_at,next_followup_at,created_at').gte('created_at',since(30)).in('status',['open','paused']).order('created_at',{ascending:false}).limit(300),
+  d.from('nexus_communications').select('recipient,event_type,metadata,created_at').gte('created_at',since(30)).order('created_at',{ascending:false}).limit(500)
  ]);
- if(sig.error)throw sig.error;if(com.error)throw com.error;
+ if(leads.error)throw leads.error;if(com.error)throw com.error;
  const by=new Map();
- (sig.data||[]).forEach(x=>{const consent=String(x.metadata?.consent_status||x.metadata?.consent||'').toLowerCase();if(consent!=='granted'&&consent!=='true')return;const p=phone(x.phone||x.customer_phone||x.metadata?.phone||'');if(!p)return;const r=by.get(p)||{phone:p,name:x.name||x.metadata?.lead_name||'Calon pelanggan',last:x.created_at};r.last=new Date(r.last)>new Date(x.created_at)?r.last:x.created_at;by.set(p,r)});
+ (leads.data||[]).forEach(x=>{const consent=String(x.consent_status||'').toLowerCase();if(!['granted','true','yes'].includes(consent))return;const p=phone(x.phone);if(!p)return;const r=by.get(p)||{phone:p,name:x.name||'Calon pelanggan',last:x.last_activity_at||x.created_at};r.last=new Date(r.last)>new Date(x.last_activity_at||x.created_at)?r.last:(x.last_activity_at||x.created_at);by.set(p,r)});
  (com.data||[]).forEach(x=>{const consent=String(x.metadata?.consent_status||x.metadata?.consent_checked||'').toLowerCase();if(x.event_type!=='AI_LEAD_FOLLOWUP'&&consent!=='granted'&&consent!=='true')return;const p=phone(x.recipient||x.metadata?.phone||'');if(!p)return;const r=by.get(p)||{phone:p,name:x.metadata?.lead_name||'Pelanggan',last:x.created_at};r.last=new Date(r.last)>new Date(x.created_at)?r.last:x.created_at;by.set(p,r)});
  let made=0,skipped=0;
  for(const r of [...by.values()].slice(0,25)){
