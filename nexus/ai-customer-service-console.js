@@ -98,7 +98,7 @@ async function renderData(){
  document.querySelectorAll('.acs-wa-open').forEach(b=>b.onclick=()=>window.open('https://wa.me/'+b.dataset.phone,'_blank','noopener'));
 }
 async function render(){
- const host=document.getElementById('content-ai-customer-service');if(!host||host.dataset.mounted==='1')return;host.dataset.mounted='1';shell(host);
+ const host=document.getElementById('content-ai-customer-service'),d=db();if(!host||host.dataset.mounted==='1'||!d)return;host.dataset.mounted='1';shell(host);
  document.getElementById('acs-lead-form').addEventListener('submit',submitLead);document.getElementById('acs-send').addEventListener('click',sendChat);document.getElementById('acs-chat-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat()}});document.getElementById('acs-refresh').addEventListener('click',renderData);
  try{await renderData()}catch(e){document.getElementById('acs-form-msg').textContent='Data belum dapat dimuat: '+e.message}
 }
