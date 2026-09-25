@@ -4,42 +4,64 @@ window.NEXUS_CONFIG = {
   supabaseAnonKey: TRANSMIND_NEXUS_KEY
 };
 
-window.addEventListener('DOMContentLoaded', () => {
-  if (!document.querySelector('link[data-transmind-seo-print]')) {
-    const css = document.createElement('link');
-    css.rel = 'stylesheet';
-    css.href = './seo-print.css?v=1';
-    css.dataset.transmindSeoPrint = '1';
-    document.head.appendChild(css);
-  }
-  const scripts = [
-    ['./auth-recovery.js?v=4'],
-    ['./enhancements.js?v=2'],
-    ['./social-marketing.js?v=2'],
-    ['./growth-intelligence.js?v=2'],
-    ['./seo-stakeholder.js?v=3'],
-    ['./seo-live-center.js?v=2'],
-    ['./accounting-driver.js?v=4'],
-    ['./accounting-arap.js?v=2'],
-    ['./operations-command.js?v=1'],
-    ['./driver-management.js?v=4'],
-    ['./driver-workflow.js?v=1'],
-    ['./growth-command-center.js?v=1'],
-    ['./growth-channel-center.js?v=1'],
-    ['./demand-supply-command-center.js?v=1'],
-    ['./matching-command-center.js?v=1'],
-    ['./executive-command-center.js?v=1'],
-    ['./erp-governance.js?v=1'],
-    ['./erp-master-data.js?v=1'],
-    ['./production-readiness.js?v=1'],
-    ['./navigation-bridge.js?v=1'],
-    ['./manual-entry.js?v=4'],
-    ['./ai-customer-care.js?v=20260924-1']
-  ];
-  scripts.forEach(([src]) => {
-    const s = document.createElement('script'); s.src = src; s.defer = true; document.head.appendChild(s);
-  });
-});
+const NEXUS_PROTECTED_SCRIPTS = [
+  './integrated-crud.js?v=20260922-7',
+  './seo-f1-engine.js?v=20260925-2',
+  './seo-f4-engine.js?v=20260924-1',
+  './seo-f5-engine.js?v=20260924-1',
+  './booking-growth-engine.js?v=20260925-1',
+  './customer-care-autopilot.js?v=20260925-2',
+  './ai-customer-care-growth-loop.js?v=20260925-2',
+  './ai-customer-service-console.js?v=20260925-2',
+  './customer-care-outcome-learning.js?v=20260925-1',
+  './enhancements.js?v=2',
+  './social-marketing.js?v=2',
+  './growth-intelligence.js?v=2',
+  './seo-stakeholder.js?v=3',
+  './seo-live-center.js?v=2',
+  './accounting-driver.js?v=4',
+  './accounting-arap.js?v=2',
+  './operations-command.js?v=1',
+  './driver-management.js?v=4',
+  './driver-workflow.js?v=1',
+  './growth-command-center.js?v=1',
+  './growth-channel-center.js?v=1',
+  './demand-supply-command-center.js?v=1',
+  './matching-command-center.js?v=1',
+  './executive-command-center.js?v=1',
+  './erp-governance.js?v=1',
+  './erp-master-data.js?v=1',
+  './production-readiness.js?v=1',
+  './navigation-bridge.js?v=1',
+  './manual-entry.js?v=4',
+  './ai-customer-care.js?v=20260924-1'
+];
+
+function loadNexusScript(src){
+  if(document.querySelector('script[data-nexus-src="'+src.replace(/"/g,'&quot;')+'"]')) return;
+  const s=document.createElement('script');
+  s.src=src;
+  s.dataset.nexusSrc=src;
+  s.defer=true;
+  document.head.appendChild(s);
+}
+
+function loadNexusProtectedModules(){
+  if(window.__NEXUS_PROTECTED_MODULES_LOADED) return;
+  window.__NEXUS_PROTECTED_MODULES_LOADED=true;
+  NEXUS_PROTECTED_SCRIPTS.forEach(loadNexusScript);
+}
+
+function loadAuthRecovery(){
+  loadNexusScript('./auth-recovery.js?v=4');
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',loadAuthRecovery,{once:true});
+}else{
+  loadAuthRecovery();
+}
+window.addEventListener('nexus:authenticated',loadNexusProtectedModules,{once:true});
 
 function nexusAccessValue(data){
   const row = Array.isArray(data) ? (data[0] || {}) : (data || {});
