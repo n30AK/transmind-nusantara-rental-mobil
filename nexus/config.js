@@ -34,7 +34,11 @@ const NEXUS_PROTECTED_SCRIPTS = [
   './production-readiness.js?v=1',
   './navigation-bridge.js?v=1',
   './manual-entry.js?v=4',
-  './ai-customer-care.js?v=20260924-1'
+  './ai-customer-care.js?v=20260924-1',
+  './ai-customer-service-console.js?v=20260925-2',
+  './customer-care-outcome-learning.js?v=20260925-2',
+  './ai-customer-care-growth-loop.js?v=20260925-3',
+  './ai-customer-service-engine.js?v=20260925-2'
 ];
 
 function loadNexusScript(src){
