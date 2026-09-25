@@ -1,0 +1,1 @@
+-- Keep the scheduler function on a fixed search_path for predictable execution.\nalter function public.process_customer_care_followups() set search_path = public, pg_catalog;\n
