@@ -73,32 +73,22 @@ async function submitLead(e){
 }
 async function renderData(){
  const d=db();if(!d)return;
- const since=new Date(Date.now()-86400000).toISOString();
- const [ev,tasks,sigs,comms,due,bookingView]=await Promise.all([
-  d.from('website_analytics_events').select('event_type,visitor_session_id,metadata,occurred_at').gte('occurred_at',since).limit(3000),
-  d.from('crm_tasks').select('id,title,status,priority,next_followup_at,quote_value,metadata,created_at').in('status',['open','OPEN','IN_PROGRESS']).order('next_followup_at',{ascending:true}).limit(100),
-  d.from('ai_companion_demand_signals').select('id,intent,tags,phone,customer_phone,metadata,created_at').gte('created_at',new Date(Date.now()-30*86400000).toISOString()).order('created_at',{ascending:false}).limit(100),
-  d.from('nexus_communications').select('id,recipient,event_type,status,message_body,metadata,created_at').gte('created_at',new Date(Date.now()-30*86400000).toISOString()).order('created_at',{ascending:false}).limit(100),
-  d.from('crm_tasks').select('id,title,status,priority,next_followup_at,quote_value,notes,metadata').eq('task_type','AI_CUSTOMER_CARE_FOLLOWUP').in('status',['open','OPEN','IN_PROGRESS']).lte('next_followup_at',new Date().toISOString()).order('next_followup_at',{ascending:true}).limit(30),
-  d.from('nexus_console_booking_360').select('booking_code,status,created_at').gte('created_at',since).order('created_at',{ascending:false}).limit(200)
- ]);
- const all=[ev,tasks,sigs,comms,due,bookingView];const bad=all.find(x=>x.error);if(bad)throw bad.error;
- const rows=ev.data||[],count=t=>rows.filter(x=>x.event_type===t).length;
- document.getElementById('acs-cta').textContent=count('booking_cta_click');document.getElementById('acs-wa').textContent=count('whatsapp_click');document.getElementById('acs-start').textContent=count('booking_start');
- const bookingRows=rows.filter(x=>/^(booking_success|booking_created)$/.test(String(x.event_type||'')));const bookingKeys=new Set(bookingRows.map(x=>String(x.metadata?.booking_id||x.metadata?.booking_code||x.visitor_session_id+'|'+String(x.occurred_at||'').slice(0,16))));
- const persistedBookings=(bookingView.data||[]).filter(x=>!['Dibatalkan','CANCELLED','REFUND','CANCELLED'].includes(String(x.status||'').toUpperCase()));
- const booking=Math.max(bookingKeys.size,persistedBookings.length);document.getElementById('acs-book').textContent=booking;
- const phones=new Set((sigs.data||[]).map(x=>String(x.phone||x.customer_phone||x.metadata?.phone||'').replace(/\D/g,'')).filter(x=>x.length>=9));
- document.getElementById('acs-leads').textContent=phones.size;document.getElementById('acs-tasks').textContent=(tasks.data||[]).length;
- const rescue=(tasks.data||[]).filter(x=>/rescue|lead|customer care/i.test(String(x.title||'')+' '+String(x.metadata?.mode||''))).length;document.getElementById('acs-rescue').textContent=rescue;
- const starts=count('booking_start'),cta=count('booking_cta_click'),wa=count('whatsapp_click');const rate=(a,b)=>b?((a/b)*100).toFixed(1)+'%':'0.0%';document.getElementById('acs-rate-start').textContent=rate(starts,cta);document.getElementById('acs-rate-book').textContent=rate(booking,starts);document.getElementById('acs-rate-wa').textContent=rate(booking,wa);document.getElementById('acs-gap50').textContent=String(Math.max(0,50-booking));const health=(starts>0&&booking===0)?'CHECKOUT LEAK':((cta>0&&starts===0)?'FORM START GAP':'HEALTHY');document.getElementById('acs-health').textContent=health;document.getElementById('acs-health').className='acs-value '+(health==='HEALTHY'?'acs-ok':'acs-warn');
- const by=new Map();
- (sigs.data||[]).forEach(x=>{const p=String(x.phone||x.customer_phone||x.metadata?.phone||'').replace(/\D/g,'');if(!p)return;const r=by.get(p)||{phone:p,name:x.name||x.metadata?.lead_name||'Calon pelanggan',intent:x.intent||'consultation',at:x.created_at};r.intent=x.intent||r.intent;r.at=new Date(r.at)>new Date(x.created_at)?r.at:x.created_at;by.set(p,r)});
- (tasks.data||[]).forEach(x=>{const p=String(x.metadata?.phone||'').replace(/\D/g,'');if(!p)return;const r=by.get(p)||{phone:p,name:x.metadata?.lead_name||'Calon pelanggan',intent:'booking',at:x.created_at};r.name=r.name||x.metadata?.lead_name;r.task=x.title;r.next=x.next_followup_at;r.quote=x.quote_value;by.set(p,r)});
- const dueBox=document.getElementById('acs-due');const dueRows=due.data||[];if(dueBox){dueBox.innerHTML=dueRows.length?'<div class="acs-row acs-head"><span>Prioritas</span><span>Peluang</span><span>Jatuh tempo</span><span>Nilai</span><span>Aksi</span></div>'+dueRows.map(x=>'<div class="acs-row"><span class="acs-pill">'+esc(x.priority||'normal')+'</span><span><b>'+esc(x.title||'Follow-up calon pelanggan')+'</b><br><small>'+esc(x.notes||'')+'</small></span><span>'+esc(fmt(x.next_followup_at))+'</span><span>'+esc(x.quote_value??'—')+'</span><span><button class="acs-btn green acs-due-wa" data-phone="'+esc(x.metadata?.phone||'')+'">Buka WhatsApp</button></span></div>').join(''):'<div class="acs-note" style="padding:12px">Tidak ada follow-up yang jatuh tempo sekarang.</div>';dueBox.querySelectorAll('.acs-due-wa').forEach(b=>b.onclick=()=>{const p=String(b.dataset.phone||'').replace(/\D/g,'');if(p)window.open('https://wa.me/'+p,'_blank','noopener')})}
- const out=document.getElementById('acs-rows');const list=[...by.values()].slice(0,20);
- out.innerHTML=list.length?list.map(r=>'<div class="acs-row"><span><b>'+esc(r.name)+'</b><br><small>'+esc(r.phone)+'</small></span><span class="acs-pill">'+esc(r.intent)+'</span><span class="acs-pill">'+(r.task?'ADMIN FOLLOW-UP':'LEAD')+'</span><span>'+esc(fmt(r.next||r.at))+'</span><span><button class="acs-btn green acs-wa-open" data-phone="'+esc(r.phone)+'">WhatsApp</button></span></div>').join(''):'<div class="acs-note" style="padding:15px">Belum ada lead dengan nomor WhatsApp yang tertangkap. Gunakan form di atas untuk uji end-to-end.</div>';
- document.querySelectorAll('.acs-wa-open').forEach(b=>b.onclick=()=>window.open('https://wa.me/'+b.dataset.phone,'_blank','noopener'));
+ try{
+  const r=await d.rpc('nexus_customer_care_dashboard',{p_days:1});if(r.error)throw r.error;
+  const x=r.data||{},cta=Number(x.cta||0),wa=Number(x.whatsapp||0),starts=Number(x.booking_start||0),book=Number(x.bookings||0),leads=Number(x.leads||0),tasks=Number(x.open_tasks||0),due=Number(x.due_followups||0);
+  const rate=(a,b)=>b?((a/b)*100).toFixed(1)+'%':'0.0%';
+  const el=id=>document.getElementById(id);
+  el('acs-cta').textContent=cta;el('acs-wa').textContent=wa;el('acs-start').textContent=starts;el('acs-book').textContent=book;el('acs-leads').textContent=leads;el('acs-tasks').textContent=tasks;el('acs-rescue').textContent=due;
+  el('acs-rate-start').textContent=rate(starts,cta);el('acs-rate-book').textContent=rate(book,starts);el('acs-rate-wa').textContent=rate(book,wa);el('acs-gap50').textContent=String(Math.max(0,50-book));
+  const health=(starts>0&&book===0)?'CHECKOUT LEAK':((cta>0&&starts===0)?'FORM START GAP':'HEALTHY');el('acs-health').textContent=health;el('acs-health').className='acs-value '+(health==='HEALTHY'?'acs-ok':'acs-warn');
+  const dueRows=x.due_items||[],dueBox=el('acs-due');if(dueBox)dueBox.innerHTML=dueRows.length?'<div class="acs-row acs-head"><span>Prioritas</span><span>Peluang</span><span>Jatuh tempo</span><span>Pesan</span><span>Aksi</span></div>'+dueRows.map(q=>'<div class="acs-row"><span class="acs-pill">'+esc(q.priority||'normal')+'</span><span><b>'+esc(q.name||'Calon pelanggan')+'</b><br><small>'+esc(q.phone||'')+' · '+esc(q.stage||'')+'</small></span><span>'+esc(fmt(q.scheduled_at))+'</span><span>'+esc(q.message_body||'')+'</span><span><button class="acs-btn green acs-due-wa" data-phone="'+esc(q.phone||'')+'">Buka WhatsApp</button></span></div>').join(''):'<div class="acs-note" style="padding:12px">Tidak ada follow-up yang jatuh tempo sekarang.</div>';
+  dueBox?.querySelectorAll('.acs-due-wa').forEach(b=>b.onclick=()=>{const p=String(b.dataset.phone||'').replace(/\D/g,'');if(p)window.open('https://wa.me/'+p,'_blank','noopener')});
+  const out=el('acs-rows'),list=x.lead_items||[];out.innerHTML=list.length?list.map(q=>'<div class="acs-row"><span><b>'+esc(q.name||'Calon pelanggan')+'</b><br><small>'+esc(q.phone||'')+'</small></span><span class="acs-pill">'+esc(q.intent||'consultation')+'</span><span class="acs-pill">'+esc(q.status||'open')+(q.human_required?' · ADMIN':'')+'</span><span>'+esc(fmt(q.next_followup_at))+'</span><span><button class="acs-btn green acs-wa-open" data-phone="'+esc(q.phone||'')+'">WhatsApp</button></span></div>').join(''):'<div class="acs-note" style="padding:15px">Belum ada lead dengan izin follow-up yang tertangkap.</div>';
+  out.querySelectorAll('.acs-wa-open').forEach(b=>b.onclick=()=>{const p=String(b.dataset.phone||'').replace(/\D/g,'');if(p)window.open('https://wa.me/'+p,'_blank','noopener')});
+ }catch(e){
+  document.getElementById('acs-form-msg').textContent='Dashboard Customer Care belum dapat membaca data: '+e.message;
+  document.getElementById('acs-health').textContent='DATA ERROR';document.getElementById('acs-health').className='acs-value acs-danger';
+ }
 }
 async function render(){
  const host=document.getElementById('content-ai-customer-service'),d=db();if(!host||host.dataset.mounted==='1'||!d)return;host.dataset.mounted='1';shell(host);
