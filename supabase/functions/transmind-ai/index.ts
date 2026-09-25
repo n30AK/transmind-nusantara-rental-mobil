@@ -33,11 +33,11 @@ async function lead(s:any,b:any,c:any,q:any){
  if(leadId){
    for(const stage of stages){
      const scheduled=new Date(now.getTime()+stage.minutes*60000).toISOString();
-     await s.from("customer_care_followup_queue").upsert({lead_id:leadId,stage:stage.key,scheduled_at:scheduled,channel:"whatsapp",message_body:stage.text,status:"queued",requires_human:false,metadata:{consent_status:"granted",intent:c.intent,quote_value:q?.total_price||null,source:"transmind_ai"}},{onConflict:"lead_id,stage"});
+     await s.from("customer_care_followup_queue").upsert({lead_id:leadId,stage:stage.key,scheduled_at:scheduled,channel:"whatsapp",message_body:stage.text,status:"queued",requires_human:true,metadata:{consent_status:"granted",intent:c.intent,quote_value:q?.total_price||null,source:"transmind_ai"}},{onConflict:"lead_id,stage"});
    }
    await s.from("customer_care_learning").insert({lead_id:leadId,session_id:b.session_id,signal_type:"lead_captured",signal_value:{intent:c.intent,tags:c.tags,vehicle:c.vehicle_hint,service:c.service,duration_days:c.duration_days,quote_value:q?.total_price||null,human_required:c.human_required},outcome:"open"});
  }
- await s.from("crm_tasks").insert({customer_id:cid,task_type:"AI_LEAD_FOLLOWUP",priority:q?.total_price?"high":"normal",status:"open",title:"Follow-up calon pelanggan dari Asisten AI",notes:"Lead dari website/Asisten AI; follow-up bertahap 30m, 1d, 3d, 7d. AI wajib menyerahkan keputusan khusus kepada admin.",pipeline_stage:"qualified_lead",next_followup_at:next,quote_value:q?.total_price||null,metadata:{source:"transmind_ai",lead_id:leadId,quote:q||null,tags:c.tags,consent_status:"granted",human_required:c.human_required,followup_sequence:stages.map(x=>x.key),followup_stage:"30m"}});
+ await s.from("crm_tasks").insert({customer_id:cid,task_type:"AI_CUSTOMER_CARE_FOLLOWUP",priority:q?.total_price?"high":"normal",status:"open",title:"Follow-up calon pelanggan dari Asisten AI",notes:"Lead dari website/Asisten AI; follow-up bertahap 30m, 1d, 3d, 7d. AI wajib menyerahkan keputusan khusus kepada admin.",pipeline_stage:"qualified_lead",next_followup_at:next,quote_value:q?.total_price||null,metadata:{source:"transmind_ai",lead_id:leadId,quote:q||null,tags:c.tags,consent_status:"granted",human_required:c.human_required,followup_sequence:stages.map(x=>x.key),followup_stage:"30m"}});
  const memory=b?.lead?.memory||[];
  if(Array.isArray(memory)) for(const item of memory.slice(0,12)){
   const value=String(item.value||"").trim(); if(!value)continue;
@@ -49,7 +49,7 @@ async function lead(s:any,b:any,c:any,q:any){
  for(const stage of stages){
   await s.from("nexus_communications").insert({customer_id:cid,channel:"whatsapp",direction:"outbound",event_type:"AI_LEAD_FOLLOWUP",recipient:phone,message_template:"ai_followup_"+stage.key,message_body:stage.text,provider:"pending_whatsapp_provider",status:"queued",metadata:{scheduled_at:new Date(now.getTime()+stage.minutes*60000).toISOString(),consent_status:"granted",lead_name:name,intent:c.intent,followup_stage:stage.key,delivery_mode:"admin_or_provider_queue"}});
  }
- return{captured:true,lead_id:leadId,next_followup_at:next,followup_stages:stages.map(x=>x.key),whatsapp_link:wa(stages[0].text),delivery_status:"queued_for_admin_or_authorized_provider"};
+ return{captured:true,lead_id:leadId,next_followup_at:next,followup_stages:stages.map(x=>x.key),whatsapp_link:wa(stages[0].text),delivery_status:"queued_for_admin_until_authorized_provider"};
 }
 Deno.serve(async(req)=>{if(req.method==="OPTIONS")return new Response("ok",{headers:cors});if(req.headers.get("origin")!==ORIGIN)return json({success:false,message:"Origin tidak diizinkan."},403);if(req.method!=="POST")return json({success:false,message:"Gunakan POST."},405);try{const b=await req.json(),m=String(b.message||"").trim(),sid=String(b.session_id||"").trim();if(!m||!sid)return json({success:false,message:"message dan session_id wajib."},400);const s=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!),c=classify(m),now=new Date().toISOString();await s.from("ai_companion_sessions").upsert({session_id:sid,path:String(b.path||"/").slice(0,500),referrer:String(b.referrer||"").slice(0,1000),last_seen_at:now},{onConflict:"session_id"});await s.from("ai_companion_messages").insert({session_id:sid,role:"user",content:m,source:"ai_companion",intent:c.intent,tags:c.tags});const priorPhone=String(b?.lead?.phone||"").replace(/[^0-9]/g,"");
  const priorName=String(b?.lead?.name||"").trim();
