@@ -31,7 +31,7 @@ async function metrics(d){
 }
 async function queue(d,mode){
  const [leads,com]=await Promise.all([
-  d.from('customer_care_leads').select('id,name,phone,consent_status,status,stage,intent,last_activity_at,next_followup_at,created_at').gte('created_at',since(30)).in('status',['open','paused']).order('created_at',{ascending:false}).limit(300),
+  d.from('customer_care_leads').select('id,name,phone,consent_status,status,stage,intent,last_activity_at,next_followup_at,created_at').gte('created_at',since(90)).in('status',mode==='care'?['lost']:['open','paused']).order('created_at',{ascending:false}).limit(300),
   d.from('nexus_communications').select('recipient,event_type,metadata,created_at').gte('created_at',since(30)).order('created_at',{ascending:false}).limit(500)
  ]);
  if(leads.error)throw leads.error;if(com.error)throw com.error;
@@ -59,7 +59,7 @@ function render(el,m){
  $('#tm-cc-rescue')?.addEventListener('click',async()=>{const b=$('#tm-cc-msg');b.textContent='Menyusun peluang rescue…';try{const r=await queue(db(),'rescue');b.textContent='Selesai: '+r.made+' peluang dibuat, '+r.skipped+' ditahan karena belum waktunya/duplikat.'}catch(e){b.textContent='Gagal: '+e.message}});
  $('#tm-cc-care')?.addEventListener('click',async()=>{const b=$('#tm-cc-msg');b.textContent='Menyusun relationship care…';try{const r=await queue(db(),'care');b.textContent='Selesai: '+r.made+' hubungan masuk antrean, '+r.skipped+' ditahan karena belum waktunya/duplikat.'}catch(e){b.textContent='Gagal: '+e.message}});
 }
-async function boot(){const body=document.getElementById('seoBody'),d=db();if(!body||!d||document.getElementById('tm-care-growth'))return;try{render(body,await metrics(d))}catch(e){body.insertAdjacentHTML('beforeend','<div class="notice bad" style="margin-top:12px">AI Customer Service belum dapat membaca data: '+esc(e.message)+'</div>')}}
+async function boot(){const body=document.getElementById('seoBody'),d=db();if(!body||!d||document.getElementById('tm-care-growth'))return;try{const [m]=await Promise.all([metrics(d),queue(d,'rescue').catch(()=>null),queue(d,'care').catch(()=>null)]);render(body,m)}catch(e){body.insertAdjacentHTML('beforeend','<div class="notice bad" style="margin-top:12px">AI Customer Service belum dapat membaca data: '+esc(e.message)+'</div>')}}
 window.TRANSMIND_AI_CUSTOMER_CARE_GROWTH={boot};
 document.addEventListener('tm-seo-refresh',()=>setTimeout(boot,120));
 setTimeout(boot,1200); setInterval(()=>{const b=document.getElementById('seoBody');if(b&&!document.hidden&&!document.getElementById('tm-care-growth'))boot()},15*60*1000);
