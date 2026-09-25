@@ -69,16 +69,26 @@ async function operationsPage(el){return operationsContent(el)}
 async function genericContent(id,el){const [title,group]=pageMeta(id);let map={procurement:['purchase_requests','Purchase Request'],documents:['documents','Documents'],ai:['advice_events','Advice Events'],admin:['audit_log','Audit Log'],hr:['profiles','Employee']};let base=id.split('-')[0];if(map[base]){let n=0;try{const {count}=await sb.from(map[base][0]).select('*',{count:'exact',head:true});n=count||0}catch(e){}el.innerHTML=cards([[map[base][1],n,'Data yang dapat diakses'],['Status','CONNECTED','Backend foundation'],['Action','READY','Workspace']])+`<div class="notice" style="margin-top:13px">Halaman <b>${esc(title)}</b> sudah menjadi bagian dari struktur aplikasi. CRUD khusus modul ini mengikuti permission, schema dan workflow backend agar tidak menghasilkan transaksi palsu.</div>`}else{el.innerHTML=`<div class="workspace"><div class="card"><h3>${esc(title)}</h3><div class="notice">Modul ini sudah tersedia dalam navigasi NEXUS dan siap dihubungkan ke data/workflow backend terkait. Tidak ada angka fiktif yang ditampilkan.</div></div><div class="card"><h3>Module Status</h3><div class="metric-stack"><div class="list-row"><span>Module</span><b>READY</b></div><div class="list-row"><span>RBAC</span><b>ENABLED</b></div><div class="list-row"><span>Data Integrity</span><b>PROTECTED</b></div></div></div></div>`}}
 async function loadPage(id){try{const el=$('content-'+id);if(!el)return;if(id.startsWith('dashboard'))return dashboard(id);if(id.startsWith('booking'))return bookingContent(id,el);if(id==='calendar')return calendarContent(el);if(id.startsWith('fleet'))return fleetContent(el);if(id.startsWith('crm'))return crmContent(el);if(id.startsWith('partner'))return partnerContent(el);if(id.startsWith('finance'))return financeContent(el);if(id.startsWith('reports'))return reportContent(el);if(id.startsWith('forecast'))return forecastContent(el);if(id.startsWith('bi'))return biContent(el);if(id==='seo-live'){el.innerHTML='<div id="seoBody"></div>';if(window.TRANSMIND_SEO_F1?.render)return window.TRANSMIND_SEO_F1.render(7);return;}if(id==='ai-customer-service'){if(window.TRANSMIND_AI_CUSTOMER_SERVICE_CONSOLE?.render)return window.TRANSMIND_AI_CUSTOMER_SERVICE_CONSOLE.render();return;}if(id.startsWith('operations'))return operationsPage(el);return genericContent(id,el)}catch(e){console.error(e);$('content-'+id).innerHTML=`<div class="notice bad">Gagal memuat modul: ${esc(e.message)}</div>`}}
 async function access(){
-  // Authorization source-of-truth: the existing server-side nexus_my_access()
-  // contract. Do not bypass RBAC/RLS when a role or permission lookup fails.
-  const accessResult=await sb.rpc('nexus_my_access');
-  if(accessResult.error){
-    const e=accessResult.error;
-    throw new Error('Pemeriksaan akses NEXUS gagal: '+(e.message||'permission denied')+(e.hint?' · '+e.hint:''));
-  }
-  const value=nexusAccessValue(accessResult.data);
-  if(!nexusHasDashboardAccess(accessResult.data)){
-    throw new Error('Akun berhasil login tetapi belum memiliki permission dashboard.view.');
+  // Primary authorization contract remains nexus_my_access().
+  // If that RPC is temporarily unavailable, use the existing granular
+  // dashboard.view authorization RPC. Never fall back to "logged in = allowed".
+  let accessResult=await sb.rpc('nexus_my_access');
+  let value=null;
+  if(!accessResult.error){
+    value=nexusAccessValue(accessResult.data);
+    if(!nexusHasDashboardAccess(accessResult.data)){
+      throw new Error('Akun berhasil login tetapi belum memiliki permission dashboard.view.');
+    }
+  }else{
+    const primaryError=accessResult.error;
+    const permissionResult=await sb.rpc('has_permission',{p_permission_code:'dashboard.view'});
+    if(permissionResult.error){
+      throw new Error('Pemeriksaan akses NEXUS gagal: '+(primaryError.message||'permission denied')+(primaryError.hint?' · '+primaryError.hint:''));
+    }
+    if(permissionResult.data!==true){
+      throw new Error('Akun berhasil login tetapi belum memiliki permission dashboard.view.');
+    }
+    value=true;
   }
   let roleLabel='AUTHENTICATED';
   if(typeof value==='string')roleLabel=value;
