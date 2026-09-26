@@ -28,7 +28,7 @@
 <script src="./ai-customer-service-engine.js?v=20260926-booking-ledger-v2"></script>
 <script src="./ai-customer-service-console.js?v=20260925-1"></script>
 <script src="./customer-care-outcome-learning.js?v=20260925-1"></script>
-<script src="./customer-care-autopilot.js?v=20260925-1"></script>\n<script src="./growth-operations-command.js?v=20260926-1"></script>
+<script src="./customer-care-autopilot.js?v=20260925-1"></script>\n<script src="./agent-network.js?v=20260926-1"></script>\n<script src="./growth-operations-command.js?v=20260926-1"></script>
 <script>
 const cfg=window.NEXUS_CONFIG||{};let sb=null,session=null,currentPage='dashboard';
 const $=id=>document.getElementById(id);const clearNexusBrowserAuth=async()=>{try{if(sb)await sb.auth.signOut({scope:'local'});}catch(_){}try{Object.keys(localStorage).filter(k=>k.startsWith('sb-ynigwuutmqpnfnkhlaip-')).forEach(k=>localStorage.removeItem(k));}catch(_){}try{sessionStorage.removeItem('transmind_nexus_recovery_cooldown_v1');}catch(_){}session=null;$('email')&&($('email').value='');$('password')&&($('password').value='');$('loginMsg')&&($('loginMsg').textContent='');};const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const rup=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n||0));
