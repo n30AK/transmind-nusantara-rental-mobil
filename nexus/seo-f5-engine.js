@@ -27,5 +27,5 @@ async function run(){
  }catch(e){el.insertAdjacentHTML('beforeend','<div class="notice bad f5">F5 gagal membaca opportunity: '+esc(e.message)+'</div>')}
 }
 window.TRANSMIND_SEO_F5={render:run};
-let n=0;const boot=()=>{if(document.getElementById('seoBody')&&window.TRANSMIND_SEO_F4)return run();if(++n<30)setTimeout(boot,500)};boot();
+let n=0;const boot=()=>{if(document.getElementById('seoBody')&&window.TRANSMIND_SEO_F4){run();const s=document.createElement('script');s.src='./conversion-command-engine.js?v=20260927-1';s.onload=()=>window.TRANSMIND_CONVERSION_COMMAND?.render();document.head.appendChild(s);return}if(++n<30)setTimeout(boot,500)};boot();
 })();
