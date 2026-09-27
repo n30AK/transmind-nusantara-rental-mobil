@@ -1,0 +1,39 @@
+{
+  "@context":"https://schema.org",
+  "@graph":[
+    {
+      "@type":"Organization",
+      "@id":"https://transmindnusantararentalmobil.co.id/#organization",
+      "name":"Transmind Nusantara Rental Mobil",
+      "url":"https://transmindnusantararentalmobil.co.id/",
+      "telephone":"+628816654141",
+      "sameAs":[
+        "https://www.instagram.com/transmind.nusantara/",
+        "https://www.tiktok.com/@transmindrentalmobil",
+        "https://x.com/transmindnusant"
+      ]
+    },
+    {
+      "@type":"WebSite",
+      "@id":"https://transmindnusantararentalmobil.co.id/#website",
+      "url":"https://transmindnusantararentalmobil.co.id/",
+      "name":"Transmind Nusantara Rental Mobil",
+      "publisher":{"@id":"https://transmindnusantararentalmobil.co.id/#organization"},
+      "inLanguage":"id-ID"
+    },
+    {
+      "@type":"Service",
+      "@id":"https://transmindnusantararentalmobil.co.id/#rental-service",
+      "name":"Layanan Rental Mobil Transmind",
+      "provider":{"@id":"https://transmindnusantararentalmobil.co.id/#organization"},
+      "areaServed":[
+        {"@type":"City","name":"Jakarta"},
+        {"@type":"City","name":"Bekasi"},
+        {"@type":"City","name":"Bogor"},
+        {"@type":"City","name":"Depok"},
+        {"@type":"City","name":"Tangerang"}
+      ],
+      "serviceType":["Rental mobil lepas kunci","Rental mobil dengan pengemudi","Rental mobil corporate","Rental mobil pariwisata","Rental mobil wedding"]
+    }
+  ]
+}
