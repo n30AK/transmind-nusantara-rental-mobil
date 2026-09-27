@@ -1564,52 +1564,48 @@ async function submitBooking(
         }}));
 
         console.log(
-            'MEMANGGIL RPC create_booking...'
+            'MEMANGGIL RPC create_booking_with_attribution...'
         );
 
 
+        const attribution =
+            window.TRANSMIND_ATTRIBUTION?.first_touch ||
+            window.TRANSMIND_ATTRIBUTION?.last_touch ||
+            {};
+
         const rpcResponse =
             await sb.rpc(
-                'create_booking',
+                'create_booking_with_attribution',
                 {
-
-                    p_name:
-                        formData.name,
-
-                    p_phone:
-                        formData.phone,
-
-                    p_vehicle_id:
-                        formData.vehicleId,
-
-                    p_service:
-                        formData.service,
-
-                    p_start_date:
-                        formData.start,
-
-                    p_end_date:
-                        formData.end,
-
-                    p_area:
-                        formData.area,
-
-                    p_notes:
-                        [
-                            formData.notes,
-                            formData.pickupLocation
-                                ? 'Lokasi penjemputan: ' + formData.pickupLocation
-                                : '',
-                            formData.dropoffLocation
-                                ? 'Lokasi tujuan/penurunan: ' + formData.dropoffLocation
-                                : '',
-                            formData.pickupLatitude && formData.pickupLongitude
-                                ? 'Koordinat GPS penjemputan: ' +
-                                  formData.pickupLatitude + ', ' +
-                                  formData.pickupLongitude
-                                : ''
-                        ].filter(Boolean).join(' | ')
-
+                    p_name: formData.name,
+                    p_phone: formData.phone,
+                    p_vehicle_id: formData.vehicleId,
+                    p_service: formData.service,
+                    p_start_date: formData.start,
+                    p_end_date: formData.end,
+                    p_area: formData.area,
+                    p_notes: [
+                        formData.notes,
+                        formData.pickupLocation
+                            ? 'Lokasi penjemputan: ' + formData.pickupLocation
+                            : '',
+                        formData.dropoffLocation
+                            ? 'Lokasi tujuan/penurunan: ' + formData.dropoffLocation
+                            : '',
+                        formData.pickupLatitude && formData.pickupLongitude
+                            ? 'Koordinat GPS penjemputan: ' +
+                              formData.pickupLatitude + ', ' +
+                              formData.pickupLongitude
+                            : ''
+                    ].filter(Boolean).join(' | '),
+                    p_attribution_source: attribution.source || '',
+                    p_attribution_medium: attribution.medium || '',
+                    p_attribution_campaign: attribution.campaign || '',
+                    p_attribution_content: attribution.content || '',
+                    p_attribution_term: attribution.term || '',
+                    p_landing_page: attribution.landing_page || location.pathname,
+                    p_referrer_url: attribution.referrer_url || document.referrer || '',
+                    p_visitor_session_id: window.TRANSMIND_VISITOR_SESSION_ID || ''
                 }
             );
 
@@ -1634,6 +1630,17 @@ async function submitBooking(
                 'CREATE BOOKING ERROR:',
                 error
             );
+
+            if (typeof window.TRANSMIND_TRACK_CONVERSION === 'function') {
+                await window.TRANSMIND_TRACK_CONVERSION('booking_failed', {
+                    stage: 'rpc',
+                    error_code: error.code || '',
+                    error_message: String(error.message || 'Booking gagal').slice(0, 240),
+                    vehicle_id: formData.vehicleId || null,
+                    service: formData.service || '',
+                    area: formData.area || ''
+                });
+            }
 
 
             const resultBox =
