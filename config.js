@@ -27,6 +27,6 @@ window.supabase.createClient=function(){var client=original.apply(window.supabas
 window.addEventListener('DOMContentLoaded',function(){if(!document.querySelector('link[data-transmind-responsive]')){var css=document.createElement('link');css.rel='stylesheet';css.href='../css/responsive.css?v=4';css.dataset.transmindResponsive='1';document.head.appendChild(css)}});
 })();
 (function(){
-  function load(){if(document.querySelector('script[data-transmind-customer-care]'))return;var s=document.createElement('script');s.src='ai-companion-customer-care.js?v=20260922-2';s.async=true;s.dataset.transmindCustomerCare='1';document.body.appendChild(s)}
+  function load(){if(document.querySelector('script[data-transmind-customer-care]'))return;var s=document.createElement('script');s.src='ai-companion-customer-care.js?v=20260928-1';s.async=true;s.dataset.transmindCustomerCare='1';document.body.appendChild(s)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load);else load();
 })();
