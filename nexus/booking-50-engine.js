@@ -35,5 +35,5 @@ async function run(){
   render(el,x,null);
  }catch(e){el.insertAdjacentHTML('beforeend',css+'<section class="b50"><div class="b50c"><h3>Booking 50/hari</h3><div class="b50muted">Data funnel belum dapat dibaca saat ini. Refresh setelah koneksi Nexus tersedia.</div></div></section>');}
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+window.TRANSMIND_BOOKING_50={render:run};window.addEventListener('nexus:authenticated',()=>setTimeout(run,350));
 })();
