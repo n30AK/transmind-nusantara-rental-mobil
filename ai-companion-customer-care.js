@@ -198,7 +198,8 @@ function update(){
  }
  if(s.follow_up?.status==='scheduled'&&s.follow_up.scheduled_at&&Date.now()>=Date.parse(s.follow_up.scheduled_at)){
    if(s.follow_up.reason==='booking_success'||s.follow_up.status==='booked'){c.style.display='none';return}
-   const name=(s.lead?.name||'').trim().split(/\\s+/)[0]||'Anda';\n   const stage=Number(s.follow_up?.stage||1);\n   const greetings=stage>=3?'Semoga kabarnya baik. Saya masih menyimpan konteks kebutuhan perjalanan Anda. Kalau rencananya berubah, kita bisa menyesuaikannya bersama.':stage===2?'Selamat pagi '+name+'. Saya masih menyimpan konteks kebutuhan perjalanan Anda. Kalau rencananya masih berjalan, kita bisa lanjut tanpa mengulang dari awal.':'Senang melihat Anda kembali, '+name+'. Saya masih menyimpan konteks kebutuhan perjalanan Anda. Kita lanjut dari kebutuhan terakhir saja.';\n   t.textContent=greetings;
+   const name=(s.lead?.name||'').trim().split(/\\s+/)[0]||'Anda';
+   const stage=Number(s.follow_up?.stage||1);\n   const greetings=stage>=3?'Semoga kabarnya baik. Saya masih menyimpan konteks kebutuhan perjalanan Anda. Kalau rencananya berubah, kita bisa menyesuaikannya bersama.':stage===2?'Selamat pagi '+name+'. Saya masih menyimpan konteks kebutuhan perjalanan Anda. Kalau rencananya masih berjalan, kita bisa lanjut tanpa mengulang dari awal.':'Senang melihat Anda kembali, '+name+'. Saya masih menyimpan konteks kebutuhan perjalanan Anda. Kita lanjut dari kebutuhan terakhir saja.';\n   t.textContent=greetings;
    c.style.display='block';
    emit('ai_return_followup_due',{reason:s.follow_up.reason,stage:Number(s.follow_up.stage||1),relationship_state:s.relationship_state||'nurture'});
    return;
