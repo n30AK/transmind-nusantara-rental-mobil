@@ -11,9 +11,9 @@
  */
 (function(){
 'use strict';
-if(window.__TM_CUSTOMER_CARE_V5)return;window.__TM_CUSTOMER_CARE_V4=true;
+if(window.__TM_CUSTOMER_CARE_V5)return;window.__TM_CUSTOMER_CARE_V5=true;
 
-const KEY='transmind_customer_care_v5';
+const KEY='transmind_customer_care_v6';
 const SESSION='transmind_ai_session_v1';
 const WA='628816654141';
 const FOLLOW=[30*60e3,24*3600e3,3*24*3600e3,7*24*3600e3];
@@ -47,7 +47,7 @@ function emit(type,detail){
  window.dispatchEvent(new CustomEvent('transmind:customer-care',{detail:p}));
  try{
    const a=JSON.parse(localStorage.getItem('transmind_ai_demand_v5')||'[]');
-   a.push(p);localStorage.setItem('transmind_ai_demand_v4',JSON.stringify(a.slice(-500)));
+   a.push(p);localStorage.setItem('transmind_ai_demand_v5',JSON.stringify(a.slice(-500)));
  }catch(_){}
  return p;
 }
