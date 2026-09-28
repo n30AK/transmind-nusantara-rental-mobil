@@ -1,4 +1,4 @@
-/* TransMind AI Customer Service — Conversion Care v4
+/* TransMind AI Customer Service — Conversion Care v5
  * Booking 50/day mission: human-feeling care, consent-aware memory,
  * return-visitor continuity, booking rescue, admin handoff and learning.
  *
@@ -11,9 +11,9 @@
  */
 (function(){
 'use strict';
-if(window.__TM_CUSTOMER_CARE_V4)return;window.__TM_CUSTOMER_CARE_V4=true;
+if(window.__TM_CUSTOMER_CARE_V5)return;window.__TM_CUSTOMER_CARE_V4=true;
 
-const KEY='transmind_customer_care_v4';
+const KEY='transmind_customer_care_v5';
 const SESSION='transmind_ai_session_v1';
 const WA='628816654141';
 const FOLLOW=[30*60e3,24*3600e3,3*24*3600e3,7*24*3600e3];
@@ -46,7 +46,7 @@ function emit(type,detail){
  const p=Object.assign({event_type:type,session_id:sid(),path:location.pathname,occurred_at:now()},detail||{});
  window.dispatchEvent(new CustomEvent('transmind:customer-care',{detail:p}));
  try{
-   const a=JSON.parse(localStorage.getItem('transmind_ai_demand_v4')||'[]');
+   const a=JSON.parse(localStorage.getItem('transmind_ai_demand_v5')||'[]');
    a.push(p);localStorage.setItem('transmind_ai_demand_v4',JSON.stringify(a.slice(-500)));
  }catch(_){}
  return p;
@@ -198,9 +198,9 @@ function update(){
  }
  if(s.follow_up?.status==='scheduled'&&s.follow_up.scheduled_at&&Date.now()>=Date.parse(s.follow_up.scheduled_at)){
    if(s.follow_up.reason==='booking_success'||s.follow_up.status==='booked'){c.style.display='none';return}
-   t.textContent='Senang melihat Anda kembali. Saya masih menyimpan konteks kebutuhan perjalanan Anda. Kalau rencananya masih berjalan, kita bisa lanjut tanpa mengulang dari awal.';
+   const name=(s.lead?.name||'').trim().split(/\\s+/)[0]||'Anda';\n   const stage=Number(s.follow_up?.stage||1);\n   const greetings=stage>=3?'Semoga kabarnya baik. Saya masih menyimpan konteks kebutuhan perjalanan Anda. Kalau rencananya berubah, kita bisa menyesuaikannya bersama.':stage===2?'Selamat pagi '+name+'. Saya masih menyimpan konteks kebutuhan perjalanan Anda. Kalau rencananya masih berjalan, kita bisa lanjut tanpa mengulang dari awal.':'Senang melihat Anda kembali, '+name+'. Saya masih menyimpan konteks kebutuhan perjalanan Anda. Kita lanjut dari kebutuhan terakhir saja.';\n   t.textContent=greetings;
    c.style.display='block';
-   emit('ai_return_followup_due',{reason:s.follow_up.reason});
+   emit('ai_return_followup_due',{reason:s.follow_up.reason,stage:Number(s.follow_up.stage||1),relationship_state:s.relationship_state||'nurture'});
    return;
  }
  c.style.display='none';
