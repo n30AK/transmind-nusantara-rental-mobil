@@ -17,3 +17,14 @@ export function classifyOpportunity(input) {
   if (score >= 0.40) return { class: "TEST", score };
   return { class: "OBSERVE", score };
 }
+
+export function validateOpportunity(input) {
+  const hardBlock = input.hardBlock === true;
+  const requiredEvidence = ["search_console_or_first_party_signal", "page_inventory", "intent_alignment", "content_differentiation", "safety_check"];
+  const evidence = new Set(Array.isArray(input.evidenceTypes) ? input.evidenceTypes : []);
+  const missingEvidence = requiredEvidence.filter((key) => !evidence.has(key));
+  const productionMutation = input.productionMutation === true;
+  const rollback = input.rollbackRequired !== false;
+  const safe = !hardBlock && input.safety === 1 && missingEvidence.length === 0 && (!productionMutation || rollback);
+  return { safe, hardBlock, missingEvidence, productionMutation, rollback };
+}
