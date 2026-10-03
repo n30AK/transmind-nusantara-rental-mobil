@@ -1,11 +1,11 @@
-/* TRANSMIND SEO — structured data v2 */
+/* TRANSMIND SEO — structured data v3 */
 (function(){
 'use strict';
 function add(data,id){if(document.getElementById(id))return;var s=document.createElement('script');s.type='application/ld+json';s.id=id;s.textContent=JSON.stringify(data);document.head.appendChild(s)}
 function boot(){
 var origin='https://transmindnusantararentalmobil.co.id', page=location.pathname;
 var org={'@type':'Organization','@id':origin+'/#organization','name':'Transmind Nusantara Rental Mobil','url':origin+'/','logo':origin+'/logo/transmind.png','telephone':'+628816654141','sameAs':['https://www.instagram.com/transmind.nusantara/','https://www.tiktok.com/@transmindrentalmobil','https://x.com/transmindnusant']};
-var site={'@type':'WebSite','@id':origin+'/#website','url':origin+'/','name':'Transmind Nusantara Rental Mobil','publisher':{'@id':origin+'/#organization'},'inLanguage':'id-ID'};
+var site={'@type':'WebSite','@id':origin+'/#website','url':origin+'/','name':'Transmind Nusantara Rental Mobil','publisher':{'@id':origin+'/#organization'},'inLanguage':'id-ID','potentialAction':{'@type':'ContactAction','target':origin+'/#booking'}};
 var graph=[org,site];
 if(page==='/'||page==='/index.html'){
  graph.push(
