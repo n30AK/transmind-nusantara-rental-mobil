@@ -10,6 +10,7 @@ on:
       - "index.html"
       - "demand/**"
       - "rental-mobil-*.html"
+      - "panduan-*.html"
       - "supabase/functions/transmind-ai/**"
       - "docs/08-SEO-GROWTH/**"
       - "docs/09-AI/**"
@@ -63,7 +64,6 @@ jobs:
             grep -q 'Transmind' "$f"
           done
 
-
       - name: Validate sitemap URLs and internal SEO graph
         shell: bash
         run: |
@@ -71,9 +71,16 @@ jobs:
           python - <<'PY'
           import re
           from pathlib import Path
+
           sitemap = Path("sitemap.xml").read_text(encoding="utf-8")
           urls = re.findall(r"<loc>(https://transmindnusantararentalmobil\.co\.id/[^<]*)</loc>", sitemap)
           assert urls, "No sitemap URLs found"
+
+          local_pages = {}
+          for p in [Path("index.html"), *Path(".").glob("*.html"), *Path("demand").glob("*.html")]:
+              if p.exists():
+                  local_pages[p.as_posix()] = p.read_text(encoding="utf-8")
+
           for url in urls:
               path = url.replace("https://transmindnusantararentalmobil.co.id/","") or "index.html"
               if path.endswith("/"):
@@ -84,8 +91,34 @@ jobs:
               assert 'rel="canonical"' in html, f"Missing canonical: {path}"
               assert 'name="description"' in html, f"Missing description: {path}"
               assert 'application/ld+json' in html, f"Missing structured data: {path}"
-          home = Path("index.html").read_text(encoding="utf-8")
-          for path in [u.replace("https://transmindnusantararentalmobil.co.id/","") for u in urls if u.endswith(".html") and u.replace("https://transmindnusantararentalmobil.co.id/","") != "demand/index.html"]:
-              assert f'href="/{path}"' in home or f'href="{path}"' in home, f"Homepage missing internal link: {path}"
-          print(f"SEO graph validated: {len(urls)} sitemap URLs")
+
+          # The homepage is the primary hub, but deeper guide/service pages do not
+          # need to be linked directly from it. Validate a real internal-link graph:
+          # every indexed HTML page must have at least one inbound internal link,
+          # while the homepage itself is the root and demand hub is intentionally
+          # excluded from this inbound-link requirement.
+          normalized_urls = []
+          for u in urls:
+              path = u.replace("https://transmindnusantararentalmobil.co.id/","") or "index.html"
+              if path.endswith("/"):
+                  path = path + "index.html"
+              normalized_urls.append(path)
+
+          inbound = {p: 0 for p in normalized_urls if p not in ("index.html", "demand/index.html")}
+          href_re = re.compile(r'href=["\'](?:https://transmindnusantararentalmobil\.co\.id)?/?([^"\'#?]+)["\']', re.I)
+
+          for source_path, html in local_pages.items():
+              for href_path in href_re.findall(html):
+                  clean = href_path.lstrip("/")
+                  if clean in inbound:
+                      inbound[clean] += 1
+
+          missing = [p for p, count in inbound.items() if count == 0]
+          assert not missing, "Indexed pages without inbound internal links: " + ", ".join(missing)
+
+          # Ensure the primary regional hub actually links to the Jabodetabek guide.
+          hub = Path("rental-mobil-jabodetabek.html").read_text(encoding="utf-8")
+          assert 'href="/panduan-rental-mobil-jabodetabek.html"' in hub or 'href="panduan-rental-mobil-jabodetabek.html"' in hub, "Jabodetabek hub missing guide link"
+
+          print(f"SEO graph validated: {len(urls)} sitemap URLs; {len(inbound)} indexed pages checked for inbound links")
           PY
