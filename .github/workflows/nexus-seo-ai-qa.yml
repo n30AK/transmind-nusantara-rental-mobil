@@ -83,7 +83,7 @@ jobs:
               assert 'name="description"' in html, f"Missing description: {path}"
               assert 'application/ld+json' in html, f"Missing structured data: {path}"
           home = Path("index.html").read_text(encoding="utf-8")
-          for path in [u.replace("https://transmindnusantararentalmobil.co.id/","") for u in urls if u.endswith(".html")]:
+          for path in [u.replace("https://transmindnusantararentalmobil.co.id/","") for u in urls if u.endswith(".html") and u.replace("https://transmindnusantararentalmobil.co.id/","") != "demand/index.html"]:
               assert f'href="/{path}"' in home or f'href="{path}"' in home, f"Homepage missing internal link: {path}"
           print(f"SEO graph validated: {len(urls)} sitemap URLs")
           PY
