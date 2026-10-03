@@ -5,6 +5,8 @@
 ## Primary website
 
 - https://transmindnusantararentalmobil.co.id/
+- https://transmindnusantararentalmobil.co.id/rental-mobil-jabodetabek.html — cornerstone area page
+- https://transmindnusantararentalmobil.co.id/demand/ — demand/booking request flow
 - Main booking and vehicle discovery page.
 - Final vehicle availability, service selection and booking confirmation are subject to operational availability.
 
