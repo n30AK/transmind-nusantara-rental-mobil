@@ -1,3 +1,4 @@
+# Transmind public crawl policy — reviewed 2026-10-03
 User-agent: *
 Allow: /
 Disallow: /admin/
