@@ -1,0 +1,42 @@
+/* TRANSMIND NEXUS — SEO INTELLIGENCE HUB
+   Provider-neutral research control room.
+   Connectors are intentionally separated from the public website.
+*/
+(()=>{'use strict';
+const providers=[
+ {id:'gsc',name:'Google Search Console',mode:'live',cap:'search queries, pages, indexing, URL inspection'},
+ {id:'keyword-planner',name:'Google Keyword Planner',mode:'research',cap:'keyword volume, competition, commercial demand'},
+ {id:'bing',name:'Bing Webmaster',mode:'live',cap:'Bing search performance, indexing, IndexNow'},
+ {id:'ahrefs',name:'Ahrefs',mode:'research',cap:'keywords, backlinks, competitors, AI visibility'},
+ {id:'screaming-frog',name:'Screaming Frog',mode:'audit-import',cap:'technical crawl, links, canonicals, metadata'},
+ {id:'seobility',name:'Seobility',mode:'audit-research',cap:'site audit, rankings, backlinks'},
+ {id:'answerthepublic',name:'AnswerThePublic',mode:'research',cap:'questions and search-demand ideas'},
+ {id:'alsoasked',name:'AlsoAsked',mode:'research',cap:'People Also Ask question trees'},
+ {id:'keyword-surfer',name:'Keyword Surfer',mode:'research',cap:'SERP keyword ideas and volume signals'}
+];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>new Intl.NumberFormat('id-ID').format(Number(n||0));
+function css(){if(document.getElementById('nxSeoHubCss'))return;const s=document.createElement('style');s.id='nxSeoHubCss';s.textContent='.nx-seo-hub{margin-top:14px}.nx-seo-hub .provider-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.nx-seo-hub .provider{border:1px solid #292e37;background:#101319;border-radius:12px;padding:12px}.nx-seo-hub .provider b{display:block}.nx-seo-hub .provider small{display:block;color:#8e949f;margin-top:5px;line-height:1.45}.nx-seo-hub .badge{display:inline-block;margin-top:8px;padding:4px 7px;border-radius:999px;border:1px solid #343943;color:#f0cf68;font-size:9px}.nx-seo-hub .seo-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.nx-seo-hub .seo-tabs button{background:#0d1015;color:#ddd;border:1px solid #343943;border-radius:8px;padding:8px 10px}.nx-seo-hub .seo-tabs button.active{border-color:#806a27;color:#f0cf68}.nx-seo-hub .seo-panel{border:1px solid #292e37;background:#101319;border-radius:12px;padding:14px}.nx-seo-hub table{width:100%;border-collapse:collapse;font-size:11px}.nx-seo-hub th,.nx-seo-hub td{text-align:left;padding:8px;border-bottom:1px solid #252a31}.nx-seo-hub th{color:#8e949f;font-size:9px;text-transform:uppercase}.nx-seo-hub .muted{color:#8e949f}@media(max-width:900px){.nx-seo-hub .provider-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.nx-seo-hub .provider-grid{grid-template-columns:1fr}}';document.head.appendChild(s)}
+function sb(){return window.NXSB||window.transmindSupabase||null}
+async function query(table,limit=100){const c=sb();if(!c)return[];const r=await c.from(table).select('*').order('captured_at',{ascending:false}).limit(limit);return r.data||[]}
+async function renderPanel(root,tab){
+ let html='';
+ if(tab==='overview'){
+  const src=await query('nexus_seo_sources',30),runs=await query('nexus_seo_sync_runs',20);
+  html='<div class="provider-grid">'+providers.map(p=>{const x=src.find(s=>s.provider===p.id)||{};return '<div class="provider"><b>'+esc(p.name)+'</b><small>'+esc(p.cap)+'</small><span class="badge">'+esc(x.status||'NOT CONNECTED')+'</span><small>Mode: '+esc(p.mode)+'</small></div>'}).join('')+'</div><div class="seo-panel" style="margin-top:12px"><b>Sync ledger</b><table style="margin-top:8px"><thead><tr><th>Provider</th><th>Status</th><th>Records</th><th>Last run</th></tr></thead><tbody>'+runs.map(r=>'<tr><td>'+esc(r.provider)+'</td><td>'+esc(r.status)+'</td><td>'+fmt(r.records_upserted)+'</td><td>'+esc(r.finished_at||r.started_at)+'</td></tr>').join('')||'<tr><td colspan="4" class="muted">Belum ada sinkronisasi provider.</td></tr>'+'</tbody></table></div>';
+ }else if(tab==='keywords'){
+  const d=await query('nexus_seo_keyword_snapshots',200);html='<div class="seo-panel"><b>Keyword Intelligence</b><table style="margin-top:8px"><thead><tr><th>Keyword</th><th>Provider</th><th>Volume</th><th>Difficulty</th><th>Position</th><th>URL</th></tr></thead><tbody>'+d.map(r=>'<tr><td>'+esc(r.keyword)+'</td><td>'+esc(r.provider)+'</td><td>'+fmt(r.volume)+'</td><td>'+esc(r.difficulty??'—')+'</td><td>'+esc(r.position??'—')+'</td><td>'+esc(r.url??'—')+'</td></tr>').join('')||'<tr><td colspan="6" class="muted">Belum ada data keyword provider.</td></tr>'+'</tbody></table></div>';
+ }else if(tab==='competitors'){
+  const d=await query('nexus_seo_competitors',100);html='<div class="seo-panel"><b>Competitor Intelligence</b><table style="margin-top:8px"><thead><tr><th>Domain</th><th>Provider</th><th>Visibility</th><th>Keywords</th><th>Backlinks</th><th>Traffic</th></tr></thead><tbody>'+d.map(r=>'<tr><td>'+esc(r.domain)+'</td><td>'+esc(r.provider)+'</td><td>'+esc(r.visibility??'—')+'</td><td>'+fmt(r.keywords)+'</td><td>'+fmt(r.backlinks)+'</td><td>'+fmt(r.estimated_traffic)+'</td></tr>').join('')||'<tr><td colspan="6" class="muted">Belum ada data competitor.</td></tr>'+'</tbody></table></div>';
+ }else if(tab==='backlinks'){
+  const d=await query('nexus_seo_backlinks',150);html='<div class="seo-panel"><b>Backlink Intelligence</b><table style="margin-top:8px"><thead><tr><th>Source</th><th>Target</th><th>Anchor</th><th>Follow</th><th>Authority</th></tr></thead><tbody>'+d.map(r=>'<tr><td>'+esc(r.source_domain||r.source_url)+'</td><td>'+esc(r.target_domain)+'</td><td>'+esc(r.anchor||'—')+'</td><td>'+esc(r.dofollow?'YES':'NO')+'</td><td>'+esc(r.authority??'—')+'</td></tr>').join('')||'<tr><td colspan="5" class="muted">Belum ada backlink provider.</td></tr>'+'</tbody></table></div>';
+ }else if(tab==='technical'){
+  const d=await query('nexus_seo_technical_issues',200);html='<div class="seo-panel"><b>Technical SEO Audit</b><table style="margin-top:8px"><thead><tr><th>Severity</th><th>Issue</th><th>URL</th><th>Status</th><th>Provider</th></tr></thead><tbody>'+d.map(r=>'<tr><td>'+esc(r.severity)+'</td><td>'+esc(r.title)+'</td><td>'+esc(r.url||'—')+'</td><td>'+esc(r.status)+'</td><td>'+esc(r.provider)+'</td></tr>').join('')||'<tr><td colspan="5" class="muted">Belum ada crawl/audit issue.</td></tr>'+'</tbody></table></div>';
+ }else{
+  const d=await query('nexus_seo_question_research',200);html='<div class="seo-panel"><b>Question & Search Intent Research</b><table style="margin-top:8px"><thead><tr><th>Seed</th><th>Question</th><th>Intent</th><th>Provider</th></tr></thead><tbody>'+d.map(r=>'<tr><td>'+esc(r.seed_keyword)+'</td><td>'+esc(r.question)+'</td><td>'+esc(r.intent||'—')+'</td><td>'+esc(r.provider)+'</td></tr>').join('')||'<tr><td colspan="4" class="muted">Belum ada question research.</td></tr>'+'</tbody></table></div>';
+ }
+ root.innerHTML=html;
+}
+function mount(){const page=document.getElementById('seo-live-page')||document.querySelector('#content-seo-live');if(!page||document.getElementById('nxSeoHub'))return;css();const root=document.createElement('section');root.id='nxSeoHub';root.className='nx-seo-hub card';root.innerHTML='<div class="eyebrow">SEO INTELLIGENCE LAYER</div><h3 style="margin:4px 0">Provider Research Hub</h3><div class="desc">Satu control room untuk data Search Console, Keyword Planner, Bing, Ahrefs, technical crawl dan question research. Provider tanpa API tidak akan dipalsukan sebagai live.</div><div class="seo-tabs">'+[['overview','Overview'],['keywords','Keywords'],['competitors','Competitors'],['backlinks','Backlinks'],['technical','Technical'],['questions','Questions']].map((x,i)=>'<button data-tab="'+x[0]+'" class="'+(i===0?'active':'')+'">'+x[1]+'</button>').join('')+'</div><div id="nxSeoHubBody"></div>';page.appendChild(root);root.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{root.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderPanel(root.querySelector('#nxSeoHubBody'),b.dataset.tab)});renderPanel(root.querySelector('#nxSeoHubBody'),'overview')}
+const boot=setInterval(()=>{if(sb()&&document.body){mount();if(document.getElementById('nxSeoHub'))clearInterval(boot)}},500);
+})();
