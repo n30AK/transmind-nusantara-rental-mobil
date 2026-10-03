@@ -8,7 +8,9 @@
 
   function sid(){
     return window.TRANSMIND_VISITOR_SESSION_ID ||
-      sessionStorage.getItem('transmind_visitor_session_v2') || '';
+      sessionStorage.getItem('transmind_visitor_session_v3') ||
+      sessionStorage.getItem('transmind_visitor_session_v2') ||
+      localStorage.getItem('transmind_visitor_session_v1') || '';
   }
 
   function clean(v,n){ return String(v==null?'':v).slice(0,n||300); }
