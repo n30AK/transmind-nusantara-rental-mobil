@@ -118,6 +118,7 @@ jobs:
               "/rental-mobil-corporate-jabodetabek.html",
               "/rental-mobil-wedding-jabodetabek.html",
               "/rental-mobil-pariwisata-jabodetabek.html",
+              "/panduan-rental-mobil-jabodetabek.html",
           ]
 
           def get(path):
