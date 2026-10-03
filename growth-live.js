@@ -19,6 +19,19 @@
   try { existing = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (_) {}
 
   if (!current.utm_source && existing.utm_source) current = existing;
+
+  var referrer = document.referrer || '';
+  if (!current.utm_source) {
+    try {
+      var rh = new URL(referrer).host.toLowerCase();
+      if (/google\\./i.test(rh)) { current.utm_source = 'google'; current.utm_medium = 'organic'; }
+      else if (/bing\\./i.test(rh)) { current.utm_source = 'bing'; current.utm_medium = 'organic'; }
+      else if (/yahoo\\./i.test(rh)) { current.utm_source = 'yahoo'; current.utm_medium = 'organic'; }
+      else if (/duckduckgo\\./i.test(rh)) { current.utm_source = 'duckduckgo'; current.utm_medium = 'organic'; }
+      else if (rh) { current.utm_source = rh; current.utm_medium = 'referral'; }
+      else { current.utm_source = 'direct'; current.utm_medium = 'none'; }
+    } catch (_) { current.utm_source = 'direct'; current.utm_medium = 'none'; }
+  }
   current.landing_path = current.landing_path || window.location.pathname;
   current.landing_url = current.landing_url || window.location.href.slice(0, 1000);
   current.captured_at = current.captured_at || new Date().toISOString();
@@ -84,7 +97,11 @@
           start_date: start && start.value,
           end_date: end && end.value
         });
-        window.TRANSMIND_GROWTH_ATTRIBUTION = getAttribution();
+        window.TRANSMIND_ATTRIBUTION = {
+    first_touch: Object.assign({}, getAttribution()),
+    last_touch: Object.assign({}, getAttribution())
+  };
+  window.TRANSMIND_GROWTH_ATTRIBUTION = getAttribution();
       }, true);
     });
   }
