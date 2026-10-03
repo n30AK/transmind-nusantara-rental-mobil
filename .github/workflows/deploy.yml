@@ -106,19 +106,16 @@ jobs:
           import xml.etree.ElementTree as ET
 
           base = "https://transmindnusantararentalmobil.co.id"
+          # Audit every public URL declared in the sitemap.
+          # This prevents a new/edited landing page from silently losing
+          # its crawl/index signals.
           urls = [
-              "/",
-              "/rental-mobil-jakarta.html",
-              "/rental-mobil-bekasi.html",
-              "/rental-mobil-bogor.html",
-              "/rental-mobil-depok.html",
-              "/rental-mobil-tangerang.html",
-              "/rental-mobil-lepas-kunci-jabodetabek.html",
-              "/rental-mobil-dengan-driver-jabodetabek.html",
-              "/rental-mobil-corporate-jabodetabek.html",
-              "/rental-mobil-wedding-jabodetabek.html",
-              "/rental-mobil-pariwisata-jabodetabek.html",
-              "/panduan-rental-mobil-jabodetabek.html",
+              x.replace("https://transmindnusantararentalmobil.co.id", "")
+              for x in [
+                  node.text.strip()
+                  for node in ET.fromstring(sitemap).findall("sm:url/sm:loc", ns)
+                  if node.text
+              ]
           ]
 
           def get(path):
@@ -147,10 +144,21 @@ jobs:
                   raise SystemExit(f"{path}: HTTP {status}")
               if "<title>" not in html.lower():
                   raise SystemExit(f"{path}: missing title")
-              if 'rel="canonical"' not in html.lower():
+              low = html.lower()
+              if 'rel="canonical"' not in low:
                   raise SystemExit(f"{path}: missing canonical")
-              if "application/ld+json" not in html.lower():
+              if "application/ld+json" not in low:
                   raise SystemExit(f"{path}: missing JSON-LD")
+              if "<h1" not in low:
+                  raise SystemExit(f"{path}: missing H1")
+              title_match = re.search(r"<title[^>]*>(.*?)</title>", html, re.I | re.S)
+              if not title_match or len(re.sub(r"\\s+", " ", title_match.group(1)).strip()) < 20:
+                  raise SystemExit(f"{path}: title missing/too short")
+              # Each public SEO page should point back to at least one
+              # Transmind internal destination, avoiding isolated pages.
+              internal = re.findall(r'href=["\\\'](/[^"\\\'#? ]+)', html, re.I)
+              if path != "/" and not internal:
+                  raise SystemExit(f"{path}: no internal links")
               print(f"SEO OK: {path}")
 
           key_path = "/52fdd0dc084fc01a8ffd003a51cf7848.txt"
