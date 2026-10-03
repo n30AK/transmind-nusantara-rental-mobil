@@ -1,0 +1,49 @@
+name: Transmind SEO IndexNow
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'sitemap.xml'
+      - '*.html'
+      - 'seo/**'
+      - 'robots.txt'
+      - '.github/workflows/seo-indexnow.yml'
+  workflow_dispatch:
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit public URLs to IndexNow
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import urllib.request, xml.etree.ElementTree as ET, json
+          sitemap='https://transmindnusantararentalmobil.co.id/sitemap.xml'
+          data=urllib.request.urlopen(sitemap, timeout=30).read()
+          root=ET.fromstring(data)
+          ns={'sm':'http://www.sitemaps.org/schemas/sitemap/0.9'}
+          urls=[x.text.strip() for x in root.findall('sm:url/sm:loc',ns) if x.text]
+          payload={
+            'host':'transmindnusantararentalmobil.co.id',
+            'key':'8f6d2c1a9b4e7d35c0a2f91e6b83d4aa',
+            'keyLocation':'https://transmindnusantararentalmobil.co.id/8f6d2c1a9b4e7d35c0a2f91e6b83d4aa.txt',
+            'urlList':urls
+          }
+          req=urllib.request.Request(
+            'https://api.indexnow.org/indexnow',
+            data=json.dumps(payload).encode(),
+            headers={'Content-Type':'application/json; charset=utf-8'},
+            method='POST')
+          try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+              print('IndexNow HTTP',r.status)
+              print(r.read().decode(errors='replace'))
+          except urllib.error.HTTPError as e:
+            print('IndexNow HTTP',e.code)
+            print(e.read().decode(errors='replace'))
+            raise
+          print('Submitted URLs:',len(urls))
+          PY
