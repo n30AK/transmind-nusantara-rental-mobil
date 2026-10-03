@@ -76,6 +76,8 @@ jobs:
           assert urls, "No sitemap URLs found"
           for url in urls:
               path = url.replace("https://transmindnusantararentalmobil.co.id/","") or "index.html"
+              if path.endswith("/"):
+                  path = path + "index.html"
               p = Path(path)
               assert p.exists(), f"Sitemap URL missing local file: {path}"
               html = p.read_text(encoding="utf-8")
