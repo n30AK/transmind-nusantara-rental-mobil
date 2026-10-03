@@ -1,7 +1,9 @@
 name: TransMind Nexus SEO + AI QA
 on:
   push:
-    branches: ["nexus/aggressive-seo-ai-cs-20260924"]
+    branches: ["main"]
+  schedule:
+    - cron: "17 2 * * *"
   pull_request:
     branches: ["main"]
     paths:
@@ -55,8 +57,33 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in rental-mobil-jakarta.html rental-mobil-bekasi.html rental-mobil-bogor.html rental-mobil-depok.html rental-mobil-tangerang.html demand/index.html; do
+          for f in rental-mobil-jakarta.html rental-mobil-bekasi.html rental-mobil-bogor.html rental-mobil-depok.html rental-mobil-tangerang.html rental-mobil-lepas-kunci-jabodetabek.html rental-mobil-dengan-driver-jabodetabek.html rental-mobil-corporate-jabodetabek.html rental-mobil-wedding-jabodetabek.html rental-mobil-pariwisata-jabodetabek.html demand/index.html; do
             test -f "$f"
             grep -q 'canonical' "$f"
             grep -q 'Transmind' "$f"
           done
+
+
+      - name: Validate sitemap URLs and internal SEO graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          sitemap = Path("sitemap.xml").read_text(encoding="utf-8")
+          urls = re.findall(r"<loc>(https://transmindnusantararentalmobil\.co\.id/[^<]*)</loc>", sitemap)
+          assert urls, "No sitemap URLs found"
+          for url in urls:
+              path = url.replace("https://transmindnusantararentalmobil.co.id/","") or "index.html"
+              p = Path(path)
+              assert p.exists(), f"Sitemap URL missing local file: {path}"
+              html = p.read_text(encoding="utf-8")
+              assert 'rel="canonical"' in html, f"Missing canonical: {path}"
+              assert 'name="description"' in html, f"Missing description: {path}"
+              assert 'application/ld+json' in html, f"Missing structured data: {path}"
+          home = Path("index.html").read_text(encoding="utf-8")
+          for path in [u.replace("https://transmindnusantararentalmobil.co.id/","") for u in urls if u.endswith(".html")]:
+              assert f'href="/{path}"' in home or f'href="{path}"' in home, f"Homepage missing internal link: {path}"
+          print(f"SEO graph validated: {len(urls)} sitemap URLs")
+          PY
