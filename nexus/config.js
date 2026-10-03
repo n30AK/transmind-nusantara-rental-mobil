@@ -39,7 +39,8 @@ const NEXUS_PROTECTED_SCRIPTS = [
   './customer-care-outcome-learning.js?v=20260925-2',
   './ai-customer-care-growth-loop.js?v=20260925-3',
   './ai-customer-service-engine.js?v=20260925-2',
-  './seo-intelligence-hub.js?v=20261003-1'
+  './seo-intelligence-hub.js?v=20261003-1',
+  './seo-research-layer.js?v=20261003-1'
 ];
 
 function loadNexusScript(src){
