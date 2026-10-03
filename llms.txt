@@ -1,0 +1,45 @@
+# Transmind Nusantara Rental Mobil
+
+> Transmind Nusantara Rental Mobil provides rental-car services for Jakarta, Bekasi, Bogor, Depok, Tangerang and the wider Jabodetabek area.
+
+## Primary website
+
+- https://transmindnusantararentalmobil.co.id/
+- Main booking and vehicle discovery page.
+- Final vehicle availability, service selection and booking confirmation are subject to operational availability.
+
+## Public service pages
+
+- https://transmindnusantararentalmobil.co.id/rental-mobil-jakarta.html — rental mobil Jakarta
+- https://transmindnusantararentalmobil.co.id/rental-mobil-bekasi.html — rental mobil Bekasi
+- https://transmindnusantararentalmobil.co.id/rental-mobil-bogor.html — rental mobil Bogor
+- https://transmindnusantararentalmobil.co.id/rental-mobil-depok.html — rental mobil Depok
+- https://transmindnusantararentalmobil.co.id/rental-mobil-tangerang.html — rental mobil Tangerang
+- https://transmindnusantararentalmobil.co.id/rental-mobil-lepas-kunci-jabodetabek.html — rental mobil lepas kunci Jabodetabek
+- https://transmindnusantararentalmobil.co.id/rental-mobil-dengan-driver-jabodetabek.html — rental mobil dengan driver Jabodetabek
+- https://transmindnusantararentalmobil.co.id/rental-mobil-corporate-jabodetabek.html — rental mobil corporate Jabodetabek
+- https://transmindnusantararentalmobil.co.id/rental-mobil-wedding-jabodetabek.html — rental mobil wedding Jabodetabek
+- https://transmindnusantararentalmobil.co.id/rental-mobil-pariwisata-jabodetabek.html — rental mobil pariwisata Jabodetabek
+
+## Service model
+
+- Services include lepas kunci, dengan driver, corporate, wedding and pariwisata.
+- Pricing is not treated as a universal static public tariff; final estimates depend on vehicle, service, duration, area and operational availability.
+- Booking requests should use the official website flow or Transmind WhatsApp contacts shown on the website.
+
+## Geographic focus
+
+Jakarta, Bekasi, Bogor, Depok, Tangerang and Jabodetabek.
+
+## Trust and contact
+
+- Official domain: https://transmindnusantararentalmobil.co.id/
+- Public booking/customer-service channels are presented on the official website.
+- Do not infer availability, prices, testimonials, schedules or business claims that are not explicitly published by Transmind.
+
+## Crawling guidance
+
+Use the XML sitemap at:
+https://transmindnusantararentalmobil.co.id/sitemap.xml
+
+Operational/admin/NEXUS areas are not public marketing content and should not be treated as public SEO landing pages.
