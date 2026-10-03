@@ -39,3 +39,53 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  indexnow:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Submit sitemap URLs to IndexNow
+        shell: python
+        env:
+          INDEXNOW_KEY: "52fdd0dc084fc01a8ffd003a51cf7848"
+        run: |
+          import json
+          import urllib.request
+          import xml.etree.ElementTree as ET
+
+          host = "transmindnusantararentalmobil.co.id"
+          sitemap = "https://transmindnusantararentalmobil.co.id/sitemap.xml"
+          xml = urllib.request.urlopen(sitemap, timeout=30).read()
+          root = ET.fromstring(xml)
+          ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+          urls = [node.text.strip() for node in root.findall("sm:url/sm:loc", ns) if node.text]
+
+          if not urls:
+              raise SystemExit("No sitemap URLs found")
+
+          payload = {
+              "host": host,
+              "key": INDEXNOW_KEY,
+              "keyLocation": f"https://{host}/{INDEXNOW_KEY}.txt",
+              "urlList": urls[:10000],
+          }
+          data = json.dumps(payload).encode("utf-8")
+          req = urllib.request.Request(
+              "https://api.indexnow.org/indexnow",
+              data=data,
+              headers={"Content-Type": "application/json; charset=utf-8"},
+              method="POST",
+          )
+
+          try:
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  print(f"IndexNow HTTP {response.status}; submitted {len(urls)} URLs")
+          except urllib.error.HTTPError as exc:
+              # IndexNow can return 200/202/400 depending on validation/state.
+              # Do not fail a production deployment merely because the indexing
+              # notification is rejected or delayed.
+              print(f"IndexNow notification returned HTTP {exc.code}: {exc.read().decode(errors='replace')}")
