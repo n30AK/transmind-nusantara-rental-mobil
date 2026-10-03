@@ -109,14 +109,7 @@ jobs:
           # Audit every public URL declared in the sitemap.
           # This prevents a new/edited landing page from silently losing
           # its crawl/index signals.
-          urls = [
-              x.replace("https://transmindnusantararentalmobil.co.id", "")
-              for x in [
-                  node.text.strip()
-                  for node in ET.fromstring(sitemap).findall("sm:url/sm:loc", ns)
-                  if node.text
-              ]
-          ]
+          urls = []
 
           def get(path):
               req = urllib.request.Request(base + path, headers={"User-Agent":"Transmind-SEO-Smoke/1.0"})
@@ -129,6 +122,7 @@ jobs:
           root = ET.fromstring(sitemap)
           ns = {"sm":"http://www.sitemaps.org/schemas/sitemap/0.9"}
           sitemap_urls = [x.text.strip() for x in root.findall("sm:url/sm:loc", ns) if x.text]
+          urls = [x.replace(base, "") for x in sitemap_urls]
           if len(sitemap_urls) < 10:
               raise SystemExit(f"sitemap unexpectedly small: {len(sitemap_urls)} URLs")
           print(f"Sitemap OK: {len(sitemap_urls)} URLs")
