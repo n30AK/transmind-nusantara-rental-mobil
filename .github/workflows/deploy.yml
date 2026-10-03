@@ -91,3 +91,69 @@ jobs:
               # Do not fail a production deployment merely because the indexing
               # notification is rejected or delayed.
               print(f"IndexNow notification returned HTTP {exc.code}: {exc.read().decode(errors='replace')}")
+
+
+  seo-smoke:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Verify public SEO surface
+        shell: python
+        run: |
+          import re
+          import urllib.request
+          import xml.etree.ElementTree as ET
+
+          base = "https://transmindnusantararentalmobil.co.id"
+          urls = [
+              "/",
+              "/rental-mobil-jakarta.html",
+              "/rental-mobil-bekasi.html",
+              "/rental-mobil-bogor.html",
+              "/rental-mobil-depok.html",
+              "/rental-mobil-tangerang.html",
+              "/rental-mobil-lepas-kunci-jabodetabek.html",
+              "/rental-mobil-dengan-driver-jabodetabek.html",
+              "/rental-mobil-corporate-jabodetabek.html",
+              "/rental-mobil-wedding-jabodetabek.html",
+              "/rental-mobil-pariwisata-jabodetabek.html",
+          ]
+
+          def get(path):
+              req = urllib.request.Request(base + path, headers={"User-Agent":"Transmind-SEO-Smoke/1.0"})
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return r.status, r.read().decode("utf-8", errors="replace")
+
+          status, sitemap = get("/sitemap.xml")
+          if status != 200:
+              raise SystemExit(f"sitemap HTTP {status}")
+          root = ET.fromstring(sitemap)
+          ns = {"sm":"http://www.sitemaps.org/schemas/sitemap/0.9"}
+          sitemap_urls = [x.text.strip() for x in root.findall("sm:url/sm:loc", ns) if x.text]
+          if len(sitemap_urls) < 10:
+              raise SystemExit(f"sitemap unexpectedly small: {len(sitemap_urls)} URLs")
+          print(f"Sitemap OK: {len(sitemap_urls)} URLs")
+
+          status, robots = get("/robots.txt")
+          if status != 200 or "Sitemap:" not in robots:
+              raise SystemExit("robots.txt missing Sitemap directive")
+          print("Robots OK")
+
+          for path in urls:
+              status, html = get(path)
+              if status != 200:
+                  raise SystemExit(f"{path}: HTTP {status}")
+              if "<title>" not in html.lower():
+                  raise SystemExit(f"{path}: missing title")
+              if 'rel="canonical"' not in html.lower():
+                  raise SystemExit(f"{path}: missing canonical")
+              if "application/ld+json" not in html.lower():
+                  raise SystemExit(f"{path}: missing JSON-LD")
+              print(f"SEO OK: {path}")
+
+          key_path = "/52fdd0dc084fc01a8ffd003a51cf7848.txt"
+          status, key_body = get(key_path)
+          if status != 200 or "52fdd0dc084fc01a8ffd003a51cf7848" not in key_body:
+              raise SystemExit("IndexNow key verification failed")
+          print("IndexNow key OK")
