@@ -54,9 +54,11 @@ jobs:
           INDEXNOW_KEY: "52fdd0dc084fc01a8ffd003a51cf7848"
         run: |
           import json
+          import os
           import urllib.request
           import xml.etree.ElementTree as ET
 
+          INDEXNOW_KEY = os.environ["INDEXNOW_KEY"]
           host = "transmindnusantararentalmobil.co.id"
           sitemap = "https://transmindnusantararentalmobil.co.id/sitemap.xml"
           xml = urllib.request.urlopen(sitemap, timeout=30).read()
