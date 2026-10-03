@@ -6,9 +6,6 @@
 
 - https://transmindnusantararentalmobil.co.id/
 - https://transmindnusantararentalmobil.co.id/rental-mobil-jabodetabek.html — cornerstone area page
-- https://transmindnusantararentalmobil.co.id/demand/ — demand/booking request flow
-- Main booking and vehicle discovery page.
-- Final vehicle availability, service selection and booking confirmation are subject to operational availability.
 
 ## Public service pages
 
@@ -25,9 +22,9 @@
 
 ## Public guide / topical authority pages
 
-- https://transmindnusantararentalmobil.co.id/panduan-rental-mobil-jakarta.html — how to choose and prepare a rental mobil Jakarta booking
-- https://transmindnusantararentalmobil.co.id/panduan-rental-mobil-lepas-kunci.html — guide to rental mobil lepas kunci
-- https://transmindnusantararentalmobil.co.id/panduan-rental-mobil-dengan-driver.html — guide to rental mobil dengan driver
+- https://transmindnusantararentalmobil.co.id/panduan-rental-mobil-jakarta.html
+- https://transmindnusantararentalmobil.co.id/panduan-rental-mobil-lepas-kunci.html
+- https://transmindnusantararentalmobil.co.id/panduan-rental-mobil-dengan-driver.html
 
 ## Service model
 
@@ -50,4 +47,4 @@ Jakarta, Bekasi, Bogor, Depok, Tangerang and Jabodetabek.
 Use the XML sitemap at:
 https://transmindnusantararentalmobil.co.id/sitemap.xml
 
-Operational/admin/NEXUS areas are not public marketing content and should not be treated as public SEO landing pages.
+The /demand/ booking-request entry point is intentionally noindex and is not a canonical SEO landing page. Operational /admin/ and /nexus/ areas are internal application surfaces and are not public marketing content.
