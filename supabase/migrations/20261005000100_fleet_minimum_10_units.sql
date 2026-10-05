@@ -2,6 +2,22 @@
 -- Safe/idempotent migration. It does not invent license plates.
 begin;
 
+create or replace function public.log_vehicle_change()
+returns trigger language plpgsql security definer set search_path = public
+as $
+declare v_vehicle_id uuid; v_entity_id uuid;
+begin
+  if TG_TABLE_NAME='vehicles' then
+    if TG_OP='DELETE' then v_vehicle_id:=OLD.id; v_entity_id:=OLD.id; else v_vehicle_id:=NEW.id; v_entity_id:=NEW.id; end if;
+  else
+    if TG_OP='DELETE' then v_vehicle_id:=OLD.vehicle_id; v_entity_id:=OLD.id; else v_vehicle_id:=NEW.vehicle_id; v_entity_id:=NEW.id; end if;
+  end if;
+  insert into public.vehicle_change_history(vehicle_id,entity_type,entity_id,action,before_data,after_data,actor_user_id)
+  values(v_vehicle_id,TG_TABLE_NAME,v_entity_id,TG_OP,to_jsonb(OLD),to_jsonb(NEW),auth.uid());
+  return coalesce(NEW,OLD);
+end;
+$;
+
 alter table if exists public.vehicles
   add column if not exists total_units integer not null default 10;
 
@@ -50,7 +66,7 @@ begin
       insert into public.vehicle_units (vehicle_id, unit_code, status, notes)
       select new.id,
              upper(base_code || '-' || lpad(n::text, 3, '0')),
-             'AVAILABLE',
+             'Tersedia',
              'Auto-provisioned by fleet inventory baseline'
       where not exists (
         select 1 from public.vehicle_units u
