@@ -18,7 +18,7 @@
 
   function status(box){
     const s=document.querySelector('#fleetStatus');
-    if(s&&box)s.textContent='Menampilkan '+box.querySelectorAll('.car').length+' unit armada.';
+    if(s&&box)s.textContent='Menampilkan '+box.querySelectorAll('.car').length+' jenis armada. Jumlah unit dikelola real-time di NEXUS.';
   }
 
   function render(sb,rows){
@@ -55,6 +55,10 @@
         p.textContent=v.capacity;
         info.appendChild(p);
       }
+      const count=document.createElement('p');
+      count.className='fleet-unit-count';
+      count.textContent=(Number(v.total_units)||10)+' unit armada';
+      info.appendChild(count);
       const btn=document.createElement('button');
       btn.type='button';
       btn.className='btn gold';
@@ -68,7 +72,7 @@
     });
 
     status(box);
-    console.log('TRANSMIND FLEET: Supabase vehicles + Storage',box.querySelectorAll('.car').length,'/ 24');
+    console.log('TRANSMIND FLEET: vehicle types + unit inventory',box.querySelectorAll('.car').length,'types');
     return true;
   }
 
@@ -78,7 +82,7 @@
     if(!box||!sb)return;
     try{
       const r=await sb.from('vehicles')
-        .select('id,name,category,capacity,active,image_path,sort_order')
+        .select('id,name,category,capacity,total_units,active,image_path,sort_order')
         .eq('active',true)
         .not('image_path','is',null)
         .order('sort_order',{ascending:true,nullsFirst:false})
