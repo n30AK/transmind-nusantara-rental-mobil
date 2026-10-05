@@ -1614,3 +1614,7 @@ footer{background:#05080c;border-top-color:rgba(255,255,255,.07)}
 #tm-ai-input{background:#0b1118!important;border-color:rgba(255,255,255,.10)!important}#tm-ai-send{background:linear-gradient(135deg,#1677ff,#39c6ff)!important;color:#041019!important}
 @media(max-width:700px){.hero{min-height:700px}.hero-in{min-height:700px}.hero-content h1{font-size:48px;letter-spacing:-2.4px}.hero-logo{width:180px}.booking{padding:10px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+
+
+/* Fleet capacity badge */
+.fleet-unit-count{font-weight:700;margin:.45rem 0 .8rem;opacity:.9}
