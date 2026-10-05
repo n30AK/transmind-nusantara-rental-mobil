@@ -72,14 +72,25 @@ for each row
 execute function public.sync_vehicle_unit_inventory();
 
 -- Backfill physical unit records for every existing vehicle type.
-do $$
-declare
-  v record;
-begin
-  for v in select id from public.vehicles loop
-    perform public.sync_vehicle_unit_inventory(v);
-  end loop;
-end $$;
+insert into public.vehicle_units (vehicle_id, unit_code, status, notes)
+select
+  v.id,
+  upper(trim(both '-' from lower(regexp_replace(coalesce(nullif(v.slug,''), v.name, 'vehicle'), '[^a-zA-Z0-9]+', '-', 'g')))
+    || '-' || lpad(gs.n::text, 3, '0')),
+  'AVAILABLE',
+  'Auto-provisioned by fleet inventory baseline'
+from public.vehicles v
+cross join lateral generate_series(
+  (select count(*)::integer from public.vehicle_units u where u.vehicle_id = v.id) + 1,
+  greatest(coalesce(v.total_units, 10), 10)
+) gs(n)
+where not exists (
+  select 1
+  from public.vehicle_units u
+  where u.vehicle_id = v.id
+    and u.unit_code = upper(trim(both '-' from lower(regexp_replace(coalesce(nullif(v.slug,''), v.name, 'vehicle'), '[^a-zA-Z0-9]+', '-', 'g')))
+      || '-' || lpad(gs.n::text, 3, '0'))
+);
 
 create index if not exists idx_vehicle_units_vehicle_status
   on public.vehicle_units(vehicle_id, status);
