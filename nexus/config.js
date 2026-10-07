@@ -1,6 +1,6 @@
 const TRANSMIND_NEXUS_KEY = ['sb_publishable_', 'MycpkacWOWLwO2gXclp2Cw_ApWaeeAw'].join('');
 window.NEXUS_CONFIG = {
-  supabaseUrl: "https://ynigwuutmqpnfnkhlaip.supabase.co",
+  supabaseUrl: "https://unbysxbtzuncifugiqql.supabase.co",
   supabaseAnonKey: TRANSMIND_NEXUS_KEY
 };
 
