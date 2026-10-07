@@ -122,3 +122,39 @@ jobs:
 
           print(f"SEO graph validated: {len(urls)} sitemap URLs; {len(inbound)} indexed pages checked for inbound links")
           PY
+
+      - name: Validate live public SEO endpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://transmindnusantararentalmobil.co.id"
+          for path in "/" "/robots.txt" "/sitemap.xml" "/rental-mobil-jakarta.html" "/rental-mobil-pariwisata-jabodetabek.html"; do
+            code="$(curl -L -sS -o /tmp/tm-seo-body -w "%{http_code}" "$base$path")"
+            test "$code" = "200" || { echo "Public endpoint failed: $path -> $code"; exit 1; }
+          done
+          curl -L -sS "$base/robots.txt" | grep -q "Sitemap: $base/sitemap.xml"
+          curl -L -sS "$base/sitemap.xml" | grep -q "$base/"
+          echo "Live public SEO endpoints are reachable."
+
+      - name: Validate SEO metadata quality
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          pages=[Path("index.html"), *Path(".").glob("rental-mobil-*.html"), *Path(".").glob("panduan-*.html")]
+          for p in pages:
+              html=p.read_text(encoding="utf-8")
+              title=re.search(r"<title>(.*?)</title>",html,re.S|re.I)
+              desc=re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']+)["\']',html,re.I)
+              canonical=re.search(r'<link[^>]+rel=["\']canonical["\'][^>]+href=["\']([^"\']+)["\']',html,re.I)
+              assert title and title.group(1).strip(), f"Missing title: {p}"
+              assert 20 <= len(title.group(1).strip()) <= 70, f"Title length out of range: {p}"
+              assert desc and 80 <= len(desc.group(1).strip()) <= 180, f"Description length out of range: {p}"
+              assert canonical and canonical.group(1).startswith("https://transmindnusantararentalmobil.co.id/"), f"Bad canonical: {p}"
+              assert "priceRange" not in html or '"$"' not in html, f"Unverified priceRange found: {p}"
+          print(f"SEO metadata quality validated for {len(pages)} pages.")
+          PY
+
