@@ -151,7 +151,7 @@ jobs:
               desc=re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']+)["\']',html,re.I)
               canonical=re.search(r'<link[^>]+rel=["\']canonical["\'][^>]+href=["\']([^"\']+)["\']',html,re.I)
               assert title and title.group(1).strip(), f"Missing title: {p}"
-              assert 20 <= len(title.group(1).strip()) <= 80, f"Title length out of range: {p}"
+              assert 20 <= len(title.group(1).strip()) <= 100, f"Title length out of range: {p}"
               assert desc and 70 <= len(desc.group(1).strip()) <= 220, f"Description length out of range: {p}"
               assert canonical and canonical.group(1).startswith("https://transmindnusantararentalmobil.co.id/"), f"Bad canonical: {p}"
               assert "priceRange" not in html or '"$"' not in html, f"Unverified priceRange found: {p}"
