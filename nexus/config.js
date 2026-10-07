@@ -1,6 +1,6 @@
 const TRANSMIND_NEXUS_KEY = ['sb_publishable_', 'MycpkacWOWLwO2gXclp2Cw_ApWaeeAw'].join('');
 window.NEXUS_CONFIG = {
-  supabaseUrl: "https://unbysxbtzuncifugiqql.supabase.co",
+  supabaseUrl: "https://ynigwuutmqpnfnkhlaip.supabase.co",
   supabaseAnonKey: TRANSMIND_NEXUS_KEY
 };
 
@@ -45,78 +45,12 @@ const NEXUS_PROTECTED_SCRIPTS = [
 
 function loadNexusScript(src){
   if(document.querySelector('script[data-nexus-src="'+src.replace(/"/g,'&quot;')+'"]')) return;
-  const s=document.createElement('script');
-  s.src=src;
-  s.dataset.nexusSrc=src;
-  s.defer=true;
-  document.head.appendChild(s);
+  const s=document.createElement('script'); s.src=src; s.dataset.nexusSrc=src; s.defer=true; document.head.appendChild(s);
 }
-
-function loadNexusProtectedModules(){
-  if(window.__NEXUS_PROTECTED_MODULES_LOADED) return;
-  window.__NEXUS_PROTECTED_MODULES_LOADED=true;
-  NEXUS_PROTECTED_SCRIPTS.forEach(loadNexusScript);
-}
-
-function loadAuthRecovery(){
-  loadNexusScript('./auth-recovery.js?v=4');
-}
-
-if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',loadAuthRecovery,{once:true});
-}else{
-  loadAuthRecovery();
-}
+function loadNexusProtectedModules(){if(window.__NEXUS_PROTECTED_MODULES_LOADED)return;window.__NEXUS_PROTECTED_MODULES_LOADED=true;NEXUS_PROTECTED_SCRIPTS.forEach(loadNexusScript)}
+function loadAuthRecovery(){loadNexusScript('./auth-recovery.js?v=4')}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadAuthRecovery,{once:true});else loadAuthRecovery();
 window.addEventListener('nexus:authenticated',loadNexusProtectedModules,{once:true});
-
-function nexusAccessValue(data){
-  const row = Array.isArray(data) ? (data[0] || {}) : (data || {});
-  if (typeof row === 'boolean') return row;
-  if (typeof row === 'string') return row;
-  if (row && typeof row === 'object') {
-    if (typeof row.allowed === 'boolean') return row.allowed;
-    if (typeof row.has_access === 'boolean') return row.has_access;
-    if (typeof row.access === 'boolean') return row.access;
-    if (typeof row.authorized === 'boolean') return row.authorized;
-    if (typeof row.can_access === 'boolean') return row.can_access;
-    if (Array.isArray(row.permissions)) return row.permissions;
-    if (typeof row.permission_code === 'string') return [row.permission_code];
-    if (typeof row.role_code === 'string') return row.role_code;
-    if (typeof row.role === 'string') return row.role;
-  }
-  return data;
-}
-
-function nexusHasDashboardAccess(data){
-  const v=nexusAccessValue(data);
-  if(v===true) return true;
-  if(Array.isArray(v)) return v.some(x=>String(x).toLowerCase()==='dashboard.view');
-  if(typeof v==='string') return v.length>0;
-  return false;
-}
-
-window.getTransmindSupabaseClient = function(){
-  if (window.transmindSupabase) return window.transmindSupabase;
-  if (!window.NEXUS_CONFIG?.supabaseUrl || !window.NEXUS_CONFIG?.supabaseAnonKey || !window.supabase) return null;
-  const raw = window.supabase.createClient(window.NEXUS_CONFIG.supabaseUrl, window.NEXUS_CONFIG.supabaseAnonKey, {
-    auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true }
-  });
-  const originalRpc = raw.rpc.bind(raw);
-  raw.rpc = async function(name,args){
-    const result = await originalRpc(name,args);
-    if(name==='current_role_code' && result.error){
-      const fallback = await originalRpc('nexus_my_access');
-      if(!fallback.error){
-        const value=nexusAccessValue(fallback.data);
-        return {data:Array.isArray(value)?null:(typeof value==='string'?value:(value?.role_code||value?.role||null)),error:null};
-      }
-    }
-    if(name==='has_permission' && (result.error || result.data!==true) && args?.p_permission_code==='dashboard.view'){
-      const fallback = await originalRpc('nexus_my_access');
-      if(!fallback.error && nexusHasDashboardAccess(fallback.data)) return {data:true,error:null};
-    }
-    return result;
-  };
-  window.transmindSupabase=raw;
-  return raw;
-};
+function nexusAccessValue(data){const row=Array.isArray(data)?(data[0]||{}):(data||{});if(typeof row==='boolean')return row;if(typeof row==='string')return row;if(row&&typeof row==='object'){if(typeof row.allowed==='boolean')return row.allowed;if(typeof row.has_access==='boolean')return row.has_access;if(typeof row.access==='boolean')return row.access;if(typeof row.authorized==='boolean')return row.authorized;if(typeof row.can_access==='boolean')return row.can_access;if(Array.isArray(row.permissions))return row.permissions;if(typeof row.permission_code==='string')return[row.permission_code];if(typeof row.role_code==='string')return row.role_code;if(typeof row.role==='string')return row.role}return data}
+function nexusHasDashboardAccess(data){const v=nexusAccessValue(data);if(v===true)return true;if(Array.isArray(v))return v.some(x=>String(x).toLowerCase()==='dashboard.view');if(typeof v==='string')return v.length>0;return false}
+window.getTransmindSupabaseClient=function(){if(window.transmindSupabase)return window.transmindSupabase;if(!window.NEXUS_CONFIG?.supabaseUrl||!window.NEXUS_CONFIG?.supabaseAnonKey||!window.supabase)return null;const raw=window.supabase.createClient(window.NEXUS_CONFIG.supabaseUrl,window.NEXUS_CONFIG.supabaseAnonKey,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});const originalRpc=raw.rpc.bind(raw);raw.rpc=async function(name,args){const result=await originalRpc(name,args);if(name==='current_role_code'&&result.error){const fallback=await originalRpc('nexus_my_access');if(!fallback.error){const value=nexusAccessValue(fallback.data);return{data:Array.isArray(value)?null:(typeof value==='string'?value:(value?.role_code||value?.role||null)),error:null}}}if(name==='has_permission'&&(result.error||result.data!==true)&&args?.p_permission_code==='dashboard.view'){const fallback=await originalRpc('nexus_my_access');if(!fallback.error&&nexusHasDashboardAccess(fallback.data))return{data:true,error:null}}return result};window.transmindSupabase=raw;return raw};
