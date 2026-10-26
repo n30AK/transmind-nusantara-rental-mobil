@@ -26,7 +26,7 @@
   function buildEmpatheticComplaintReply(message) {
     const text = String(message || '').trim();
     const triage = classifyCustomerDissatisfaction(text);
-    if (!triage.complaint) return null;
+    if (!triage.complaint && !triage.urgent) return null;
     if (triage.urgent) {
       return 'Saya turut prihatin mendengar situasi ini. Keselamatan Anda yang utama. Jika ada bahaya langsung atau seseorang terluka, segera hubungi layanan darurat setempat dan pindah ke tempat aman bila memungkinkan. Jangan menunggu balasan chat ini. Saya akan menandai kasus ini untuk segera ditinjau oleh tim Transmind. Setelah aman, beri tahu kami secara singkat apa yang terjadi—hindari mengirim data identitas atau pembayaran yang sensitif.';
     }
