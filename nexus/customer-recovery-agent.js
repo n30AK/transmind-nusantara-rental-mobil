@@ -14,8 +14,8 @@
     const complaint = complaintPattern.test(text);
     return {
       complaint,
-      urgent: complaint && urgentPattern.test(text),
-      humanReviewRequired: complaint || humanPattern.test(text),
+      urgent: urgentPattern.test(text),
+      humanReviewRequired: complaint || urgentPattern.test(text) || humanPattern.test(text),
       category: urgentPattern.test(text) ? 'safety' :
         /(refund|pengembalian dana|kompensasi|pembayaran|payment)/i.test(text) ? 'payment_or_refund' :
         /(terlambat|telat|menunggu|late|delay)/i.test(text) ? 'delay' :
@@ -26,7 +26,7 @@
   function buildEmpatheticComplaintReply(message) {
     const text = String(message || '').trim();
     const triage = classifyCustomerDissatisfaction(text);
-    if (!triage.complaint) return null;
+    if (!triage.complaint && !triage.urgent) return null;
     if (triage.urgent) {
       return 'Saya turut prihatin mendengar situasi ini. Keselamatan Anda yang utama. Jika ada bahaya langsung atau seseorang terluka, segera hubungi layanan darurat setempat dan pindah ke tempat aman bila memungkinkan. Jangan menunggu balasan chat ini. Saya akan menandai kasus ini untuk segera ditinjau oleh tim Transmind. Setelah aman, beri tahu kami secara singkat apa yang terjadi—hindari mengirim data identitas atau pembayaran yang sensitif.';
     }

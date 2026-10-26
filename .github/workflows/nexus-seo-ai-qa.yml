@@ -54,6 +54,15 @@ jobs:
           set -euo pipefail
           for f in nexus/*.js ai-companion-customer-care.js ai-live-travel.js app.js conversion-bridge.js attribution.js whatsapp-identity-bridge.js; do node --check "$f"; done
 
+      - name: Test customer recovery policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/customer-recovery-agent.test.mjs
+          grep -q 'classifyDissatisfaction' supabase/functions/transmind-ai/index.ts
+          grep -q 'AI_CUSTOMER_COMPLAINT' supabase/functions/transmind-ai/index.ts
+          grep -q 'customer_recovery' supabase/functions/transmind-ai/index.ts
+
       - name: Validate local SEO pages
         shell: bash
         run: |
