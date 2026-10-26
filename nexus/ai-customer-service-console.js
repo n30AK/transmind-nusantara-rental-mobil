@@ -57,7 +57,7 @@ function addMsg(text,who){const box=document.getElementById('acs-messages');cons
 async function sendChat(){
  const input=document.getElementById('acs-chat-input'),msg=document.getElementById('acs-chat-msg'),v=input.value.trim();if(!v)return;
  addMsg(v,'user');input.value='';msg.textContent='AI sedang membantu…';
- try{const r=await callAI(v,{});addMsg(r.answer||'Saya perlu meneruskan ini kepada admin Transmind.', 'ai');msg.textContent=r.human_required?'Perlu keputusan admin — konteks sudah disiapkan.':(r.lead?.captured?'Lead tertangkap dan follow-up dibuat.':'Percakapan tercatat.')}catch(e){addMsg('Maaf, saya sedang mengalami kendala. Admin Transmind dapat melanjutkan percakapan ini.','ai');msg.textContent=e.message}
+ try{const r=await callAI(v,{});addMsg(r.answer||'Saya perlu meneruskan ini kepada admin Transmind.', 'ai');msg.textContent=r.customer_recovery?.required?(r.customer_recovery.urgent?'PRIORITAS KESELAMATAN — keluhan masuk antrean tinjauan manusia.':'Keluhan masuk antrean tinjauan manusia; tidak ada janji refund/kompensasi otomatis.'):r.human_required?'Perlu keputusan admin — konteks sudah disiapkan.':(r.lead?.captured?'Lead tertangkap dan follow-up dibuat.':'Percakapan tercatat.')}catch(e){addMsg('Maaf, saya sedang mengalami kendala. Admin Transmind dapat melanjutkan percakapan ini.','ai');msg.textContent=e.message}
 }
 async function submitLead(e){
  e.preventDefault();const msg=document.getElementById('acs-form-msg');msg.textContent='Menyimpan dan meminta AI menyiapkan langkah berikutnya…';
