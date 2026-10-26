@@ -14,8 +14,8 @@
     const complaint = complaintPattern.test(text);
     return {
       complaint,
-      urgent: complaint && urgentPattern.test(text),
-      humanReviewRequired: complaint || humanPattern.test(text),
+      urgent: urgentPattern.test(text),
+      humanReviewRequired: complaint || urgentPattern.test(text) || humanPattern.test(text),
       category: urgentPattern.test(text) ? 'safety' :
         /(refund|pengembalian dana|kompensasi|pembayaran|payment)/i.test(text) ? 'payment_or_refund' :
         /(terlambat|telat|menunggu|late|delay)/i.test(text) ? 'delay' :
