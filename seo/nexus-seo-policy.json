@@ -1,0 +1,46 @@
+{
+  "name": "NEXUS_AGGRESSIVE_GROWTH_ENGINE",
+  "mode": "AGGRESSIVE_COMPLIANT",
+  "production_mutation": "GATED",
+  "hard_block": [
+    "cloaking",
+    "hidden_text",
+    "hidden_links",
+    "keyword_stuffing",
+    "doorway_pages",
+    "fake_reviews",
+    "fake_locations",
+    "fake_affiliations",
+    "link_spam",
+    "pbn_link_scheme",
+    "scraped_thin_content",
+    "scaled_thin_content",
+    "misleading_structured_data",
+    "deceptive_redirects"
+  ],
+  "opportunity_classes": [
+    "STRIKE_ZONE",
+    "CONTENT_GAP",
+    "LOCAL_INTENT",
+    "CONVERSION_BRIDGE",
+    "TECHNICAL",
+    "REFRESH"
+  ],
+  "required_evidence": [
+    "search_console_or_first_party_signal",
+    "page_inventory",
+    "intent_alignment",
+    "content_differentiation",
+    "safety_check"
+  ],
+  "required_measurement": [
+    "impressions",
+    "clicks",
+    "ctr",
+    "average_position",
+    "page_views",
+    "booking_or_lead_events"
+  ],
+  "scale_policy": "OBSERVE_THEN_SCALE",
+  "rollback_required": true
+}
